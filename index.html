@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Profile Checker</title>
+  <title>Roblox Profile Checker - VedatDev</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     body {
       font-family: 'Press Start 2P', monospace;
-      background-color: #0d1117;
-      color: #ffffff;
+      /* Set the pixel-art landscape as the fixed background */
+      background-image: url('https://i.imgur.com/8QO9n5K.png'); /* A detailed pixel landscape image */
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,57 +25,102 @@
     }
 
     .card {
-      background: #161b22;
+      background: rgba(22, 27, 34, 0.9); /* Translucent dark background */
       padding: 24px;
       width: 100%;
       max-width: 450px;
       text-align: center;
-      border: 4px solid #30363d;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      border: 6px solid #161b22; /* Thick, dark border */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      position: relative; /* For corner detail positioning */
     }
 
+    /* Top and bottom dark bar details */
+    .card::before, .card::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background-color: #161b22;
+    }
+    .card::before { top: 12px; }
+    .card::after { bottom: 12px; }
+
     h2 {
-      font-size: 14px;
+      font-size: 16px;
       color: #58a6ff;
-      margin-bottom: 20px;
+      margin-top: 25px;
+      margin-bottom: 25px;
+      text-shadow: 2px 2px 0px #000;
     }
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 2px solid #30363d;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 4px solid #30363d;
       background: #0d1117;
       color: #fff;
       font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
+      font-size: 11px;
       box-sizing: border-box;
+      outline: none;
+    }
+
+    /* Keyframe animation for the button glow */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgba(58, 206, 114, 0.5); }
+      50% { box-shadow: 0 0 25px rgba(58, 206, 114, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(58, 206, 114, 0.5); }
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      border: none;
+      padding: 16px;
+      margin-top: 10px;
+      border: 4px solid #000;
       background: #238636;
       color: white;
       font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
+      font-size: 12px;
       cursor: pointer;
+      text-shadow: 1px 1px #000;
+      transition: background 0.2s, transform 0.1s;
+      
+      /* Apply the animation to the button */
+      animation: pulse 2.5s infinite;
+    }
+
+    button:hover {
+      background: #2ea043;
+    }
+
+    button:active {
+      transform: translateY(3px); /* Press down effect */
     }
 
     .results {
-      margin-top: 20px;
+      margin-top: 25px;
       text-align: left;
-      font-size: 9px;
-      line-height: 1.8;
-      background: #0d1117;
+      font-size: 10px;
+      line-height: 2;
+      background: rgba(13, 17, 23, 0.8);
       padding: 16px;
-      border: 2px solid #30363d;
+      border: 4px solid #30363d;
       display: none;
     }
 
     .results span {
       color: #58a6ff;
+      word-break: break-all;
+    }
+    
+    .loading {
+      color: #c9d1d9;
+      font-size: 10px;
+      margin-top: 15px;
+      display: none;
     }
   </style>
 </head>
@@ -81,7 +130,7 @@
     <h2>ROBLOX PROFILE CHECKER</h2>
     <input type="text" id="usernameInput" placeholder="Enter Username...">
     <button onclick="checkProfile()">SEARCH PROFILE</button>
-
+    <div id="loadingStatus" class="loading">CONNECTING TO API...</div>
     <div id="resultsBox" class="results"></div>
   </div>
 
@@ -89,18 +138,23 @@
     async function checkProfile() {
       const username = document.getElementById('usernameInput').value.trim();
       const resultsBox = document.getElementById('resultsBox');
+      const loadingStatus = document.getElementById('loadingStatus');
 
       if (!username) {
-        alert("Please enter a Roblox username!");
+        alert("PLEASE ENTER A ROBLOX USERNAME!");
         return;
       }
 
-      resultsBox.style.display = "block";
-      resultsBox.innerHTML = "Fetching profile data...";
+      // Hide previous results and show loading
+      resultsBox.style.display = "none";
+      loadingStatus.style.display = "block";
+      loadingStatus.innerHTML = "FETCHING USER ID AND DETAILS...";
 
       try {
-        // 1. Get User ID & Join Date
+        // We must use a CORS proxy to query Roblox APIs from a browser
         const proxy = "https://corsproxy.io/?";
+
+        // 1. Resolve Username to User ID
         const userReq = await fetch(proxy + encodeURIComponent("https://users.roblox.com/v1/usernames/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -109,38 +163,53 @@
         const userData = await userReq.json();
 
         if (!userData.data || userData.data.length === 0) {
-          resultsBox.innerHTML = "<span style='color:#f85149'>User not found.</span>";
-          return;
+          throw new Error("USER NOT FOUND.");
         }
 
         const userId = userData.data[0].id;
         const displayName = userData.data[0].displayName;
 
-        // 2. Fetch Detailed Info (Creation Date)
+        // 2. Get Account Details (Creation Date)
+        loadingStatus.innerHTML = `FETCHING PROFILE INFO FOR ${userId}...`;
         const detailsReq = await fetch(proxy + encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`));
         const detailsData = await detailsReq.json();
-        const createdDate = new Date(detailsData.created).toLocaleDateString();
+        
+        // Convert creation timestamp to a readable date
+        const createdDateObj = new Date(detailsData.created);
+        const createdDate = createdDateObj.toLocaleDateString();
 
-        // 3. Fetch Presence (Last Online)
+        // 3. Get Presence Status (Last Online)
         const presenceReq = await fetch(proxy + encodeURIComponent("https://presence.roblox.com/v1/presence/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userIds: [userId] })
         });
         const presenceData = await presenceReq.json();
-        const lastOnline = presenceData.userPresences[0]?.lastOnline ? new Date(presenceData.userPresences[0].lastOnline).toLocaleString() : "Hidden/Private";
+        
+        const lastOnlineTimestamp = presenceData.userPresences[0]?.lastOnline;
+        let lastOnlineStr = "HIDDEN/PRIVATE";
+        
+        if (lastOnlineTimestamp) {
+            const lastOnlineDateObj = new Date(lastOnlineTimestamp);
+            lastOnlineStr = lastOnlineDateObj.toLocaleDateString() + " " + lastOnlineDateObj.toLocaleTimeString();
+        }
 
-        // Display results
+        // Hide loading and Display results
+        loadingStatus.style.display = "none";
+        resultsBox.style.display = "block";
         resultsBox.innerHTML = `
-          <strong>Username:</strong> <span>${userData.data[0].name}</span><br>
-          <strong>Display Name:</strong> <span>${displayName}</span><br>
-          <strong>User ID:</strong> <span>${userId}</span><br>
-          <strong>Account Created:</strong> <span>${createdDate}</span><br>
-          <strong>Last Online:</strong> <span>${lastOnline}</span><br>
-          <strong>Inventory RAP:</strong> <span>Requires Rolimons API integration or public inventory permissions</span>
+          <strong>USERNAME:</strong> <span>${userData.data[0].name}</span><br>
+          <strong>DISPLAY NAME:</strong> <span>${displayName}</span><br>
+          <strong>USER ID:</strong> <span>${userId}</span><br>
+          <strong>ACCOUNT CREATED:</strong> <span>${createdDate}</span><br>
+          <strong>LAST ONLINE:</strong> <span>${lastOnlineStr}</span><br>
+          <strong>TOTAL RAP:</strong> <span>AVAILABLE WHEN INVENTORY SET TO PUBLIC</span>
         `;
+
       } catch (err) {
-        resultsBox.innerHTML = "<span style='color:#f85149'>Error fetching data. Try again later.</span>";
+        loadingStatus.style.display = "none";
+        resultsBox.style.display = "block";
+        resultsBox.innerHTML = `<span style='color:#f85149'>ERROR: ${err.message}</span>`;
       }
     }
   </script>
