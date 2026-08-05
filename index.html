@@ -166,6 +166,68 @@
       color: #f1e05a;
       text-shadow: 1px 1px 0 #000;
     }
+
+    /* Item List Styling */
+    .item-list-container {
+      margin-top: 10px;
+      border-top: 2px dashed #30363d;
+      padding-top: 8px;
+    }
+
+    .item-list-title {
+      color: #58a6ff;
+      font-size: 7px;
+      margin-bottom: 6px;
+      display: block;
+      text-transform: uppercase;
+    }
+
+    .item-scroll-box {
+      max-height: 120px;
+      overflow-y: auto;
+      background: #161b22;
+      border: 2px solid #000;
+      padding: 6px;
+    }
+
+    /* Custom Scrollbar */
+    .item-scroll-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .item-scroll-box::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+    .item-scroll-box::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border: 1px solid #000;
+    }
+
+    .item-entry {
+      font-size: 7px;
+      line-height: 1.6;
+      padding: 4px 0;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .item-entry:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      color: #c9d1d9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    .item-rap {
+      color: #3fb950;
+      flex-shrink: 0;
+    }
     
     .loading {
       color: #c9d1d9;
@@ -319,6 +381,7 @@
         let totalRAP = 0;
         let limitedCount = 0;
         let rapStatusMessage = "";
+        let collectedItems = [];
 
         try {
           let cursor = "";
@@ -337,8 +400,13 @@
 
             if (invData.data && invData.data.length > 0) {
               invData.data.forEach(item => {
-                totalRAP += item.recentAveragePrice || 0;
+                const rapVal = item.recentAveragePrice || 0;
+                totalRAP += rapVal;
                 limitedCount++;
+                collectedItems.push({
+                  name: item.name || "Unknown Item",
+                  rap: rapVal
+                });
               });
             }
 
@@ -356,6 +424,24 @@
           rapStatusMessage = "UNABLE TO FETCH";
         }
 
+        // Render Item List HTML
+        let itemsListHtml = "";
+        if (collectedItems.length > 0) {
+          itemsListHtml = `
+            <div class="item-list-container">
+              <span class="item-list-title">RAP ITEM LIST:</span>
+              <div class="item-scroll-box">
+                ${collectedItems.map(item => `
+                  <div class="item-entry">
+                    <span class="item-name" title="${item.name}">${item.name}</span>
+                    <span class="item-rap">${item.rap.toLocaleString()} R$</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
         loadingStatus.style.display = "none";
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `
@@ -369,6 +455,7 @@
           <strong>JOINED:</strong> <span>${createdDate}</span><br>
           <strong>ACCOUNT AGE:</strong> <span>${accountAgeDays} DAYS</span><br>
           <strong>EST. RAP:</strong> <span class="rap-text">${rapStatusMessage}</span><br>
+          ${itemsListHtml}
           <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">VIEW PROFILE</a>
         `;
 
