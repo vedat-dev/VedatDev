@@ -9,12 +9,8 @@
 
     body {
       font-family: 'Press Start 2P', monospace;
-      background-color: #1e252f;
-      background-image: 
-        radial-gradient(#2d3644 35%, transparent 36%),
-        radial-gradient(#151921 35%, transparent 36%);
-      background-size: 20px 20px;
-      background-position: 0 0, 10px 10px;
+      background-color: #1a1e29;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -22,10 +18,21 @@
       margin: 0;
       padding: 15px;
       box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    /* Animated Canvas Background */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
     }
 
     .card {
-      background: #161b22;
+      background: rgba(22, 27, 34, 0.95);
       padding: 18px;
       width: 100%;
       max-width: 360px;
@@ -34,7 +41,8 @@
       box-shadow: 
         inset 0 4px 0 #30363d,
         inset 0 -4px 0 #0d1117,
-        0 6px 0 #000;
+        0 8px 16px rgba(0,0,0,0.6);
+      position: relative;
     }
 
     h2 {
@@ -78,6 +86,7 @@
       text-shadow: 1px 1px 0 #000;
       animation: pulse 2s infinite;
       box-sizing: border-box;
+      transition: transform 0.1s;
     }
 
     button:active {
@@ -89,7 +98,7 @@
       margin-top: 15px;
       text-align: left;
       font-size: 8px;
-      line-height: 1.8;
+      line-height: 2;
       background: #0d1117;
       padding: 12px;
       border: 3px solid #000;
@@ -97,15 +106,32 @@
       display: none;
     }
 
+    .avatar-container {
+      position: relative;
+      width: 90px;
+      margin: 0 auto 12px auto;
+    }
+
     .avatar-img {
       width: 90px;
       height: 90px;
       display: block;
-      margin: 0 auto 12px auto;
       border: 3px solid #30363d;
       background: #161b22;
       image-rendering: pixelated;
     }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 7px;
+      border: 2px solid #000;
+      margin-top: 4px;
+    }
+
+    .status-online { background: #238636; color: #fff; }
+    .status-offline { background: #da3633; color: #fff; }
+    .status-ingame { background: #8957e5; color: #fff; }
 
     .results span {
       color: #58a6ff;
@@ -122,6 +148,8 @@
 </head>
 <body>
 
+  <canvas id="bgCanvas"></canvas>
+
   <div class="card">
     <h2>ROBLOX PROFILE CHECKER</h2>
     <input type="text" id="usernameInput" placeholder="USERNAME...">
@@ -131,7 +159,66 @@
   </div>
 
   <script>
+    // --- Canvas Animated Pixel Stars Background ---
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createStars();
+    }
+
+    function createStars() {
+      stars = [];
+      const count = Math.floor((canvas.width * canvas.height) / 3000);
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() > 0.8 ? 4 : 2,
+          speed: 0.2 + Math.random() * 0.5,
+          opacity: Math.random()
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(star => {
+        ctx.fillStyle = `rgba(88, 166, 255, ${star.opacity})`;
+        ctx.fillRect(star.x, star.y, star.size, star.size);
+        star.y -= star.speed;
+        if (star.y < 0) star.y = canvas.height;
+      });
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    drawStars();
+
+    // --- Audio Sound Effect Setup ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // --- Profile Fetcher Function ---
     async function checkProfile() {
+      playBeep();
       const username = document.getElementById('usernameInput').value.trim();
       const resultsBox = document.getElementById('resultsBox');
       const loadingStatus = document.getElementById('loadingStatus');
@@ -143,12 +230,12 @@
 
       resultsBox.style.display = "none";
       loadingStatus.style.display = "block";
-      loadingStatus.innerHTML = "LOADING...";
+      loadingStatus.innerHTML = "FETCHING USER...";
 
       try {
         const proxy = "https://corsproxy.io/?";
 
-        // 1. Resolve Username to ID
+        // 1. Resolve User ID
         const userReq = await fetch(proxy + encodeURIComponent("https://users.roblox.com/v1/usernames/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -163,17 +250,22 @@
         const userId = userData.data[0].id;
         const displayName = userData.data[0].displayName;
 
-        // 2. Fetch User Avatar Thumbnail
+        // 2. Avatar Thumbnail
         const avatarReq = await fetch(proxy + encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`));
         const avatarData = await avatarReq.json();
         const avatarUrl = avatarData.data[0]?.imageUrl || "";
 
-        // 3. Fetch Creation Date
+        // 3. User Details & Age Calculation
         const detailsReq = await fetch(proxy + encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`));
         const detailsData = await detailsReq.json();
-        const createdDate = new Date(detailsData.created).toLocaleDateString();
+        const createdDateObj = new Date(detailsData.created);
+        const createdDate = createdDateObj.toLocaleDateString();
 
-        // 4. Fetch Presence Status
+        // Calculate age in days
+        const diffTime = Math.abs(new Date() - createdDateObj);
+        const accountAgeDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        // 4. Presence Status
         const presenceReq = await fetch(proxy + encodeURIComponent("https://presence.roblox.com/v1/presence/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -181,24 +273,30 @@
         });
         const presenceData = await presenceReq.json();
         
-        const lastOnlineTimestamp = presenceData.userPresences[0]?.lastOnline;
-        let lastOnlineStr = "HIDDEN/PRIVATE";
-        
-        if (lastOnlineTimestamp) {
-            const lastOnlineDateObj = new Date(lastOnlineTimestamp);
-            lastOnlineStr = lastOnlineDateObj.toLocaleDateString();
+        const presenceType = presenceData.userPresences[0]?.userPresenceType || 0;
+        let statusText = "OFFLINE";
+        let statusClass = "status-offline";
+
+        if (presenceType === 1) {
+          statusText = "ONLINE";
+          statusClass = "status-online";
+        } else if (presenceType === 2) {
+          statusText = "IN-GAME";
+          statusClass = "status-ingame";
         }
 
-        // Hide loading indicator and reveal profile output
         loadingStatus.style.display = "none";
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `
-          ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
+          <div class="avatar-container">
+            ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
+            <div class="status-badge ${statusClass}">${statusText}</div>
+          </div>
           <strong>USER:</strong> <span>${userData.data[0].name}</span><br>
           <strong>DISPLAY:</strong> <span>${displayName}</span><br>
           <strong>ID:</strong> <span>${userId}</span><br>
           <strong>JOINED:</strong> <span>${createdDate}</span><br>
-          <strong>LAST ONLINE:</strong> <span>${lastOnlineStr}</span>
+          <strong>ACCOUNT AGE:</strong> <span>${accountAgeDays} DAYS</span>
         `;
 
       } catch (err) {
