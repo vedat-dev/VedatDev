@@ -94,6 +94,29 @@
       box-shadow: 0 2px 0 #10421e;
     }
 
+    .profile-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      border: 3px solid #000;
+      background: #1f6beb;
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      text-align: center;
+      text-decoration: none;
+      text-shadow: 1px 1px 0 #000;
+      box-sizing: border-box;
+      box-shadow: 0 4px 0 #0d419d;
+      transition: transform 0.1s;
+    }
+
+    .profile-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #0d419d;
+    }
+
     .results {
       margin-top: 15px;
       text-align: left;
@@ -110,6 +133,7 @@
       position: relative;
       width: 90px;
       margin: 0 auto 12px auto;
+      text-align: center;
     }
 
     .avatar-img {
@@ -296,7 +320,8 @@
           <strong>DISPLAY:</strong> <span>${displayName}</span><br>
           <strong>ID:</strong> <span>${userId}</span><br>
           <strong>JOINED:</strong> <span>${createdDate}</span><br>
-          <strong>ACCOUNT AGE:</strong> <span>${accountAgeDays} DAYS</span>
+          <strong>ACCOUNT AGE:</strong> <span>${accountAgeDays} DAYS</span><br>
+          <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">VIEW PROFILE</a>
         `;
 
       } catch (err) {
