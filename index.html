@@ -32,6 +32,17 @@
       z-index: 10;
     }
 
+    /* Top Right Nav Buttons */
+    .top-right-nav {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+
     .nav-btn {
       display: inline-block;
       padding: 8px 10px;
@@ -66,6 +77,19 @@
 
     .nav-btn-app:active {
       box-shadow: 0 2px 0 #5a32a3;
+    }
+
+    .nav-btn-discord {
+      background: #5865F2;
+      box-shadow: 0 4px 0 #3b42a0;
+    }
+
+    .nav-btn-discord:hover {
+      background: #7983f5;
+    }
+
+    .nav-btn-discord:active {
+      box-shadow: 0 2px 0 #3b42a0;
     }
 
     /* Animated Canvas Background */
@@ -290,6 +314,11 @@
   <div class="top-left-nav">
     <a href="https://www.roblox.com" target="_blank" class="nav-btn">ROBLOX.COM</a>
     <a href="https://apps.apple.com/us/app/roblox/id431946152" target="_blank" class="nav-btn nav-btn-app">ROBLOX APP</a>
+  </div>
+
+  <!-- Top Right Links -->
+  <div class="top-right-nav">
+    <a href="https://discord.gg/d5c62Hpvu" target="_blank" class="nav-btn nav-btn-discord">DISCORD</a>
   </div>
 
   <canvas id="bgCanvas"></canvas>
