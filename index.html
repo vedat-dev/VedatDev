@@ -21,6 +21,53 @@
       overflow-x: hidden;
     }
 
+    /* Top Left Nav Buttons */
+    .top-left-nav {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .nav-btn {
+      display: inline-block;
+      padding: 8px 10px;
+      border: 3px solid #000;
+      background: #30363d;
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      text-decoration: none;
+      text-shadow: 1px 1px 0 #000;
+      box-shadow: 0 4px 0 #0d1117;
+      transition: transform 0.1s, background 0.1s;
+    }
+
+    .nav-btn:hover {
+      background: #484f58;
+    }
+
+    .nav-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #0d1117;
+    }
+
+    .nav-btn-app {
+      background: #8957e5;
+      box-shadow: 0 4px 0 #5a32a3;
+    }
+
+    .nav-btn-app:hover {
+      background: #9e6af3;
+    }
+
+    .nav-btn-app:active {
+      box-shadow: 0 2px 0 #5a32a3;
+    }
+
     /* Animated Canvas Background */
     #bgCanvas {
       position: fixed;
@@ -238,6 +285,12 @@
   </style>
 </head>
 <body>
+
+  <!-- Top Left Links -->
+  <div class="top-left-nav">
+    <a href="https://www.roblox.com" target="_blank" class="nav-btn">ROBLOX.COM</a>
+    <a href="https://apps.apple.com/us/app/roblox/id431946152" target="_blank" class="nav-btn nav-btn-app">ROBLOX APP</a>
+  </div>
 
   <canvas id="bgCanvas"></canvas>
 
