@@ -3,58 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delta Key System</title>
+  <title>Pixel Key System</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
+      font-family: 'Press Start 2P', monospace;
+      background-color: #0b0e14;
+      /* Pixelated starry background pattern */
+      background-image: 
+        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 4px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 3px);
+      background-size: 150px 150px;
+      background-position: 0 0, 75px 75px;
+      color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
+
     .card {
-      background: #161b22;
+      background: #181d28;
       padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #30363d;
-      width: 90%;
-      max-width: 380px;
+      width: 100%;
+      max-width: 420px;
       text-align: center;
+      /* Pixelated blocky border style */
+      border: 4px solid #000;
+      box-shadow: 
+        -4px 0 0 0 #4e5d78,
+        4px 0 0 0 #4e5d78,
+        0 -4px 0 0 #4e5d78,
+        0 4px 0 0 #4e5d78;
     }
+
+    h2 {
+      font-size: 16px;
+      color: #58a6ff;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      text-shadow: 2px 2px #000;
+    }
+
+    p {
+      font-size: 10px;
+      color: #8b949e;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
     input {
       width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      border-radius: 6px;
-      border: 1px solid #30363d;
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 4px solid #000;
       background: #0d1117;
-      color: white;
+      color: #3fb950;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
       box-sizing: border-box;
-      font-size: 14px;
+      outline: none;
     }
+
     button {
       width: 100%;
-      padding: 12px;
-      border-radius: 6px;
-      border: none;
+      padding: 14px;
+      border: 4px solid #000;
       background: #238636;
       color: white;
-      font-weight: bold;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
       cursor: pointer;
-      font-size: 15px;
+      text-shadow: 1px 1px #000;
+      box-shadow: inset -4px -4px 0px 0px #155d27;
     }
-    .key-box {
-      background: #0d1117;
-      border: 1px solid #30363d;
+
+    button:active {
+      box-shadow: inset 4px 4px 0px 0px #155d27;
+    }
+
+    .output-box {
+      margin-top: 20px;
       padding: 12px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 14px;
-      color: #58a6ff;
-      margin-top: 15px;
+      background: #0d1117;
+      border: 4px solid #000;
+      font-size: 10px;
+      line-height: 1.6;
       word-break: break-all;
       display: none;
     }
@@ -63,46 +101,33 @@
 <body>
 
   <div class="card">
-    <h2>Delta Key Generator</h2>
-    <p>Paste your Delta URL below to generate your key:</p>
+    <h2>KEY SYSTEM</h2>
+    <p>ENTER YOUR CODE BELOW TO GENERATE YOUR KEY:</p>
     
-    <input type="text" id="deltaUrl" placeholder="https://gateway.platoboost.com/a/8?id=...">
-    <button onclick="generateKey()">Get Key</button>
+    <input type="text" id="passInput" placeholder="ENTER CODE...">
+    <button onclick="processKey()">GET KEY</button>
 
-    <div id="keyBox" class="key-box"></div>
+    <div id="output" class="output-box"></div>
   </div>
 
   <script>
-    async function generateKey() {
-      const urlInput = document.getElementById('deltaUrl').value.trim();
-      const keyBox = document.getElementById('keyBox');
+    function processKey() {
+      const input = document.getElementById('passInput').value.trim();
+      const output = document.getElementById('output');
 
-      if (!urlInput) {
-        alert("Please paste your Delta link first!");
+      if (!input) {
+        output.style.display = "block";
+        output.style.color = "#f85149";
+        output.innerText = "PLEASE ENTER A CODE FIRST!";
         return;
       }
 
-      keyBox.style.display = "block";
-      keyBox.style.color = "#c9d1d9";
-      keyBox.innerText = "Bypassing & Generating Key...";
-
-      try {
-        // Fetches from the bypass API using your Delta link
-        const response = await fetch(`https://api.bypass.vip/bypass?url=${encodeURIComponent(urlInput)}`);
-        const data = await response.json();
-
-        if (data.result || data.key) {
-          const finalKey = data.result || data.key;
-          keyBox.style.color = "#3fb950";
-          keyBox.innerHTML = "<strong>Your Key:</strong><br>" + finalKey;
-        } else {
-          keyBox.style.color = "#f85149";
-          keyBox.innerText = "Failed to generate key. Ensure your Delta link is valid.";
-        }
-      } catch (error) {
-        keyBox.style.color = "#f85149";
-        keyBox.innerText = "Error connecting to service. Try again in a moment.";
-      }
+      // Local key generation demonstration
+      const generatedKey = "KEY-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      output.style.display = "block";
+      output.style.color = "#3fb950";
+      output.innerHTML = "YOUR KEY:<br><br>" + generatedKey;
     }
   </script>
 
