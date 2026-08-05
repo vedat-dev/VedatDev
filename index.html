@@ -9,7 +9,6 @@
 
     body {
       font-family: 'Press Start 2P', monospace;
-      /* CSS-generated Pixel Studs Background */
       background-color: #1e252f;
       background-image: 
         radial-gradient(#2d3644 35%, transparent 36%),
@@ -27,12 +26,10 @@
 
     .card {
       background: #161b22;
-      padding: 18px; /* Reduced by 20% */
+      padding: 18px;
       width: 100%;
-      max-width: 360px; /* Reduced by 20% from 450px */
+      max-width: 360px;
       text-align: center;
-      
-      /* 3D Blocky Stud Border Effect */
       border: 4px solid #000;
       box-shadow: 
         inset 0 4px 0 #30363d,
@@ -41,7 +38,7 @@
     }
 
     h2 {
-      font-size: 11px; /* Scaled down */
+      font-size: 11px;
       color: #58a6ff;
       margin: 15px 0;
       line-height: 1.4;
@@ -57,7 +54,7 @@
       background: #0d1117;
       color: #3fb950;
       font-family: 'Press Start 2P', monospace;
-      font-size: 8px; /* Scaled down */
+      font-size: 8px;
       box-sizing: border-box;
       outline: none;
       box-shadow: inset 2px 2px 0 #000;
@@ -76,7 +73,7 @@
       background: #238636;
       color: #ffffff;
       font-family: 'Press Start 2P', monospace;
-      font-size: 9px; /* Scaled down */
+      font-size: 9px;
       cursor: pointer;
       text-shadow: 1px 1px 0 #000;
       animation: pulse 2s infinite;
@@ -91,13 +88,23 @@
     .results {
       margin-top: 15px;
       text-align: left;
-      font-size: 8px; /* Scaled down */
+      font-size: 8px;
       line-height: 1.8;
       background: #0d1117;
       padding: 12px;
       border: 3px solid #000;
       box-shadow: inset 2px 2px 0 #000;
       display: none;
+    }
+
+    .avatar-img {
+      width: 90px;
+      height: 90px;
+      display: block;
+      margin: 0 auto 12px auto;
+      border: 3px solid #30363d;
+      background: #161b22;
+      image-rendering: pixelated;
     }
 
     .results span {
@@ -119,7 +126,7 @@
     <h2>ROBLOX PROFILE CHECKER</h2>
     <input type="text" id="usernameInput" placeholder="USERNAME...">
     <button onclick="checkProfile()">SEARCH PROFILE</button>
-    <div id="loadingStatus" class="loading">FETCHING DATA...</div>
+    <div id="loadingStatus" class="loading">LOADING...</div>
     <div id="resultsBox" class="results"></div>
   </div>
 
@@ -136,7 +143,7 @@
 
       resultsBox.style.display = "none";
       loadingStatus.style.display = "block";
-      loadingStatus.innerHTML = "FETCHING USER ID...";
+      loadingStatus.innerHTML = "LOADING...";
 
       try {
         const proxy = "https://corsproxy.io/?";
@@ -156,13 +163,17 @@
         const userId = userData.data[0].id;
         const displayName = userData.data[0].displayName;
 
-        // 2. Fetch User Creation Date
-        loadingStatus.innerHTML = "FETCHING PROFILE...";
+        // 2. Fetch User Avatar Thumbnail
+        const avatarReq = await fetch(proxy + encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`));
+        const avatarData = await avatarReq.json();
+        const avatarUrl = avatarData.data[0]?.imageUrl || "";
+
+        // 3. Fetch Creation Date
         const detailsReq = await fetch(proxy + encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`));
         const detailsData = await detailsReq.json();
         const createdDate = new Date(detailsData.created).toLocaleDateString();
 
-        // 3. Fetch Last Online Presence
+        // 4. Fetch Presence Status
         const presenceReq = await fetch(proxy + encodeURIComponent("https://presence.roblox.com/v1/presence/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -178,9 +189,11 @@
             lastOnlineStr = lastOnlineDateObj.toLocaleDateString();
         }
 
+        // Hide loading indicator and reveal profile output
         loadingStatus.style.display = "none";
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `
+          ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
           <strong>USER:</strong> <span>${userData.data[0].name}</span><br>
           <strong>DISPLAY:</strong> <span>${displayName}</span><br>
           <strong>ID:</strong> <span>${userId}</span><br>
