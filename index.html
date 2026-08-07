@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Profile & RAP Checker</title>
+  <title>Roblox Utilities & Profile Checker</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -12,11 +12,12 @@
       background-color: #1a1e29;
       color: #fff;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       min-height: 100vh;
       margin: 0;
-      padding: 15px;
+      padding: 60px 15px 30px 15px;
       box-sizing: border-box;
       overflow-x: hidden;
     }
@@ -106,7 +107,7 @@
       background: rgba(22, 27, 34, 0.95);
       padding: 18px;
       width: 100%;
-      max-width: 380px;
+      max-width: 420px;
       text-align: center;
       border: 4px solid #000;
       box-shadow: 
@@ -114,10 +115,11 @@
         inset 0 -4px 0 #0d1117,
         0 8px 16px rgba(0,0,0,0.6);
       position: relative;
+      margin-bottom: 25px;
     }
 
     h2 {
-      font-size: 11px;
+      font-size: 10px;
       color: #58a6ff;
       margin: 15px 0;
       line-height: 1.4;
@@ -125,7 +127,7 @@
       letter-spacing: -1px;
     }
 
-    input {
+    input[type="text"], textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 12px;
@@ -137,6 +139,11 @@
       box-sizing: border-box;
       outline: none;
       box-shadow: inset 2px 2px 0 #000;
+    }
+
+    textarea {
+      resize: vertical;
+      line-height: 1.4;
     }
 
     @keyframes pulse {
@@ -152,17 +159,28 @@
       background: #238636;
       color: #ffffff;
       font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
+      font-size: 8px;
       cursor: pointer;
       text-shadow: 1px 1px 0 #000;
       animation: pulse 2s infinite;
       box-sizing: border-box;
       transition: transform 0.1s;
+      margin-bottom: 8px;
     }
 
     button:active {
       transform: translateY(2px);
       box-shadow: 0 2px 0 #10421e;
+    }
+
+    .btn-secondary {
+      background: #1f6beb;
+      animation: none;
+      box-shadow: 0 4px 0 #0d419d;
+    }
+
+    .btn-secondary:active {
+      box-shadow: 0 2px 0 #0d419d;
     }
 
     .profile-btn {
@@ -262,13 +280,13 @@
     }
 
     /* Custom Scrollbar */
-    .item-scroll-box::-webkit-scrollbar {
+    .item-scroll-box::-webkit-scrollbar, textarea::-webkit-scrollbar {
       width: 6px;
     }
-    .item-scroll-box::-webkit-scrollbar-track {
+    .item-scroll-box::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track {
       background: #0d1117;
     }
-    .item-scroll-box::-webkit-scrollbar-thumb {
+    .item-scroll-box::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
       background: #30363d;
       border: 1px solid #000;
     }
@@ -323,12 +341,34 @@
 
   <canvas id="bgCanvas"></canvas>
 
+  <!-- 1. Profile & RAP Checker -->
   <div class="card">
     <h2>ROBLOX PROFILE CHECKER</h2>
     <input type="text" id="usernameInput" placeholder="USERNAME...">
     <button onclick="checkProfile()">SEARCH PROFILE</button>
     <div id="loadingStatus" class="loading">LOADING...</div>
     <div id="resultsBox" class="results"></div>
+  </div>
+
+  <!-- 2. Roblox Game Launcher -->
+  <div class="card">
+    <h2>GAME LAUNCHER & CHECKER</h2>
+    <input type="text" id="placeIdInput" placeholder="PLACE ID OR GAME LINK...">
+    <button onclick="launchRobloxGame()">LAUNCH VIA CLIENT</button>
+    <button class="btn-secondary" onclick="checkGameInfo()">CHECK GAME LINK</button>
+    <div id="robloxStatus" class="results"></div>
+  </div>
+
+  <!-- 3. Universal Script Deobfuscator Engine -->
+  <div class="card">
+    <h2>SCRIPT DEOBFUSCATOR</h2>
+    <textarea id="deobfInput" rows="6" placeholder="PASTE OBFUSCATED SCRIPT HERE..."></textarea>
+    <button onclick="processObfuscatedCode()">DEOBFUSCATE SCRIPT</button>
+
+    <div style="margin-top: 10px; text-align: left;">
+      <span class="item-list-title">CLEAN OUTPUT:</span>
+      <textarea id="deobfOutput" rows="8" readonly placeholder="TRANSLATED SCRIPT WILL APPEAR HERE..."></textarea>
+    </div>
   </div>
 
   <script>
@@ -434,7 +474,6 @@
         const createdDateObj = new Date(detailsData.created);
         const createdDate = createdDateObj.toLocaleDateString();
 
-        // Calculate age in days
         const diffTime = Math.abs(new Date() - createdDateObj);
         const accountAgeDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
@@ -506,7 +545,6 @@
           rapStatusMessage = "UNABLE TO FETCH";
         }
 
-        // Render Item List HTML
         let itemsListHtml = "";
         if (collectedItems.length > 0) {
           itemsListHtml = `
@@ -546,6 +584,109 @@
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `<span style='color:#f85149'>ERROR: ${err.message}</span>`;
       }
+    }
+
+    // --- Roblox Launcher Logic ---
+    function extractPlaceId(input) {
+      const match = input.match(/\d+/);
+      return match ? match[0] : null;
+    }
+
+    function launchRobloxGame() {
+      playBeep();
+      const rawInput = document.getElementById('placeIdInput').value.trim();
+      const placeId = extractPlaceId(rawInput);
+      const statusBox = document.getElementById('robloxStatus');
+      statusBox.style.display = 'block';
+
+      if (!placeId) {
+        statusBox.innerHTML = '<span style="color: #da3633;">ERROR: INVALID PLACE ID.</span>';
+        return;
+      }
+
+      statusBox.innerHTML = `<span style="color: #3fb950;">LAUNCHING PLACE ID ${placeId}...</span>`;
+      window.location.href = `roblox://experiences/start?placeId=${placeId}`;
+    }
+
+    function checkGameInfo() {
+      playBeep();
+      const rawInput = document.getElementById('placeIdInput').value.trim();
+      const placeId = extractPlaceId(rawInput);
+      const statusBox = document.getElementById('robloxStatus');
+      statusBox.style.display = 'block';
+
+      if (!placeId) {
+        statusBox.innerHTML = '<span style="color: #da3633;">ERROR: INVALID PLACE ID.</span>';
+        return;
+      }
+
+      statusBox.innerHTML = `<strong>PLACE ID:</strong> <span>${placeId}</span><br>` +
+                            `<a href="https://www.roblox.com/games/${placeId}" target="_blank" class="profile-btn">OPEN GAME PAGE</a>`;
+    }
+
+    // --- Deobfuscator Engine Logic ---
+    function processObfuscatedCode() {
+      playBeep();
+      let code = document.getElementById('deobfInput').value;
+      if (!code.trim()) return;
+
+      let previousCode = "";
+      let maxPasses = 10;
+      let currentPass = 0;
+
+      while (code !== previousCode && currentPass < maxPasses) {
+        previousCode = code;
+        currentPass++;
+
+        // 1. Convert Byte Escape Sequences (\104\101\108\108\111)
+        code = code.replace(/(\\([0-9]{1,3}))+/g, (match) => {
+          try {
+            const bytes = match.split('\\').filter(Boolean);
+            return bytes.map(b => String.fromCharCode(parseInt(b, 10))).join('');
+          } catch (e) { return match; }
+        });
+
+        // 2. Convert Hex Escape Sequences (\x68\x65\x6c\x6c\x6f)
+        code = code.replace(/(\\x[0-9a-fA-F]{2})+/g, (match) => {
+          try {
+            const hexes = match.split('\\x').filter(Boolean);
+            return hexes.map(h => String.fromCharCode(parseInt(h, 16))).join('');
+          } catch (e) { return match; }
+        });
+
+        // 3. Decode string.char(...) byte arrays
+        code = code.replace(/string\.char\(([\d\s,]+)\)/gi, (match, byteList) => {
+          try {
+            const charCodes = byteList.split(',').map(n => parseInt(n.trim(), 10));
+            const str = String.fromCharCode(...charCodes);
+            return `"${str}"`;
+          } catch (e) { return match; }
+        });
+
+        // 4. Evaluate math expressions
+        code = code.replace(/\(\s*(0x[0-9a-fA-F]+|-?\d+)\s*([+\-*\/%])\s*(0x[0-9a-fA-F]+|-?\d+)\s*\)/g, (match, a, op, b) => {
+          try {
+            const numA = a.startsWith('0x') ? parseInt(a, 16) : parseInt(a, 10);
+            const numB = b.startsWith('0x') ? parseInt(b, 16) : parseInt(b, 10);
+            let result = 0;
+            if (op === '+') result = numA + numB;
+            if (op === '-') result = numA - numB;
+            if (op === '*') result = numA * numB;
+            if (op === '/' && numB !== 0) result = Math.floor(numA / numB);
+            if (op === '%') result = numA % numB;
+            return result.toString();
+          } catch (e) { return match; }
+        });
+
+        // 5. Join split strings ("Hello " .. "World")
+        code = code.replace(/"([^"\\]*)"\s*(\.\.|\+)\s*"([^"\\]*)"/g, '"$1$3"');
+        code = code.replace(/'([^'\\]*)'\s*(\.\.|\+)\s*'([^'\\]*)'/g, "'$1$3'");
+
+        // 6. Normalize obfuscated control flows
+        code = code.replace(/while\s+true\s+do\s+if\s+.*?\s+then/gi, '-- [Control Flow Unrolled]\nif true then');
+      }
+
+      document.getElementById('deobfOutput').value = code;
     }
   </script>
 
