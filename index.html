@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Utilities & Profile Checker</title>
+  <title>Roblox Profile & Value Checker</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -12,10 +12,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       min-height: 100vh;
       margin: 0;
-      padding: 60px 15px 30px 15px;
+      padding: 20px 15px;
       box-sizing: border-box;
       overflow-x: hidden;
     }
@@ -56,33 +56,21 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    .nav-btn:hover {
-      background: #30363d;
-    }
-
-    .nav-btn:active {
-      transform: translateY(1px);
-    }
+    .nav-btn:hover { background: #30363d; }
+    .nav-btn:active { transform: translateY(1px); }
 
     .nav-btn-app {
       background: #8957e5;
       border-color: #793de8;
     }
-
-    .nav-btn-app:hover {
-      background: #9e6af3;
-    }
+    .nav-btn-app:hover { background: #9e6af3; }
 
     .nav-btn-discord {
       background: #5865F2;
       border-color: #4752c4;
     }
+    .nav-btn-discord:hover { background: #7983f5; }
 
-    .nav-btn-discord:hover {
-      background: #7983f5;
-    }
-
-    /* Animated Canvas Background */
     #bgCanvas {
       position: fixed;
       top: 0;
@@ -102,7 +90,6 @@
       border-radius: 10px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       position: relative;
-      margin-bottom: 25px;
     }
 
     h2 {
@@ -114,7 +101,7 @@
       text-transform: uppercase;
     }
 
-    input[type="text"], textarea {
+    input[type="text"] {
       width: 100%;
       padding: 10px 12px;
       margin-bottom: 12px;
@@ -129,14 +116,8 @@
       transition: border-color 0.2s;
     }
 
-    input[type="text"]:focus, textarea:focus {
+    input[type="text"]:focus {
       border-color: #58a6ff;
-    }
-
-    textarea {
-      resize: vertical;
-      line-height: 1.4;
-      font-family: monospace;
     }
 
     button {
@@ -153,13 +134,8 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    button:hover {
-      background: #2ea043;
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
+    button:hover { background: #2ea043; }
+    button:active { transform: translateY(1px); }
 
     .profile-btn {
       display: block;
@@ -178,9 +154,7 @@
       transition: background 0.2s;
     }
 
-    .profile-btn:hover {
-      background: #388bfd;
-    }
+    .profile-btn:hover { background: #388bfd; }
 
     .results {
       margin-top: 15px;
@@ -233,7 +207,12 @@
       font-weight: bold;
     }
 
-    /* Item List Styling */
+    .results .notice-text {
+      color: #8b949e;
+      font-size: 10px;
+      font-style: italic;
+    }
+
     .item-list-container {
       margin-top: 10px;
       border-top: 1px solid #30363d;
@@ -258,14 +237,9 @@
       padding: 6px;
     }
 
-    /* Custom Scrollbar */
-    .item-scroll-box::-webkit-scrollbar, textarea::-webkit-scrollbar {
-      width: 6px;
-    }
-    .item-scroll-box::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track {
-      background: #0d1117;
-    }
-    .item-scroll-box::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
+    .item-scroll-box::-webkit-scrollbar { width: 6px; }
+    .item-scroll-box::-webkit-scrollbar-track { background: #0d1117; }
+    .item-scroll-box::-webkit-scrollbar-thumb {
       background: #30363d;
       border-radius: 3px;
     }
@@ -280,9 +254,7 @@
       gap: 8px;
     }
 
-    .item-entry:last-child {
-      border-bottom: none;
-    }
+    .item-entry:last-child { border-bottom: none; }
 
     .item-name {
       color: #c9d1d9;
@@ -308,50 +280,26 @@
 </head>
 <body>
 
-  <!-- Top Left Links -->
   <div class="top-left-nav">
     <a href="https://www.roblox.com" target="_blank" class="nav-btn">Roblox.com</a>
     <a href="https://apps.apple.com/us/app/roblox/id431946152" target="_blank" class="nav-btn nav-btn-app">Roblox App</a>
   </div>
 
-  <!-- Top Right Links -->
   <div class="top-right-nav">
     <a href="https://discord.gg/d5c62Hpvu" target="_blank" class="nav-btn nav-btn-discord">Discord</a>
   </div>
 
   <canvas id="bgCanvas"></canvas>
 
-  <!-- 1. Profile & RAP Checker -->
   <div class="card">
-    <h2>Roblox Profile Checker</h2>
+    <h2>Roblox Profile & Value Checker</h2>
     <input type="text" id="usernameInput" placeholder="Enter username...">
     <button onclick="checkProfile()">Search Profile</button>
     <div id="loadingStatus" class="loading">Loading...</div>
     <div id="resultsBox" class="results"></div>
   </div>
 
-  <!-- 2. Roblox Game Launcher -->
-  <div class="card">
-    <h2>Game Launcher</h2>
-    <input type="text" id="placeIdInput" placeholder="Enter Place ID or Game Link...">
-    <button onclick="launchRobloxGame()">Launch Game</button>
-    <div id="robloxStatus" class="results"></div>
-  </div>
-
-  <!-- 3. Universal Script Deobfuscator Engine -->
-  <div class="card">
-    <h2>Script Deobfuscator</h2>
-    <textarea id="deobfInput" rows="6" placeholder="Paste obfuscated script here..."></textarea>
-    <button onclick="processObfuscatedCode()">Deobfuscate Script</button>
-
-    <div style="margin-top: 12px; text-align: left;">
-      <span class="item-list-title">Clean Output:</span>
-      <textarea id="deobfOutput" rows="8" readonly placeholder="Translated script will appear here..."></textarea>
-    </div>
-  </div>
-
   <script>
-    // --- Canvas Animated Background ---
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     let stars = [];
@@ -391,7 +339,6 @@
     resizeCanvas();
     drawStars();
 
-    // --- Audio Sound Effect Setup ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep() {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -408,7 +355,6 @@
       osc.stop(audioCtx.currentTime + 0.1);
     }
 
-    // --- Profile Fetcher Function ---
     async function checkProfile() {
       playBeep();
       const username = document.getElementById('usernameInput').value.trim();
@@ -447,7 +393,7 @@
         const avatarData = await avatarReq.json();
         const avatarUrl = avatarData.data[0]?.imageUrl || "";
 
-        // 3. User Details & Age Calculation
+        // 3. Details & Account Age
         const detailsReq = await fetch(proxy + encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`));
         const detailsData = await detailsReq.json();
         const createdDateObj = new Date(detailsData.created);
@@ -456,7 +402,7 @@
         const diffTime = Math.abs(new Date() - createdDateObj);
         const accountAgeDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        // 4. Presence Status
+        // 4. Presence
         const presenceReq = await fetch(proxy + encodeURIComponent("https://presence.roblox.com/v1/presence/users"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -476,8 +422,8 @@
           statusClass = "status-ingame";
         }
 
-        // 5. RAP & Inventory Collectibles Fetcher
-        loadingStatus.innerHTML = "Calculating RAP...";
+        // 5. Limited Collectibles RAP
+        loadingStatus.innerHTML = "Scanning Inventory & RAP...";
         let totalRAP = 0;
         let limitedCount = 0;
         let rapStatusMessage = "";
@@ -524,6 +470,28 @@
           rapStatusMessage = "Unable to fetch";
         }
 
+        // 6. Currently Equipped Avatar Item Value (Estimated Spent)
+        loadingStatus.innerHTML = "Calculating Equipped Avatar Value...";
+        let avatarVal = 0;
+        try {
+          const avatarRes = await fetch(proxy + encodeURIComponent(`https://avatar.roblox.com/v1/users/${userId}/avatar`));
+          const avatarJson = await avatarRes.json();
+          if (avatarJson.assets && avatarJson.assets.length > 0) {
+            const assetIds = avatarJson.assets.map(a => a.id).join(',');
+            const itemDetailsRes = await fetch(proxy + encodeURIComponent(`https://economy.roblox.com/v2/assets/details?assetIds=${assetIds}`));
+            const itemDetails = await itemDetailsRes.json();
+            if (Array.isArray(itemDetails)) {
+              itemDetails.forEach(item => {
+                if (item.PriceInRobux) {
+                  avatarVal += item.PriceInRobux;
+                }
+              });
+            }
+          }
+        } catch (e) {
+          avatarVal = 0;
+        }
+
         let itemsListHtml = "";
         if (collectedItems.length > 0) {
           itemsListHtml = `
@@ -554,6 +522,8 @@
           <strong>Joined:</strong> <span>${createdDate}</span><br>
           <strong>Account Age:</strong> <span>${accountAgeDays} Days</span><br>
           <strong>Estimated RAP:</strong> <span class="rap-text">${rapStatusMessage}</span><br>
+          <strong>Equipped Avatar Value:</strong> <span class="rap-text">${avatarVal.toLocaleString()} R$</span><br>
+          <span class="notice-text">*Note: Live Robux balances & total historical spends are private to account owners.</span><br>
           ${itemsListHtml}
           <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">View Profile</a>
         `;
@@ -563,93 +533,6 @@
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `<span style='color:#f85149'>Error: ${err.message}</span>`;
       }
-    }
-
-    // --- Roblox Launcher Logic ---
-    function extractPlaceId(input) {
-      const match = input.match(/\d+/);
-      return match ? match[0] : null;
-    }
-
-    function launchRobloxGame() {
-      playBeep();
-      const rawInput = document.getElementById('placeIdInput').value.trim();
-      const placeId = extractPlaceId(rawInput);
-      const statusBox = document.getElementById('robloxStatus');
-      statusBox.style.display = 'block';
-
-      if (!placeId) {
-        statusBox.innerHTML = '<span style="color: #da3633;">Error: Invalid Place ID.</span>';
-        return;
-      }
-
-      statusBox.innerHTML = `<span style="color: #3fb950;">Launching Place ID ${placeId}...</span>`;
-      window.location.href = `roblox://experiences/start?placeId=${placeId}`;
-    }
-
-    // --- Deobfuscator Engine Logic ---
-    function processObfuscatedCode() {
-      playBeep();
-      let code = document.getElementById('deobfInput').value;
-      if (!code.trim()) return;
-
-      let previousCode = "";
-      let maxPasses = 10;
-      let currentPass = 0;
-
-      while (code !== previousCode && currentPass < maxPasses) {
-        previousCode = code;
-        currentPass++;
-
-        // 1. Convert Byte Escape Sequences (\104\101\108\108\111)
-        code = code.replace(/(\\([0-9]{1,3}))+/g, (match) => {
-          try {
-            const bytes = match.split('\\').filter(Boolean);
-            return bytes.map(b => String.fromCharCode(parseInt(b, 10))).join('');
-          } catch (e) { return match; }
-        });
-
-        // 2. Convert Hex Escape Sequences (\x68\x65\x6c\x6c\x6f)
-        code = code.replace(/(\\x[0-9a-fA-F]{2})+/g, (match) => {
-          try {
-            const hexes = match.split('\\x').filter(Boolean);
-            return hexes.map(h => String.fromCharCode(parseInt(h, 16))).join('');
-          } catch (e) { return match; }
-        });
-
-        // 3. Decode string.char(...) byte arrays
-        code = code.replace(/string\.char\(([\d\s,]+)\)/gi, (match, byteList) => {
-          try {
-            const charCodes = byteList.split(',').map(n => parseInt(n.trim(), 10));
-            const str = String.fromCharCode(...charCodes);
-            return `"${str}"`;
-          } catch (e) { return match; }
-        });
-
-        // 4. Evaluate math expressions
-        code = code.replace(/\(\s*(0x[0-9a-fA-F]+|-?\d+)\s*([+\-*\/%])\s*(0x[0-9a-fA-F]+|-?\d+)\s*\)/g, (match, a, op, b) => {
-          try {
-            const numA = a.startsWith('0x') ? parseInt(a, 16) : parseInt(a, 10);
-            const numB = b.startsWith('0x') ? parseInt(b, 16) : parseInt(b, 10);
-            let result = 0;
-            if (op === '+') result = numA + numB;
-            if (op === '-') result = numA - numB;
-            if (op === '*') result = numA * numB;
-            if (op === '/' && numB !== 0) result = Math.floor(numA / numB);
-            if (op === '%') result = numA % numB;
-            return result.toString();
-          } catch (e) { return match; }
-        });
-
-        // 5. Join split strings ("Hello " .. "World")
-        code = code.replace(/"([^"\\]*)"\s*(\.\.|\+)\s*"([^"\\]*)"/g, '"$1$3"');
-        code = code.replace(/'([^'\\]*)'\s*(\.\.|\+)\s*'([^'\\]*)'/g, "'$1$3'");
-
-        // 6. Normalize obfuscated control flows
-        code = code.replace(/while\s+true\s+do\s+if\s+.*?\s+then/gi, '-- [Control Flow Unrolled]\nif true then');
-      }
-
-      document.getElementById('deobfOutput').value = code;
     }
   </script>
 
