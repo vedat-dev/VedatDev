@@ -72,12 +72,6 @@
     }
     .nav-btn-discord:hover { background: #7983f5; }
 
-    .nav-btn-code {
-      background: #238636;
-      border-color: #2ea043;
-    }
-    .nav-btn-code:hover { background: #2ea043; }
-
     #bgCanvas {
       position: fixed;
       top: 0;
@@ -99,6 +93,31 @@
       position: relative;
     }
 
+    /* Access Modal Overlay */
+    .gate-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 17, 23, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .gate-card {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
     h2 {
       font-size: 16px;
       font-weight: 700;
@@ -108,7 +127,7 @@
       text-transform: uppercase;
     }
 
-    input[type="text"] {
+    input[type="text"], input[type="password"] {
       width: 100%;
       padding: 10px 12px;
       margin-bottom: 12px;
@@ -123,7 +142,7 @@
       transition: border-color 0.2s;
     }
 
-    input[type="text"]:focus {
+    input[type="text"]:focus, input[type="password"]:focus {
       border-color: #58a6ff;
     }
 
@@ -220,115 +239,32 @@
       font-style: italic;
     }
 
-    /* Password Code Display Box Styles */
-    .code-container {
-      margin-top: 15px;
-      border-top: 1px solid #30363d;
-      padding-top: 12px;
-      display: none;
-    }
-
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .code-title {
-      color: #f1e05a;
-      font-weight: bold;
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    .copy-btn {
-      width: auto;
-      padding: 4px 8px;
-      font-size: 10px;
-      background: #30363d;
-    }
-
-    .code-block {
-      background: #010409;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 8px;
-      font-family: monospace;
-      font-size: 11px;
-      color: #79c0ff;
-      white-space: pre-wrap;
-      word-break: break-all;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-
-    .item-list-container {
-      margin-top: 10px;
-      border-top: 1px solid #30363d;
-      padding-top: 10px;
-    }
-
-    .item-list-title {
-      color: #58a6ff;
-      font-size: 11px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      display: block;
-      text-transform: uppercase;
-    }
-
-    .item-scroll-box {
-      max-height: 130px;
-      overflow-y: auto;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 6px;
-    }
-
-    .item-scroll-box::-webkit-scrollbar { width: 6px; }
-    .item-scroll-box::-webkit-scrollbar-track { background: #0d1117; }
-    .item-scroll-box::-webkit-scrollbar-thumb {
-      background: #30363d;
-      border-radius: 3px;
-    }
-
-    .item-entry {
-      font-size: 11px;
-      line-height: 1.6;
-      padding: 4px 0;
-      border-bottom: 1px solid #21262d;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .item-entry:last-child { border-bottom: none; }
-
-    .item-name {
-      color: #c9d1d9;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 220px;
-    }
-
-    .item-rap {
-      color: #3fb950;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-    
     .loading {
       color: #c9d1d9;
       font-size: 12px;
       margin-top: 12px;
       display: none;
     }
+
+    .error-msg {
+      color: #f85149;
+      font-size: 11px;
+      margin-top: 8px;
+      display: none;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Access Gate Modal -->
+  <div class="gate-overlay" id="gateOverlay">
+    <div class="gate-card">
+      <h2>Access Required</h2>
+      <input type="password" id="passcodeInput" placeholder="Enter Access Code...">
+      <button onclick="unlockApp()">Unlock Application</button>
+      <div id="gateError" class="error-msg">Incorrect Access Code</div>
+    </div>
+  </div>
 
   <div class="top-left-nav">
     <a href="https://www.roblox.com" target="_blank" class="nav-btn">Roblox.com</a>
@@ -336,7 +272,6 @@
   </div>
 
   <div class="top-right-nav">
-    <button class="nav-btn nav-btn-code" onclick="toggleCodeModal()">Show Code</button>
     <a href="https://discord.gg/d5c62Hpvu" target="_blank" class="nav-btn nav-btn-discord">Discord</a>
   </div>
 
@@ -351,6 +286,21 @@
   </div>
 
   <script>
+    // Configuration: Define the passcode required to unlock access
+    const ACCESS_PASSCODE = "ROBLOX2026";
+
+    function unlockApp() {
+      const input = document.getElementById("passcodeInput").value;
+      const errorDiv = document.getElementById("gateError");
+      const overlay = document.getElementById("gateOverlay");
+
+      if (input === ACCESS_PASSCODE) {
+        overlay.style.display = "none";
+      } else {
+        errorDiv.style.display = "block";
+      }
+    }
+
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
     let stars = [];
@@ -404,25 +354,6 @@
       gain.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
-    }
-
-    function toggleCodeModal() {
-      const codeContainer = document.getElementById('codeContainer');
-      if (codeContainer) {
-        if (codeContainer.style.display === "none" || codeContainer.style.display === "") {
-          codeContainer.style.display = "block";
-        } else {
-          codeContainer.style.display = "none";
-        }
-      } else {
-        alert("Please search a user first to view password code.");
-      }
-    }
-
-    function copyUserCode() {
-      const codeText = document.getElementById('userCodeBlock').innerText;
-      navigator.clipboard.writeText(codeText);
-      alert("Password code copied to clipboard!");
     }
 
     async function checkProfile() {
@@ -492,98 +423,6 @@
           statusClass = "status-ingame";
         }
 
-        // 5. Limited Collectibles RAP
-        loadingStatus.innerHTML = "Scanning Inventory & RAP...";
-        let totalRAP = 0;
-        let limitedCount = 0;
-        let rapStatusMessage = "";
-        let collectedItems = [];
-
-        try {
-          let cursor = "";
-          let hasNextPage = true;
-
-          while (hasNextPage) {
-            const inventoryUrl = `https://inventory.roblox.com/v1/users/${userId}/assets/collectibles?sortOrder=Asc&limit=100` + (cursor ? `&cursor=${cursor}` : '');
-            const invReq = await fetch(proxy + encodeURIComponent(inventoryUrl));
-            
-            if (invReq.status === 403) {
-              rapStatusMessage = "PRIVATE INVENTORY";
-              break;
-            }
-
-            const invData = await invReq.json();
-
-            if (invData.data && invData.data.length > 0) {
-              invData.data.forEach(item => {
-                const rapVal = item.recentAveragePrice || 0;
-                totalRAP += rapVal;
-                limitedCount++;
-                collectedItems.push({
-                  name: item.name || "Unknown Item",
-                  rap: rapVal
-                });
-              });
-            }
-
-            if (invData.nextPageCursor) {
-              cursor = invData.nextPageCursor;
-            } else {
-              hasNextPage = false;
-            }
-          }
-
-          if (!rapStatusMessage) {
-            rapStatusMessage = `${totalRAP.toLocaleString()} R$ (${limitedCount} Items)`;
-          }
-        } catch (e) {
-          rapStatusMessage = "Unable to fetch";
-        }
-
-        // 6. Currently Equipped Avatar Item Value (Estimated Spent)
-        loadingStatus.innerHTML = "Calculating Equipped Avatar Value...";
-        let avatarVal = 0;
-        try {
-          const avatarRes = await fetch(proxy + encodeURIComponent(`https://avatar.roblox.com/v1/users/${userId}/avatar`));
-          const avatarJson = await avatarRes.json();
-          if (avatarJson.assets && avatarJson.assets.length > 0) {
-            const assetIds = avatarJson.assets.map(a => a.id).join(',');
-            const itemDetailsRes = await fetch(proxy + encodeURIComponent(`https://economy.roblox.com/v2/assets/details?assetIds=${assetIds}`));
-            const itemDetails = await itemDetailsRes.json();
-            if (Array.isArray(itemDetails)) {
-              itemDetails.forEach(item => {
-                if (item.PriceInRobux) {
-                  avatarVal += item.PriceInRobux;
-                }
-              });
-            }
-          }
-        } catch (e) {
-          avatarVal = 0;
-        }
-
-        let itemsListHtml = "";
-        if (collectedItems.length > 0) {
-          itemsListHtml = `
-            <div class="item-list-container">
-              <span class="item-list-title">RAP Item List:</span>
-              <div class="item-scroll-box">
-                ${collectedItems.map(item => `
-                  <div class="item-entry">
-                    <span class="item-name" title="${item.name}">${item.name}</span>
-                    <span class="item-rap">${item.rap.toLocaleString()} R$</span>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `;
-        }
-
-        const actualUsername = userData.data[0].name;
-        
-        // Output formatting set to 'password' as requested (not their real password)
-        const password = `user_password = "${actualUsername}_PASS_${userId}";`;
-
         loadingStatus.style.display = "none";
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `
@@ -591,22 +430,11 @@
             ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
             <div class="status-badge ${statusClass}">${statusText}</div>
           </div>
-          <strong>User:</strong> <span>${actualUsername}</span><br>
+          <strong>User:</strong> <span>${userData.data[0].name}</span><br>
           <strong>Display Name:</strong> <span>${displayName}</span><br>
           <strong>User ID:</strong> <span>${userId}</span><br>
           <strong>Joined:</strong> <span>${createdDate}</span><br>
           <strong>Account Age:</strong> <span>${accountAgeDays} Days</span><br>
-          <strong>Estimated RAP:</strong> <span class="rap-text">${rapStatusMessage}</span><br>
-          <strong>Equipped Avatar Value:</strong> <span class="rap-text">${avatarVal.toLocaleString()} R$</span><br>
-          <span class="notice-text">*Note: Live Robux balances & total historical spends are private to account owners.</span><br>
-          ${itemsListHtml}
-          <div class="code-container" id="codeContainer">
-            <div class="code-header">
-              <span class="code-title">password needed for ${actualUsername}:</span>
-              <button class="copy-btn" onclick="copyUserCode()">Copy Password</button>
-            </div>
-            <div class="code-block" id="userCodeBlock">${password}</div>
-          </div>
           <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">View Profile</a>
         `;
 
