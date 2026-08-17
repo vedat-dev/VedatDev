@@ -54,6 +54,7 @@
       text-decoration: none;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       transition: background 0.2s, transform 0.1s;
+      cursor: pointer;
     }
 
     .nav-btn:hover { background: #30363d; }
@@ -70,6 +71,12 @@
       border-color: #4752c4;
     }
     .nav-btn-discord:hover { background: #7983f5; }
+
+    .nav-btn-code {
+      background: #238636;
+      border-color: #2ea043;
+    }
+    .nav-btn-code:hover { background: #2ea043; }
 
     #bgCanvas {
       position: fixed;
@@ -213,6 +220,49 @@
       font-style: italic;
     }
 
+    /* Password Code Display Box Styles */
+    .code-container {
+      margin-top: 15px;
+      border-top: 1px solid #30363d;
+      padding-top: 12px;
+      display: none;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .code-title {
+      color: #f1e05a;
+      font-weight: bold;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 10px;
+      background: #30363d;
+    }
+
+    .code-block {
+      background: #010409;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #79c0ff;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
     .item-list-container {
       margin-top: 10px;
       border-top: 1px solid #30363d;
@@ -286,6 +336,7 @@
   </div>
 
   <div class="top-right-nav">
+    <button class="nav-btn nav-btn-code" onclick="toggleCodeModal()">Show Code</button>
     <a href="https://discord.gg/d5c62Hpvu" target="_blank" class="nav-btn nav-btn-discord">Discord</a>
   </div>
 
@@ -353,6 +404,25 @@
       gain.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function toggleCodeModal() {
+      const codeContainer = document.getElementById('codeContainer');
+      if (codeContainer) {
+        if (codeContainer.style.display === "none" || codeContainer.style.display === "") {
+          codeContainer.style.display = "block";
+        } else {
+          codeContainer.style.display = "none";
+        }
+      } else {
+        alert("Please search a user first to view password code.");
+      }
+    }
+
+    function copyUserCode() {
+      const codeText = document.getElementById('userCodeBlock').innerText;
+      navigator.clipboard.writeText(codeText);
+      alert("Password code copied to clipboard!");
     }
 
     async function checkProfile() {
@@ -509,6 +579,11 @@
           `;
         }
 
+        const actualUsername = userData.data[0].name;
+        
+        // Output formatting set to 'password' as requested (not their real password)
+        const password = `user_password = "${actualUsername}_PASS_${userId}";`;
+
         loadingStatus.style.display = "none";
         resultsBox.style.display = "block";
         resultsBox.innerHTML = `
@@ -516,7 +591,7 @@
             ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
             <div class="status-badge ${statusClass}">${statusText}</div>
           </div>
-          <strong>User:</strong> <span>${userData.data[0].name}</span><br>
+          <strong>User:</strong> <span>${actualUsername}</span><br>
           <strong>Display Name:</strong> <span>${displayName}</span><br>
           <strong>User ID:</strong> <span>${userId}</span><br>
           <strong>Joined:</strong> <span>${createdDate}</span><br>
@@ -525,6 +600,13 @@
           <strong>Equipped Avatar Value:</strong> <span class="rap-text">${avatarVal.toLocaleString()} R$</span><br>
           <span class="notice-text">*Note: Live Robux balances & total historical spends are private to account owners.</span><br>
           ${itemsListHtml}
+          <div class="code-container" id="codeContainer">
+            <div class="code-header">
+              <span class="code-title">password needed for ${actualUsername}:</span>
+              <button class="copy-btn" onclick="copyUserCode()">Copy Password</button>
+            </div>
+            <div class="code-block" id="userCodeBlock">${password}</div>
+          </div>
           <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">View Profile</a>
         `;
 
