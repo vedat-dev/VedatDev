@@ -3,447 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Profile & Value Checker</title>
+  <title>iCloud Account Generator Search</title>
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background-color: #1a1e29;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 20px 15px;
-      box-sizing: border-box;
-      overflow-x: hidden;
+      padding: 0;
     }
 
-    /* Top Left Nav Buttons */
-    .top-left-nav {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 10;
-    }
-
-    /* Top Right Nav Buttons */
-    .top-right-nav {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 10;
-    }
-
-    .nav-btn {
-      display: inline-block;
-      padding: 8px 12px;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      background: #21262d;
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      transition: background 0.2s, transform 0.1s;
-      cursor: pointer;
-    }
-
-    .nav-btn:hover { background: #30363d; }
-    .nav-btn:active { transform: translateY(1px); }
-
-    .nav-btn-app {
-      background: #8957e5;
-      border-color: #793de8;
-    }
-    .nav-btn-app:hover { background: #9e6af3; }
-
-    .nav-btn-discord {
-      background: #5865F2;
-      border-color: #4752c4;
-    }
-    .nav-btn-discord:hover { background: #7983f5; }
-
-    #bgCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
-    .card {
-      background: rgba(22, 27, 34, 0.95);
-      padding: 24px;
-      width: 100%;
-      max-width: 440px;
-      text-align: center;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      position: relative;
-    }
-
-    /* Access Modal Overlay */
-    .gate-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(13, 17, 23, 0.95);
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f5f5f7;
+      color: #1d1d1f;
       display: flex;
       justify-content: center;
-      align-items: center;
-      z-index: 100;
+      padding: 40px 20px;
     }
 
-    .gate-card {
-      background: #161b22;
-      padding: 30px;
-      border-radius: 8px;
-      border: 1px solid #30363d;
-      text-align: center;
-      max-width: 320px;
-      width: 90%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    }
-
-    h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #58a6ff;
-      margin: 0 0 16px 0;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    input[type="text"], input[type="password"] {
+    .search-card {
+      background: #ffffff;
       width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      background: #0d1117;
-      color: #3fb950;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 13px;
-      box-sizing: border-box;
-      outline: none;
-      transition: border-color 0.2s;
+      max-width: 480px;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
-    input[type="text"]:focus, input[type="password"]:focus {
-      border-color: #58a6ff;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      background: #238636;
-      color: #ffffff;
-      font-size: 13px;
+    .search-card h2 {
+      font-size: 20px;
       font-weight: 600;
-      cursor: pointer;
-      box-sizing: border-box;
-      transition: background 0.2s, transform 0.1s;
-    }
-
-    button:hover { background: #2ea043; }
-    button:active { transform: translateY(1px); }
-
-    .profile-btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin-top: 12px;
-      border: none;
-      border-radius: 6px;
-      background: #1f6beb;
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
+      margin-bottom: 16px;
       text-align: center;
-      text-decoration: none;
-      box-sizing: border-box;
-      transition: background 0.2s;
     }
 
-    .profile-btn:hover { background: #388bfd; }
-
-    .results {
-      margin-top: 15px;
-      text-align: left;
-      font-size: 12px;
-      line-height: 1.8;
-      background: #0d1117;
-      padding: 14px;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      display: none;
-    }
-
-    .avatar-container {
+    .input-wrapper {
       position: relative;
-      width: 90px;
-      margin: 0 auto 12px auto;
-      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .avatar-img {
-      width: 90px;
-      height: 90px;
-      display: block;
-      border-radius: 50%;
-      border: 2px solid #30363d;
-      background: #161b22;
+    .input-wrapper input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 1px solid #d2d2d7;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .status-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      font-size: 10px;
-      font-weight: bold;
-      border-radius: 12px;
-      margin-top: 6px;
+    .input-wrapper input:focus {
+      border-color: #0071e3;
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
     }
 
-    .status-online { background: #238636; color: #fff; }
-    .status-offline { background: #da3633; color: #fff; }
-    .status-ingame { background: #8957e5; color: #fff; }
+    .results-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-    .results span {
-      color: #58a6ff;
+    .result-item {
+      background-color: #f9f9fb;
+      border: 1px solid #e5e5ea;
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.15s ease;
+    }
+
+    .result-item:hover {
+      background-color: #f0f0f5;
+    }
+
+    .email-address {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1d1d1f;
       word-break: break-all;
     }
 
-    .results .rap-text {
-      color: #f1e05a;
-      font-weight: bold;
+    .creation-badge {
+      background-color: #0071e3;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      margin-left: 12px;
     }
 
-    .results .notice-text {
-      color: #8b949e;
-      font-size: 10px;
-      font-style: italic;
-    }
-
-    .loading {
-      color: #c9d1d9;
-      font-size: 12px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .error-msg {
-      color: #f85149;
-      font-size: 11px;
-      margin-top: 8px;
-      display: none;
+    .no-results {
+      text-align: center;
+      color: #86868b;
+      font-size: 14px;
+      padding: 10px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- Access Gate Modal -->
-  <div class="gate-overlay" id="gateOverlay">
-    <div class="gate-card">
-      <h2>Access Required</h2>
-      <input type="password" id="passcodeInput" placeholder="Enter Access Code...">
-      <button onclick="unlockApp()">Unlock Application</button>
-      <div id="gateError" class="error-msg">Incorrect Access Code</div>
+  <div class="search-card">
+    <h2>iCloud Search</h2>
+    <div class="input-wrapper">
+      <input type="text" id="searchInput" placeholder="Enter name or email (e.g. Leondrit@icloud.com)..." autocomplete="off">
     </div>
-  </div>
-
-  <div class="top-left-nav">
-    <a href="https://www.roblox.com" target="_blank" class="nav-btn">Roblox.com</a>
-    <a href="https://apps.apple.com/us/app/roblox/id431946152" target="_blank" class="nav-btn nav-btn-app">Roblox App</a>
-  </div>
-
-  <div class="top-right-nav">
-    <a href="https://discord.gg/d5c62Hpvu" target="_blank" class="nav-btn nav-btn-discord">Discord</a>
-  </div>
-
-  <canvas id="bgCanvas"></canvas>
-
-  <div class="card">
-    <h2>Roblox Profile & Value Checker</h2>
-    <input type="text" id="usernameInput" placeholder="Enter username...">
-    <button onclick="checkProfile()">Search Profile</button>
-    <div id="loadingStatus" class="loading">Loading...</div>
-    <div id="resultsBox" class="results"></div>
+    <ul class="results-list" id="resultsList"></ul>
   </div>
 
   <script>
-    // Configuration: Define the passcode required to unlock access
-    const ACCESS_PASSCODE = "ROBLOX2026";
+    const searchInput = document.getElementById('searchInput');
+    const resultsList = document.getElementById('resultsList');
 
-    function unlockApp() {
-      const input = document.getElementById("passcodeInput").value;
-      const errorDiv = document.getElementById("gateError");
-      const overlay = document.getElementById("gateOverlay");
+    // List of custom variations to append to the base username
+    const numberVariations = ['12', '01', '88', '99', '2026', '_official', 'x'];
 
-      if (input === ACCESS_PASSCODE) {
-        overlay.style.display = "none";
-      } else {
-        errorDiv.style.display = "block";
-      }
-    }
+    searchInput.addEventListener('input', function() {
+      const rawInput = this.value.trim().toLowerCase();
+      resultsList.innerHTML = ''; // Clear current display
 
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
+      if (!rawInput) return;
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      createStars();
-    }
+      // Extract only the username portion before '@'
+      let baseName = rawInput.split('@')[0];
+      
+      // Clean special characters except numbers and letters
+      baseName = baseName.replace(/[^a-z0-9._-]/g, '');
 
-    function createStars() {
-      stars = [];
-      const count = Math.floor((canvas.width * canvas.height) / 3000);
-      for (let i = 0; i < count; i++) {
-        stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          size: Math.random() > 0.8 ? 3 : 1.5,
-          speed: 0.2 + Math.random() * 0.5,
-          opacity: Math.random()
+      if (!baseName) return;
+
+      // Build initial list starting with exact match
+      const generatedResults = [
+        { email: `${baseName}@icloud.com`, count: 1 }
+      ];
+
+      // Add variation patterns with calculated mock creation counts
+      numberVariations.forEach((suffix, index) => {
+        generatedResults.push({
+          email: `${baseName}${suffix}@icloud.com`,
+          count: (index + 1) * 4
         });
-      }
-    }
-
-    function drawStars() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach(star => {
-        ctx.fillStyle = `rgba(88, 166, 255, ${star.opacity})`;
-        ctx.fillRect(star.x, star.y, star.size, star.size);
-        star.y -= star.speed;
-        if (star.y < 0) star.y = canvas.height;
       });
-      requestAnimationFrame(drawStars);
-    }
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    drawStars();
+      // Render items to DOM
+      generatedResults.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'result-item';
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.1);
-    }
-
-    async function checkProfile() {
-      playBeep();
-      const username = document.getElementById('usernameInput').value.trim();
-      const resultsBox = document.getElementById('resultsBox');
-      const loadingStatus = document.getElementById('loadingStatus');
-
-      if (!username) {
-        alert("Please enter a username.");
-        return;
-      }
-
-      resultsBox.style.display = "none";
-      loadingStatus.style.display = "block";
-      loadingStatus.innerHTML = "Fetching user details...";
-
-      try {
-        const proxy = "https://corsproxy.io/?";
-
-        // 1. Resolve User ID
-        const userReq = await fetch(proxy + encodeURIComponent("https://users.roblox.com/v1/usernames/users"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ usernames: [username], excludeBannedUsers: false })
-        });
-        const userData = await userReq.json();
-
-        if (!userData.data || userData.data.length === 0) {
-          throw new Error("User not found.");
-        }
-
-        const userId = userData.data[0].id;
-        const displayName = userData.data[0].displayName;
-
-        // 2. Avatar Thumbnail
-        const avatarReq = await fetch(proxy + encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`));
-        const avatarData = await avatarReq.json();
-        const avatarUrl = avatarData.data[0]?.imageUrl || "";
-
-        // 3. Details & Account Age
-        const detailsReq = await fetch(proxy + encodeURIComponent(`https://users.roblox.com/v1/users/${userId}`));
-        const detailsData = await detailsReq.json();
-        const createdDateObj = new Date(detailsData.created);
-        const createdDate = createdDateObj.toLocaleDateString();
-
-        const diffTime = Math.abs(new Date() - createdDateObj);
-        const accountAgeDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-        // 4. Presence
-        const presenceReq = await fetch(proxy + encodeURIComponent("https://presence.roblox.com/v1/presence/users"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userIds: [userId] })
-        });
-        const presenceData = await presenceReq.json();
-        
-        const presenceType = presenceData.userPresences[0]?.userPresenceType || 0;
-        let statusText = "OFFLINE";
-        let statusClass = "status-offline";
-
-        if (presenceType === 1) {
-          statusText = "ONLINE";
-          statusClass = "status-online";
-        } else if (presenceType === 2) {
-          statusText = "IN-GAME";
-          statusClass = "status-ingame";
-        }
-
-        loadingStatus.style.display = "none";
-        resultsBox.style.display = "block";
-        resultsBox.innerHTML = `
-          <div class="avatar-container">
-            ${avatarUrl ? `<img src="${avatarUrl}" class="avatar-img" alt="Avatar">` : ''}
-            <div class="status-badge ${statusClass}">${statusText}</div>
-          </div>
-          <strong>User:</strong> <span>${userData.data[0].name}</span><br>
-          <strong>Display Name:</strong> <span>${displayName}</span><br>
-          <strong>User ID:</strong> <span>${userId}</span><br>
-          <strong>Joined:</strong> <span>${createdDate}</span><br>
-          <strong>Account Age:</strong> <span>${accountAgeDays} Days</span><br>
-          <a href="https://www.roblox.com/users/${userId}/profile" target="_blank" class="profile-btn">View Profile</a>
+        li.innerHTML = `
+          <span class="email-address">${item.email}</span>
+          <span class="creation-badge">${item.count} made</span>
         `;
 
-      } catch (err) {
-        loadingStatus.style.display = "none";
-        resultsBox.style.display = "block";
-        resultsBox.innerHTML = `<span style='color:#f85149'>Error: ${err.message}</span>`;
-      }
-    }
+        resultsList.appendChild(li);
+      });
+    });
   </script>
 
 </body>
