@@ -8,7 +8,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    background: radial-gradient(circle at 20% 0%, #1a1f2e 0%, #0a0e14 60%);
+    background-image: var(--bg-img);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -31,57 +31,20 @@
     z-index: 0;
     pointer-events: none;
   }
-  .page-title, .page-sub, .bg-btn, .bg-panel, .coming-soon { position: relative; z-index: 1; }
-  .page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-  .page-sub { font-size: 13px; color: #b8c0cf; margin-bottom: 16px; }
+  .bg-btn, .coming-soon { position: relative; z-index: 1; }
   .bg-btn {
     position: fixed; top: 16px; right: 16px; z-index: 50;
-    width: 44px; height: 44px; border-radius: 50%;
+    padding: 10px 16px; border-radius: 999px;
     border: 1px solid rgba(255,255,255,0.25);
     background: rgba(255,255,255,0.12);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
-    color: #fff; font-size: 18px;
-    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 700;
     cursor: pointer; transition: transform 0.15s ease, background 0.2s ease;
   }
-  .bg-btn:active { transform: scale(0.92); }
+  .bg-btn:active { transform: scale(0.94); }
   .bg-btn:hover { background: rgba(255,255,255,0.2); }
-  .bg-panel {
-    position: fixed; top: 66px; right: 16px; z-index: 50;
-    width: 200px; padding: 12px; border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.25);
-    background: rgba(30,34,46,0.45);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
-    display: none; flex-direction: column; gap: 8px;
-  }
-  .bg-panel.open { display: flex; }
-  .bg-option {
-    display: flex; align-items: center; gap: 8px;
-    padding: 9px 10px; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: #f1f5f9; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: background 0.15s ease;
-  }
-  .bg-option:hover { background: rgba(255,255,255,0.14); }
-  .bg-option input { display: none; }
-  .bg-option .swatch {
-    width: 22px; height: 22px; border-radius: 6px;
-    background: linear-gradient(135deg, #38bdf8, #6366f1);
-    flex-shrink: 0;
-  }
-  .bg-clear {
-    padding: 8px 10px; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.04);
-    color: #9ca3af; font-size: 11px; font-weight: 600;
-    cursor: pointer; text-align: center;
-  }
-  .bg-clear:hover { color: #f1f5f9; }
   .coming-soon {
     width: 100%; max-width: 420px; text-align: center;
     padding: 46px 28px; border-radius: 24px;
@@ -101,18 +64,7 @@
 </style>
 </head>
 <body>
-  <button class="bg-btn" id="bgBtn" title="Change background">🖼️</button>
-  <div class="bg-panel" id="bgPanel">
-    <label class="bg-option">
-      <span class="swatch"></span> Upload Photo 1
-      <input type="file" accept="image/*" id="bgInput1">
-    </label>
-    <label class="bg-option">
-      <span class="swatch" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></span> Upload Photo 2
-      <input type="file" accept="image/*" id="bgInput2">
-    </label>
-    <div class="bg-clear" id="bgClear">Reset to default</div>
-  </div>
+  <button class="bg-btn" id="bgBtn" title="Change background">Photo 1</button>
 
   <div class="coming-soon">
     <div class="emoji">🎧</div>
@@ -121,32 +73,18 @@
   </div>
 
   <script>
+    // Replace these two with your actual image sources (URL or base64 data URI)
+    const photo1 = "url('PASTE_PHOTO_1_URL_OR_BASE64_HERE')";
+    const photo2 = "url('PASTE_PHOTO_2_URL_OR_BASE64_HERE')";
+
+    document.documentElement.style.setProperty('--bg-img', photo1);
+
+    let onFirst = true;
     const bgBtn = document.getElementById('bgBtn');
-    const bgPanel = document.getElementById('bgPanel');
-    const bgInput1 = document.getElementById('bgInput1');
-    const bgInput2 = document.getElementById('bgInput2');
-    const bgClear = document.getElementById('bgClear');
-    const defaultBg = getComputedStyle(document.body).backgroundImage;
-
-    bgBtn.onclick = () => bgPanel.classList.toggle('open');
-    document.addEventListener('click', (e) => {
-      if (!bgPanel.contains(e.target) && e.target !== bgBtn) bgPanel.classList.remove('open');
-    });
-
-    function applyImage(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        document.body.style.backgroundImage = `url('${e.target.result}')`;
-        bgPanel.classList.remove('open');
-      };
-      reader.readAsDataURL(file);
-    }
-    bgInput1.onchange = (e) => applyImage(e.target.files[0]);
-    bgInput2.onchange = (e) => applyImage(e.target.files[0]);
-    bgClear.onclick = () => {
-      document.body.style.backgroundImage = defaultBg;
-      bgPanel.classList.remove('open');
+    bgBtn.onclick = () => {
+      onFirst = !onFirst;
+      document.documentElement.style.setProperty('--bg-img', onFirst ? photo1 : photo2);
+      bgBtn.innerText = onFirst ? "Photo 1" : "Photo 2";
     };
   </script>
 </body>
