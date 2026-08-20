@@ -109,12 +109,7 @@
     .title-area h3 {
       font-size: 18px;
       color: #f1f5f9;
-      margin-bottom: 4px;
-    }
-
-    .likes-count {
-      font-size: 13px;
-      color: #8b949e;
+      margin-bottom: 6px;
     }
 
     .id-box {
@@ -134,7 +129,7 @@
       font-weight: bold;
     }
 
-    /* BLOCKY COPY & PLAY BUTTONS */
+    /* BLOCKY BUTTONS */
     .btn-action {
       background-color: #38bdf8;
       color: #000000;
@@ -155,6 +150,37 @@
     .btn-action:active {
       transform: translateY(2px);
       box-shadow: 0px 1px 0px #000000;
+    }
+
+    /* INTERACTIVE LIKE BUTTON */
+    .btn-like {
+      background-color: #22c55e;
+      color: #000000;
+      border: 2px solid #000000;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0px 3px 0px #000000;
+      transition: all 0.05s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-like:hover {
+      background-color: #4ade80;
+    }
+
+    .btn-like:active {
+      transform: translateY(2px);
+      box-shadow: 0px 1px 0px #000000;
+    }
+
+    .btn-like.liked {
+      background-color: #15803d;
+      color: #ffffff;
     }
 
     /* SOUND PLAYER & TRACK SCRUBBER */
@@ -246,14 +272,16 @@
       const card = document.createElement('div');
       card.className = 'card';
       
-      // Using Roblox audio asset endpoint for playback
-      const audioUrl = `https://assetdelivery.roblox.com/v1/asset/?id=${sound.id}`;
+      const rawAudioUrl = `https://assetdelivery.roblox.com/v1/asset/?id=${sound.id}`;
+      const audioUrl = `https://corsproxy.io/?${encodeURIComponent(rawAudioUrl)}`;
 
       card.innerHTML = `
         <div class="card-header">
           <div class="title-area">
             <h3>${sound.name}</h3>
-            <div class="likes-count">👍 ${sound.likes.toLocaleString()} likes</div>
+            <button class="btn-like" id="like-btn-${index}" onclick="toggleLike(${index})">
+              👍 <span id="likes-count-${index}">${sound.likes.toLocaleString()}</span>
+            </button>
           </div>
           <div class="id-box">
             <span class="id-code">${sound.id}</span>
@@ -262,7 +290,7 @@
         </div>
 
         <div class="player-row">
-          <button class="btn-action" onclick="toggleAudio('${audioUrl}', ${index}, this)">▶ Play</button>
+          <button class="btn-action play-btn" onclick="toggleAudio('${audioUrl}', ${index}, this)">▶ Play</button>
           <input type="range" class="scrubber" id="scrubber-${index}" value="0" min="0" max="100" oninput="seekAudio(${index}, this.value)">
           <audio id="audio-${index}" src="${audioUrl}" preload="none"></audio>
         </div>
@@ -276,7 +304,6 @@
       `;
       container.appendChild(card);
 
-      // Setup audio event listeners for the track scrubber
       const audio = card.querySelector(`#audio-${index}`);
       const scrubber = card.querySelector(`#scrubber-${index}`);
 
@@ -287,11 +314,31 @@
       });
 
       audio.addEventListener('ended', () => {
-        const playBtn = card.querySelectorAll('.btn-action')[1];
+        const playBtn = card.querySelector('.play-btn');
         playBtn.innerText = "▶ Play";
         scrubber.value = 0;
       });
     });
+
+    const userLikes = {};
+
+    function toggleLike(index) {
+      const sound = sounds[index];
+      const countEl = document.getElementById(`likes-count-${index}`);
+      const btnEl = document.getElementById(`like-btn-${index}`);
+
+      if (!userLikes[index]) {
+        userLikes[index] = true;
+        sound.likes += 1;
+        btnEl.classList.add('liked');
+      } else {
+        userLikes[index] = false;
+        sound.likes -= 1;
+        btnEl.classList.remove('liked');
+      }
+
+      countEl.innerText = sound.likes.toLocaleString();
+    }
 
     function toggleAudio(url, index, btn) {
       const audio = document.getElementById(`audio-${index}`);
@@ -302,10 +349,16 @@
       }
 
       if (audio.paused) {
-        audio.play();
-        btn.innerText = "⏸ Pause";
-        currentAudio = audio;
-        currentPlayBtn = btn;
+        btn.innerText = "⌛ Loading...";
+        audio.play().then(() => {
+          btn.innerText = "⏸ Pause";
+          currentAudio = audio;
+          currentPlayBtn = btn;
+        }).catch(err => {
+          console.error("Playback error:", err);
+          btn.innerText = "❌ Error";
+          setTimeout(() => { btn.innerText = "▶ Play"; }, 2000);
+        });
       } else {
         audio.pause();
         btn.innerText = "▶ Play";
