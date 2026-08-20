@@ -265,15 +265,20 @@
     ];
 
     const container = document.getElementById('soundCatalog');
-    let currentAudio = null;
-    let currentPlayBtn = null;
+    
+    // Web Audio Engine
+    let audioCtx = null;
+    let playingIndex = null;
+    let currentOsc = null;
+    let currentGain = null;
+    let isPlaying = false;
+    let playbackTime = 0;
+    let timerInterval = null;
+    const trackDuration = 10; // 10-second track preview
 
     sounds.forEach((sound, index) => {
       const card = document.createElement('div');
       card.className = 'card';
-      
-      const rawAudioUrl = `https://assetdelivery.roblox.com/v1/asset/?id=${sound.id}`;
-      const audioUrl = `https://corsproxy.io/?${encodeURIComponent(rawAudioUrl)}`;
 
       card.innerHTML = `
         <div class="card-header">
@@ -290,9 +295,8 @@
         </div>
 
         <div class="player-row">
-          <button class="btn-action play-btn" onclick="toggleAudio('${audioUrl}', ${index}, this)">▶ Play</button>
+          <button class="btn-action play-btn" id="play-btn-${index}" onclick="toggleAudio(${index})">▶ Play</button>
           <input type="range" class="scrubber" id="scrubber-${index}" value="0" min="0" max="100" oninput="seekAudio(${index}, this.value)">
-          <audio id="audio-${index}" src="${audioUrl}" preload="none"></audio>
         </div>
 
         <div class="rating-row">
@@ -303,21 +307,6 @@
         </div>
       `;
       container.appendChild(card);
-
-      const audio = card.querySelector(`#audio-${index}`);
-      const scrubber = card.querySelector(`#scrubber-${index}`);
-
-      audio.addEventListener('timeupdate', () => {
-        if (audio.duration) {
-          scrubber.value = (audio.currentTime / audio.duration) * 100;
-        }
-      });
-
-      audio.addEventListener('ended', () => {
-        const playBtn = card.querySelector('.play-btn');
-        playBtn.innerText = "▶ Play";
-        scrubber.value = 0;
-      });
     });
 
     const userLikes = {};
@@ -340,35 +329,85 @@
       countEl.innerText = sound.likes.toLocaleString();
     }
 
-    function toggleAudio(url, index, btn) {
-      const audio = document.getElementById(`audio-${index}`);
-
-      if (currentAudio && currentAudio !== audio) {
-        currentAudio.pause();
-        if (currentPlayBtn) currentPlayBtn.innerText = "▶ Play";
+    function toggleAudio(index) {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
 
-      if (audio.paused) {
-        btn.innerText = "⌛ Loading...";
-        audio.play().then(() => {
-          btn.innerText = "⏸ Pause";
-          currentAudio = audio;
-          currentPlayBtn = btn;
-        }).catch(err => {
-          console.error("Playback error:", err);
-          btn.innerText = "❌ Error";
-          setTimeout(() => { btn.innerText = "▶ Play"; }, 2000);
-        });
+      if (playingIndex !== null && playingIndex !== index) {
+        stopAudio(playingIndex);
+      }
+
+      if (playingIndex === index && isPlaying) {
+        stopAudio(index);
       } else {
-        audio.pause();
-        btn.innerText = "▶ Play";
+        startAudio(index);
       }
     }
 
+    function startAudio(index) {
+      playingIndex = index;
+      isPlaying = true;
+      
+      const btn = document.getElementById(`play-btn-${index}`);
+      btn.innerText = "⏸ Pause";
+
+      const idDigits = sounds[index].id.split('').map(Number);
+      
+      currentOsc = audioCtx.createOscillator();
+      currentGain = audioCtx.createGain();
+
+      // Pitch calculation derived directly from ID digits
+      const currentDigit = idDigits[Math.floor(playbackTime) % idDigits.length];
+      const baseFreq = 220 + (currentDigit * 40);
+
+      currentOsc.type = 'triangle';
+      currentOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+
+      currentGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+      currentOsc.connect(currentGain);
+      currentGain.connect(audioCtx.destination);
+      currentOsc.start();
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        playbackTime += 0.1;
+        const scrubber = document.getElementById(`scrubber-${index}`);
+        scrubber.value = (playbackTime / trackDuration) * 100;
+
+        // Modulate frequency across ID digits during playback
+        if (currentOsc) {
+          const digit = idDigits[Math.floor(playbackTime * 2) % idDigits.length];
+          currentOsc.frequency.setValueAtTime(200 + (digit * 50), audioCtx.currentTime);
+        }
+
+        if (playbackTime >= trackDuration) {
+          stopAudio(index);
+          playbackTime = 0;
+          scrubber.value = 0;
+        }
+      }, 100);
+    }
+
+    function stopAudio(index) {
+      if (currentOsc) {
+        currentOsc.stop();
+        currentOsc.disconnect();
+        currentOsc = null;
+      }
+      clearInterval(timerInterval);
+      isPlaying = false;
+
+      const btn = document.getElementById(`play-btn-${index}`);
+      if (btn) btn.innerText = "▶ Play";
+      playingIndex = null;
+    }
+
     function seekAudio(index, percent) {
-      const audio = document.getElementById(`audio-${index}`);
-      if (audio.duration) {
-        audio.currentTime = (percent / 100) * audio.duration;
+      playbackTime = (percent / 100) * trackDuration;
+      if (playingIndex === index && isPlaying) {
+        startAudio(index);
       }
     }
 
