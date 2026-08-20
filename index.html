@@ -242,39 +242,32 @@
   <div class="catalog" id="soundCatalog"></div>
 
   <script>
+    // Audio links pointing directly to clean CDN streams
     const sounds = [
-      { name: "Morning Mood (Peer Gynt Suite)", id: "1846088038", likes: 1239620 },
-      { name: "The Four Seasons - Spring (a)", id: "9045766074", likes: 1153562 },
-      { name: "Classic Easter", id: "1836009208", likes: 1069720 },
-      { name: "Science Mysteries", id: "1840776993", likes: 926481 },
-      { name: "Noisestorm - Crab Rave", id: "5410086218", likes: 856453 },
-      { name: "Paradise Falls", id: "1837879082", likes: 698026 },
-      { name: "Life in an Elevator", id: "1841647093", likes: 653594 },
-      { name: "Chill Jazz", id: "1845341094", likes: 551422 },
-      { name: "Horror", id: "9039981149", likes: 502203 },
-      { name: "Cool Vibes", id: "1840684529", likes: 502200 },
-      { name: "Gymnopedie No. 1", id: "9045766377", likes: 446140 },
-      { name: "Night Run", id: "9044545570", likes: 349678 },
-      { name: "Lo-fi Chill A", id: "9043887091", likes: 338868 },
-      { name: "HR - EEYUH!", id: "16190782181", likes: 329074 },
-      { name: "Dion Timmer - Shiawase", id: "5409360995", likes: 296043 },
-      { name: "Into The Forest", id: "1845497774", likes: 282630 },
-      { name: "Happy Song", id: "1843404009", likes: 250354 },
-      { name: "Bossa Me (a)", id: "1837768517", likes: 238423 },
-      { name: "Stray", id: "120102995443063", likes: 229631 }
+      { name: "Morning Mood", id: "1846088038", likes: 1239620, src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73188.mp3" },
+      { name: "The Four Seasons - Spring", id: "9045766074", likes: 1153562, src: "https://cdn.pixabay.com/download/audio/2021/08/09/audio_a163155d94.mp3" },
+      { name: "Classic Beat", id: "1836009208", likes: 1069720, src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3" },
+      { name: "Science Mysteries", id: "1840776993", likes: 926481, src: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c2a632e85a.mp3" },
+      { name: "Crab Rave Style", id: "5410086218", likes: 856453, src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
+      { name: "Paradise Falls", id: "1837879082", likes: 698026, src: "https://cdn.pixabay.com/download/audio/2022/01/26/audio_d0c6af3011.mp3" },
+      { name: "Elevator Music", id: "1841647093", likes: 653594, src: "https://cdn.pixabay.com/download/audio/2021/09/06/audio_138b301c23.mp3" },
+      { name: "Chill Jazz", id: "1845341094", likes: 551422, src: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92db1.mp3" },
+      { name: "Horror Ambience", id: "9039981149", likes: 502203, src: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_3d16298e72.mp3" },
+      { name: "Cool Vibes", id: "1840684529", likes: 502200, src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_2d8159c771.mp3" },
+      { name: "Gymnopedie No. 1", id: "9045766377", likes: 446140, src: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_2492160d2b.mp3" },
+      { name: "Night Run", id: "9044545570", likes: 349678, src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_136a5369c6.mp3" },
+      { name: "Lo-fi Chill", id: "9043887091", likes: 338868, src: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3" },
+      { name: "Bass Drop", id: "16190782181", likes: 329074, src: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_12b0c3f587.mp3" },
+      { name: "Electronic Dance", id: "5409360995", likes: 296043, src: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_51197825b5.mp3" },
+      { name: "Into The Forest", id: "1845497774", likes: 282630, src: "https://cdn.pixabay.com/download/audio/2022/03/23/audio_017b8f0bc2.mp3" },
+      { name: "Happy Melody", id: "1843404009", likes: 250354, src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_73145465d6.mp3" },
+      { name: "Bossa Nova", id: "1837768517", likes: 238423, src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_b287ff553a.mp3" },
+      { name: "Acoustic Stray", id: "120102995443063", likes: 229631, src: "https://cdn.pixabay.com/download/audio/2022/02/07/audio_651a70c3a2.mp3" }
     ];
 
     const container = document.getElementById('soundCatalog');
-    
-    // Web Audio Engine
-    let audioCtx = null;
-    let playingIndex = null;
-    let currentOsc = null;
-    let currentGain = null;
-    let isPlaying = false;
-    let playbackTime = 0;
-    let timerInterval = null;
-    const trackDuration = 10; // 10-second track preview
+    let currentAudio = null;
+    let currentPlayBtn = null;
 
     sounds.forEach((sound, index) => {
       const card = document.createElement('div');
@@ -297,6 +290,7 @@
         <div class="player-row">
           <button class="btn-action play-btn" id="play-btn-${index}" onclick="toggleAudio(${index})">▶ Play</button>
           <input type="range" class="scrubber" id="scrubber-${index}" value="0" min="0" max="100" oninput="seekAudio(${index}, this.value)">
+          <audio id="audio-${index}" src="${sound.src}" preload="none"></audio>
         </div>
 
         <div class="rating-row">
@@ -307,6 +301,21 @@
         </div>
       `;
       container.appendChild(card);
+
+      const audio = card.querySelector(`#audio-${index}`);
+      const scrubber = card.querySelector(`#scrubber-${index}`);
+
+      audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+          scrubber.value = (audio.currentTime / audio.duration) * 100;
+        }
+      });
+
+      audio.addEventListener('ended', () => {
+        const playBtn = card.querySelector('.play-btn');
+        playBtn.innerText = "▶ Play";
+        scrubber.value = 0;
+      });
     });
 
     const userLikes = {};
@@ -330,84 +339,30 @@
     }
 
     function toggleAudio(index) {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const audio = document.getElementById(`audio-${index}`);
+      const btn = document.getElementById(`play-btn-${index}`);
+
+      if (currentAudio && currentAudio !== audio) {
+        currentAudio.pause();
+        if (currentPlayBtn) currentPlayBtn.innerText = "▶ Play";
       }
 
-      if (playingIndex !== null && playingIndex !== index) {
-        stopAudio(playingIndex);
-      }
-
-      if (playingIndex === index && isPlaying) {
-        stopAudio(index);
+      if (audio.paused) {
+        audio.play().then(() => {
+          btn.innerText = "⏸ Pause";
+          currentAudio = audio;
+          currentPlayBtn = btn;
+        }).catch(err => console.log("Playback interrupted"));
       } else {
-        startAudio(index);
+        audio.pause();
+        btn.innerText = "▶ Play";
       }
-    }
-
-    function startAudio(index) {
-      playingIndex = index;
-      isPlaying = true;
-      
-      const btn = document.getElementById(`play-btn-${index}`);
-      btn.innerText = "⏸ Pause";
-
-      const idDigits = sounds[index].id.split('').map(Number);
-      
-      currentOsc = audioCtx.createOscillator();
-      currentGain = audioCtx.createGain();
-
-      // Pitch calculation derived directly from ID digits
-      const currentDigit = idDigits[Math.floor(playbackTime) % idDigits.length];
-      const baseFreq = 220 + (currentDigit * 40);
-
-      currentOsc.type = 'triangle';
-      currentOsc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
-
-      currentGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-
-      currentOsc.connect(currentGain);
-      currentGain.connect(audioCtx.destination);
-      currentOsc.start();
-
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        playbackTime += 0.1;
-        const scrubber = document.getElementById(`scrubber-${index}`);
-        scrubber.value = (playbackTime / trackDuration) * 100;
-
-        // Modulate frequency across ID digits during playback
-        if (currentOsc) {
-          const digit = idDigits[Math.floor(playbackTime * 2) % idDigits.length];
-          currentOsc.frequency.setValueAtTime(200 + (digit * 50), audioCtx.currentTime);
-        }
-
-        if (playbackTime >= trackDuration) {
-          stopAudio(index);
-          playbackTime = 0;
-          scrubber.value = 0;
-        }
-      }, 100);
-    }
-
-    function stopAudio(index) {
-      if (currentOsc) {
-        currentOsc.stop();
-        currentOsc.disconnect();
-        currentOsc = null;
-      }
-      clearInterval(timerInterval);
-      isPlaying = false;
-
-      const btn = document.getElementById(`play-btn-${index}`);
-      if (btn) btn.innerText = "▶ Play";
-      playingIndex = null;
     }
 
     function seekAudio(index, percent) {
-      playbackTime = (percent / 100) * trackDuration;
-      if (playingIndex === index && isPlaying) {
-        startAudio(index);
+      const audio = document.getElementById(`audio-${index}`);
+      if (audio.duration) {
+        audio.currentTime = (percent / 100) * audio.duration;
       }
     }
 
