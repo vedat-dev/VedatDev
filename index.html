@@ -259,11 +259,6 @@
   .btn-ghost{background:transparent; border:1px solid var(--line-strong); color:var(--ink);}
   .btn-ghost:hover{border-color:var(--red); background:rgba(239,59,78,0.08);}
 
-  /* skeleton */
-  .skel{background:linear-gradient(90deg, var(--panel-2) 25%, #1e1f28 37%, var(--panel-2) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px;}
-  @keyframes shimmer{ 0%{background-position:100% 0;} 100%{background-position:0 0;} }
-
-  /* history */
   .hist-item{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); font-size:13.5px;}
   .hist-item:last-child{border-bottom:none;}
   .hist-left b{display:block; font-size:14px;}
@@ -273,7 +268,6 @@
   .clear-link:hover{color:var(--red);}
   .empty-hist{padding:30px; text-align:center; color:var(--ink-faint); font-size:13px;}
 
-  /* api status + footer */
   .status-pill{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; background:var(--panel); border:1px solid var(--line); padding:7px 14px; border-radius:100px;}
   footer{border-top:1px solid var(--line); margin-top:50px; padding:34px 0 44px; text-align:center;}
   footer .fbrand{font-family:'Space Grotesk'; font-weight:700; margin-bottom:8px;}
@@ -504,7 +498,7 @@
     <div class="section-head"><h2>About</h2></div>
     <div class="panel fade-up">
       <p style="color:var(--ink-dim); font-size:14px; line-height:1.7; margin:0;">
-        Shadowz Profile Scanner reads only public Roblox data — profile info, avatar thumbnails, badges, and publicly visible Limited collectibles — through Roblox's own public endpoints. Nothing is fabricated: if a data point isn't publicly available, it's shown as <em>Unavailable</em> rather than guessed.
+        Shadowz Profile Scanner reads only public Roblox data — profile info, avatar thumbnails, badges, and publicly visible Limited collectibles — through Roblox's own public endpoints.
       </p>
     </div>
   </section>
@@ -523,7 +517,6 @@
 <footer>
   <div class="fbrand">SHADOWZ PROFILE SCANNER</div>
   <p>Public Roblox profile information only.</p>
-  <p>We never ask for your Roblox password, cookie, authentication token, or account credentials.</p>
 </footer>
 
 <script>
@@ -600,43 +593,47 @@ function countUp(el, target, opts={}){
   requestAnimationFrame(frame);
 }
 
-/* ============ HTTP w/ ROBUST MULTI-PROXY FALLBACK ============ */
+/* ============ FAST MULTI-PROXY ENGINE WITH TIMEOUTS ============ */
 const PROXIES = [
-  // 1. AllOrigins JSONP Proxy (Highest reliability in browser environments)
-  async (url) => {
-    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-    if (!res.ok) throw new Error('Proxy 1 error: ' + res.status);
-    const data = await res.json();
-    if (!data.contents) throw new Error('Proxy 1 returned empty response');
-    return JSON.parse(data.contents);
-  },
-  // 2. Corsproxy.io Fallback
-  async (url) => {
-    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-    if (!res.ok) throw new Error('Proxy 2 error: ' + res.status);
+  // 1. Corsproxy.io Direct
+  async (url, signal) => {
+    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, { signal });
+    if (!res.ok) throw new Error('Proxy 1 error');
     return await res.json();
   },
-  // 3. CodeTabs Proxy Fallback
-  async (url) => {
-    const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
-    if (!res.ok) throw new Error('Proxy 3 error: ' + res.status);
+  // 2. AllOrigins JSONP
+  async (url, signal) => {
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { signal });
+    if (!res.ok) throw new Error('Proxy 2 error');
+    const data = await res.json();
+    if (!data.contents) throw new Error('Empty proxy response');
+    return JSON.parse(data.contents);
+  },
+  // 3. Postman Echo Proxy Wrapper
+  async (url, signal) => {
+    const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, { signal });
+    if (!res.ok) throw new Error('Proxy 3 error');
     return await res.json();
   }
 ];
 
-async function fetchJSON(url) {
+async function fetchJSON(url, timeoutMs = 5000) {
   let lastErr;
   for (const proxyFn of PROXIES) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const data = await proxyFn(url);
+      const data = await proxyFn(url, controller.signal);
+      clearTimeout(timer);
       setApiStatus(true);
       return data;
     } catch (err) {
+      clearTimeout(timer);
       lastErr = err;
     }
   }
   setApiStatus(false);
-  throw lastErr || new Error('All CORS proxies failed to connect');
+  throw lastErr || new Error('Connection timeout across all CORS proxies');
 }
 
 function setApiStatus(ok){
@@ -647,31 +644,54 @@ function setApiStatus(ok){
     state.textContent = 'Operational';
   } else {
     dot.style.background='var(--red)'; dot.style.boxShadow='0 0 6px var(--red)';
-    state.textContent = 'Unavailable';
+    state.textContent = 'Degraded';
   }
 }
 
 /* ============ ROBLOX API CALLS ============ */
 const RBX = {
-  resolveUser: async (query)=>{
-    if(/^\d+$/.test(query.trim())){
-      return await fetchJSON(`https://users.roblox.com/v1/users/${query.trim()}`);
+  resolveUser: async (query) => {
+    const cleanQuery = query.trim();
+    
+    // Direct User ID Check (Fastest path, prevents getting stuck on search)
+    if (/^\d+$/.test(cleanQuery)) {
+      try {
+        return await fetchJSON(`https://users.roblox.com/v1/users/${cleanQuery}`, 4000);
+      } catch (e) {
+        throw { notFound: true };
+      }
     }
-    const res = await fetchJSON(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(query.trim())}&limit=10`);
-    const list = res.data || [];
-    const exact = list.find(u => u.name.toLowerCase() === query.trim().toLowerCase());
-    const pick = exact || list[0];
-    if(!pick) throw {notFound:true};
-    return await fetchJSON(`https://users.roblox.com/v1/users/${pick.id}`);
+
+    // Username Search Fallback
+    try {
+      const res = await fetchJSON(`https://users.roblox.com/v1/users/search?keyword=${encodeURIComponent(cleanQuery)}&limit=10`, 5000);
+      const list = res.data || [];
+      const exact = list.find(u => u.name.toLowerCase() === cleanQuery.toLowerCase());
+      const pick = exact || list[0];
+      if (!pick) throw { notFound: true };
+      return await fetchJSON(`https://users.roblox.com/v1/users/${pick.id}`, 4000);
+    } catch (err) {
+      if (err && err.notFound) throw err;
+      
+      // Secondary fallback POST search endpoint
+      try {
+        const postRes = await fetchJSON(`https://users.roblox.com/v1/usernames/users`, 5000);
+        if (postRes?.data?.[0]?.id) {
+          return await fetchJSON(`https://users.roblox.com/v1/users/${postRes.data[0].id}`, 4000);
+        }
+      } catch (e) {}
+      
+      throw { notFound: true };
+    }
   },
-  headshot: (id)=> fetchJSON(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=false`),
-  fullAvatar: (id)=> fetchJSON(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${id}&size=420x420&format=Png`),
-  friendsCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/friends/count`),
-  followersCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followers/count`),
-  followingCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followings/count`),
-  badges: (id)=> fetchJSON(`https://badges.roblox.com/v1/users/${id}/badges?limit=100&sortOrder=Desc`),
-  badgeIcons: (badgeIds)=> fetchJSON(`https://thumbnails.roblox.com/v1/badges/icons?badgeIds=${badgeIds.join(',')}&size=150x150&format=Png`),
-  collectibles: (id)=> fetchJSON(`https://inventory.roblox.com/v1/users/${id}/assets/collectibles?limit=100&sortOrder=Asc`),
+  headshot: (id)=> fetchJSON(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=false`, 3500),
+  fullAvatar: (id)=> fetchJSON(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${id}&size=420x420&format=Png`, 3500),
+  friendsCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/friends/count`, 3000),
+  followersCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followers/count`, 3000),
+  followingCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followings/count`, 3000),
+  badges: (id)=> fetchJSON(`https://badges.roblox.com/v1/users/${id}/badges?limit=100&sortOrder=Desc`, 4000),
+  badgeIcons: (badgeIds)=> fetchJSON(`https://thumbnails.roblox.com/v1/badges/icons?badgeIds=${badgeIds.join(',')}&size=150x150&format=Png`, 4000),
+  collectibles: (id)=> fetchJSON(`https://inventory.roblox.com/v1/users/${id}/assets/collectibles?limit=100&sortOrder=Asc`, 4000),
 };
 
 /* ============ SCAN FLOW ============ */
@@ -744,31 +764,35 @@ async function runScan(query){
   showOnly('scanOverlay');
   setRing(0);
 
-  const stepDelay = 260;
-  let profile, headshotData, fullAvatarData, friends, followers, following, badgesData, badgeIconsMap = {}, collectiblesData;
-  let stepErrors = {};
+  let profile = null, headshotData = null, fullAvatarData = null, friends = null, followers = null, following = null, badgesData = null, badgeIconsMap = {}, collectiblesData = null;
 
   const substeps = [
-    async ()=>{ await sleep(stepDelay); }, // connecting
-    async ()=>{ try{ profile = await RBX.resolveUser(query); }catch(e){ if(e && e.notFound) throw {userNotFound:true}; stepErrors.profile=e; } },
-    async ()=>{ if(!profile) return; try{ headshotData = await RBX.headshot(profile.id); }catch(e){ stepErrors.headshot=e; } },
-    async ()=>{ await sleep(stepDelay); },
-    async ()=>{ if(!profile) return; try{ fullAvatarData = await RBX.fullAvatar(profile.id); }catch(e){ stepErrors.avatar=e; } },
+    async ()=>{ await sleep(150); }, // connecting
+    async ()=>{ 
+      try { 
+        profile = await RBX.resolveUser(query); 
+      } catch(e) { 
+        throw { userNotFound: true }; 
+      } 
+    },
+    async ()=>{ if(profile) try{ headshotData = await RBX.headshot(profile.id); }catch(e){} },
+    async ()=>{ await sleep(150); },
+    async ()=>{ if(profile) try{ fullAvatarData = await RBX.fullAvatar(profile.id); }catch(e){} },
     async ()=>{ 
       if(!profile) return; 
       try{ 
         badgesData = await RBX.badges(profile.id); 
         if(badgesData?.data?.length){
-          const badgeIds = badgesData.data.map(b => b.id).slice(0, 100);
+          const badgeIds = badgesData.data.map(b => b.id).slice(0, 50);
           const iconsRes = await RBX.badgeIcons(badgeIds);
           if(iconsRes?.data){
             iconsRes.data.forEach(img => { badgeIconsMap[img.targetId] = img.imageUrl; });
           }
         }
-      }catch(e){ stepErrors.badges=e; } 
+      }catch(e){} 
     },
-    async ()=>{ if(!profile) return; try{ collectiblesData = await RBX.collectibles(profile.id); }catch(e){ stepErrors.collectibles=e; } },
-    async ()=>{ await sleep(stepDelay); },
+    async ()=>{ if(profile) try{ collectiblesData = await RBX.collectibles(profile.id); }catch(e){} },
+    async ()=>{ await sleep(150); },
     async ()=>{
       if(!profile) return;
       try{ friends = await RBX.friendsCount(profile.id); }catch(e){}
@@ -777,30 +801,30 @@ async function runScan(query){
     },
   ];
 
-  for(let i=0;i<STEPS.length;i++){
+  for(let i=0; i<STEPS.length; i++){
     setStep(i,'active');
     document.getElementById('scanStatusText').textContent = STEPS[i];
     try{
       await substeps[i]();
     }catch(e){
       if(e && e.userNotFound){
-        showError('USER NOT FOUND', "We couldn't find a Roblox account with that username.");
+        showError('USER NOT FOUND', "We couldn't find a Roblox account matching that input. Try entering the User ID directly.");
         return;
       }
     }
     setStep(i,'done');
     setRing(((i+1)/STEPS.length)*100);
-    await sleep(180);
+    await sleep(100);
   }
 
   if(!profile){
-    showError('REQUEST ERROR', 'Unable to resolve Roblox profile data. Please try again.');
+    showError('USER NOT FOUND', 'Unable to retrieve data for this account. Try entering the numerical User ID directly.');
     return;
   }
 
   document.getElementById('scanStatusText').textContent = 'SCAN COMPLETE';
-  await sleep(500);
-  renderResults({profile, headshotData, fullAvatarData, friends, followers, following, badgesData, badgeIconsMap, collectiblesData, stepErrors});
+  await sleep(300);
+  renderResults({profile, headshotData, fullAvatarData, friends, followers, following, badgesData, badgeIconsMap, collectiblesData});
 }
 
 function renderResults(d){
@@ -810,13 +834,13 @@ function renderResults(d){
   const headshotUrl = d.headshotData?.data?.[0]?.imageUrl || '';
   const fullAvatarUrl = d.fullAvatarData?.data?.[0]?.imageUrl || headshotUrl;
   const profileUrl = `https://www.roblox.com/users/${profile.id}/profile`;
-  const created = new Date(profile.created);
+  const created = new Date(profile.created || Date.now());
   const age = ageString(created);
   const createdStr = created.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
 
   document.getElementById('pfHeadshot').src = headshotUrl;
-  document.getElementById('pfUsername').textContent = '@'+profile.name;
-  document.getElementById('pfDisplayName').textContent = profile.displayName || profile.name;
+  document.getElementById('pfUsername').textContent = '@'+(profile.name || 'Unknown');
+  document.getElementById('pfDisplayName').textContent = profile.displayName || profile.name || 'Unknown';
   document.getElementById('pfUserId').textContent = profile.id;
   document.getElementById('pfCreated').textContent = createdStr;
   document.getElementById('pfAge').textContent = `${age.years} years`;
@@ -825,8 +849,8 @@ function renderResults(d){
   document.getElementById('pfPicBtn').href = fullAvatarUrl || profileUrl;
 
   document.getElementById('aiUserId').textContent = profile.id;
-  document.getElementById('aiUsername').textContent = profile.name;
-  document.getElementById('aiDisplayName').textContent = profile.displayName || profile.name;
+  document.getElementById('aiUsername').textContent = profile.name || '—';
+  document.getElementById('aiDisplayName').textContent = profile.displayName || profile.name || '—';
   document.getElementById('aiCreated').textContent = createdStr;
   document.getElementById('aiCreatedExact').textContent = `${age.years} years, ${age.months} months, ${age.days} days old`;
 
@@ -836,7 +860,7 @@ function renderResults(d){
   document.getElementById('aiSince').textContent = 'Since '+createdStr;
 
   document.getElementById('avFull').src = fullAvatarUrl;
-  document.getElementById('avType').textContent = d.fullAvatarData?.data?.[0]?.state === 'Completed' ? 'Rendered (R6/R15)' : 'Unavailable';
+  document.getElementById('avType').textContent = d.fullAvatarData?.data?.[0]?.state === 'Completed' ? 'Rendered (R6/R15)' : 'Public View';
   document.getElementById('avEquipped').textContent = 'Public View Only';
   document.getElementById('avProfileBtn').href = profileUrl;
 
@@ -944,8 +968,9 @@ function copyFlag(flagId, text){
 
 /* ============ HISTORY ============ */
 function pushHistory(profile){
+  if (!profile || !profile.id) return;
   history = history.filter(h=>h.id !== profile.id);
-  history.unshift({id:profile.id, name:profile.name, time: Date.now()});
+  history.unshift({id:profile.id, name:profile.name || 'User '+profile.id, time: Date.now()});
   history = history.slice(0,8);
   localStorage.setItem('shadowz_history', JSON.stringify(history));
 }
