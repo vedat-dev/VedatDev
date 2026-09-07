@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NUBRIC — ODYSSEY</title>
-    <!-- Sleek Sci-Fi Fonts -->
+    <!-- Sci-Fi Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-black: #020408;
             --electric-blue: #0066ff;
             --cyan-bright: #00f0ff;
-            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --cyan-glow: rgba(0, 240, 255, 0.5);
             --text-white: #f0f6ff;
-            --glass-bg: rgba(6, 14, 32, 0.8);
-            --glass-border: rgba(0, 240, 255, 0.35);
+            --glass-bg: rgba(6, 16, 38, 0.82);
+            --glass-border: rgba(0, 240, 255, 0.45);
             --font-head: 'Orbitron', sans-serif;
             --font-ui: 'Rajdhani', sans-serif;
         }
@@ -50,11 +50,11 @@
         /* Glassmorphism Panels */
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 240, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85), inset 0 0 20px rgba(0, 240, 255, 0.15);
         }
 
         .screen {
@@ -71,7 +71,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s ease, transform 0.4s ease;
-            transform: scale(0.97);
+            transform: scale(0.96);
             padding: 20px;
         }
 
@@ -83,63 +83,79 @@
 
         .logo-title {
             font-family: var(--font-head);
-            font-size: 3.2rem;
+            font-size: 3.4rem;
             font-weight: 900;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.22em;
             color: #fff;
-            text-shadow: 0 0 20px var(--cyan-bright), 0 0 40px var(--electric-blue);
+            text-shadow: 0 0 25px var(--cyan-bright), 0 0 50px var(--electric-blue);
             margin-bottom: 5px;
             text-align: center;
         }
 
         .logo-subtitle {
             font-family: var(--font-ui);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.35em;
             color: var(--cyan-bright);
             margin-bottom: 25px;
-            text-shadow: 0 0 10px var(--cyan-glow);
+            text-shadow: 0 0 12px var(--cyan-glow);
             text-align: center;
         }
 
-        /* Buttons */
+        /* Redesigned Premium Buttons */
         .btn {
             position: relative;
             font-family: var(--font-head);
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.3), rgba(0, 240, 255, 0.1));
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.35), rgba(0, 240, 255, 0.12));
             border: 1px solid var(--glass-border);
             color: var(--text-white);
-            padding: 14px 28px;
-            margin: 6px 0;
-            border-radius: 8px;
+            padding: 16px 32px;
+            margin: 8px 0;
+            border-radius: 12px;
             cursor: pointer;
             outline: none;
             text-transform: uppercase;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            min-width: 240px;
+            gap: 12px;
+            min-width: 250px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,240,255,0.25) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::before { opacity: 1; }
 
         .btn:hover {
             border-color: var(--cyan-bright);
-            box-shadow: 0 0 20px var(--cyan-glow);
-            transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--cyan-glow), 0 0 10px rgba(0,240,255,0.8);
+            transform: translateY(-3px) scale(1.02);
             color: #fff;
         }
 
-        .btn:active { transform: translateY(1px); }
+        .btn:active { transform: translateY(1px) scale(0.98); }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.6));
+            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.75));
             border-color: var(--cyan-bright);
-            box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
         }
 
         .btn-auth {
@@ -151,7 +167,7 @@
             border: none;
             width: 100%;
         }
-        .btn-auth:hover { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.6); }
+        .btn-auth:hover { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.7); }
 
         /* HUD OVERLAY */
         #hud {
@@ -166,38 +182,39 @@
             padding: 20px;
         }
 
-        .hud-card { padding: 10px 18px; position: absolute; }
+        .hud-card { padding: 12px 20px; position: absolute; }
         .hud-top-left { top: 20px; left: 20px; }
         .hud-top-right { top: 20px; right: 20px; text-align: right; }
 
         .hud-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.15em;
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
             color: var(--cyan-bright);
             margin-bottom: 2px;
         }
 
         .hud-value {
             font-family: var(--font-head);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #fff;
-            text-shadow: 0 0 8px var(--cyan-glow);
+            text-shadow: 0 0 10px var(--cyan-glow);
         }
 
         .speed-bar-hud {
-            width: 110px;
-            height: 6px;
-            background: rgba(0,0,0,0.5);
+            width: 130px;
+            height: 8px;
+            background: rgba(0,0,0,0.6);
             border: 1px solid var(--glass-border);
-            border-radius: 3px;
-            margin-top: 4px;
+            border-radius: 4px;
+            margin-top: 5px;
             overflow: hidden;
         }
         .speed-bar-hud-fill {
             width: 0%;
             height: 100%;
-            background: var(--cyan-bright);
-            box-shadow: 0 0 8px var(--cyan-bright);
+            background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright));
+            box-shadow: 0 0 10px var(--cyan-bright);
+            transition: width 0.2s ease;
         }
 
         /* TOUCH CONTROLS */
@@ -214,39 +231,39 @@
 
         #joystick-zone {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 130px;
-            height: 130px;
-            background: rgba(6, 14, 32, 0.65);
+            bottom: 35px;
+            left: 35px;
+            width: 135px;
+            height: 135px;
+            background: rgba(6, 16, 38, 0.7);
             border: 2px solid var(--cyan-bright);
-            box-shadow: 0 0 15px var(--cyan-glow);
+            box-shadow: 0 0 20px var(--cyan-glow);
             pointer-events: auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
         }
 
         #joystick-zone.shape-round { border-radius: 50%; }
-        #joystick-zone.shape-square { border-radius: 8px; }
+        #joystick-zone.shape-square { border-radius: 12px; }
 
         #joystick-knob {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             background: radial-gradient(circle, var(--cyan-bright), var(--electric-blue));
             border: 2px solid #ffffff;
-            box-shadow: 0 0 15px var(--cyan-bright);
+            box-shadow: 0 0 18px var(--cyan-bright);
             position: absolute;
             top: 50%;
             left: 50%;
-            margin-top: -24px;
-            margin-left: -24px;
+            margin-top: -25px;
+            margin-left: -25px;
             pointer-events: none;
         }
 
         #joystick-knob.shape-round { border-radius: 50%; }
-        #joystick-knob.shape-square { border-radius: 6px; }
+        #joystick-knob.shape-square { border-radius: 8px; }
 
         #dpad-overlay {
             display: none;
@@ -256,44 +273,44 @@
         }
         .dpad-btn {
             position: absolute;
-            background: rgba(0, 240, 255, 0.2);
+            background: rgba(0, 240, 255, 0.25);
             border: 1px solid var(--cyan-bright);
             color: #fff;
             font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
+            border-radius: 6px;
         }
-        .dpad-up { top: 5px; left: 45px; width: 40px; height: 38px; }
-        .dpad-down { bottom: 5px; left: 45px; width: 40px; height: 38px; }
-        .dpad-left { top: 45px; left: 5px; width: 38px; height: 40px; }
-        .dpad-right { top: 45px; right: 5px; width: 38px; height: 40px; }
+        .dpad-up { top: 5px; left: 47px; width: 40px; height: 38px; }
+        .dpad-down { bottom: 5px; left: 47px; width: 40px; height: 38px; }
+        .dpad-left { top: 47px; left: 5px; width: 38px; height: 40px; }
+        .dpad-right { top: 47px; right: 5px; width: 38px; height: 40px; }
 
         #boost-btn {
             position: absolute;
-            bottom: 35px;
-            right: 30px;
-            width: 85px;
-            height: 85px;
+            bottom: 40px;
+            right: 35px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background: rgba(0, 102, 255, 0.3);
+            background: rgba(0, 102, 255, 0.35);
             border: 2px solid var(--cyan-bright);
-            box-shadow: 0 0 20px var(--cyan-glow);
+            box-shadow: 0 0 25px var(--cyan-glow);
             color: #fff;
             font-family: var(--font-head);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             letter-spacing: 0.1em;
             display: flex;
             align-items: center;
             justify-content: center;
             pointer-events: auto;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
         }
 
         #boost-btn:active {
-            background: rgba(0, 240, 255, 0.6);
-            box-shadow: 0 0 30px var(--cyan-bright);
+            background: rgba(0, 240, 255, 0.7);
+            box-shadow: 0 0 35px var(--cyan-bright);
         }
 
         /* NOTIFICATIONS */
@@ -314,26 +331,26 @@
         }
 
         .modal-body {
-            width: 460px;
-            max-width: 90vw;
-            padding: 30px;
+            width: 480px;
+            max-width: 92vw;
+            padding: 35px;
         }
 
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,240,255,0.15);
-            font-size: 1rem;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,240,255,0.18);
+            font-size: 1.05rem;
         }
 
         select, input[type="range"] {
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.65);
             border: 1px solid var(--cyan-bright);
             color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 8px 14px;
+            border-radius: 6px;
             outline: none;
             font-family: var(--font-ui);
         }
@@ -354,19 +371,19 @@
         .auth-modal-card {
             background: #ffffff;
             color: #202124;
-            width: 360px;
+            width: 380px;
             max-width: 90vw;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         .account-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
             cursor: pointer;
             border: 1px solid #dadce0;
             margin-top: 10px;
@@ -374,8 +391,8 @@
         }
         .account-item:hover { background: #f1f3f4; }
         .avatar-circle {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: #0066ff;
             color: #fff;
@@ -390,13 +407,13 @@
             top: 20px;
             right: 20px;
             z-index: 100;
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -408,28 +425,28 @@
 
     <!-- 1. LOADING SCREEN -->
     <div id="loader-screen" class="screen active">
-        <div class="glass-panel" style="width: 380px; max-width: 90vw; padding: 35px; text-align: center;">
-            <div class="logo-title" style="font-size: 2.2rem;">NUBRIC</div>
-            <div class="logo-subtitle">INITIALIZING CELESTIAL ENGINE</div>
-            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 4px; margin: 20px 0 12px 0; overflow: hidden;">
-                <div id="loader-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright)); box-shadow: 0 0 12px var(--cyan-bright);"></div>
+        <div class="glass-panel" style="width: 400px; max-width: 90vw; padding: 40px; text-align: center;">
+            <div class="logo-title" style="font-size: 2.4rem;">NUBRIC</div>
+            <div class="logo-subtitle">INITIALIZING SOLAR ENGINE</div>
+            <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 5px; margin: 22px 0 14px 0; overflow: hidden;">
+                <div id="loader-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright)); box-shadow: 0 0 15px var(--cyan-bright);"></div>
             </div>
             <div id="loader-percent" class="hud-label" style="text-align:center;">LOADING 0%</div>
-            <div id="loader-log" style="font-size:0.8rem; color:var(--cyan-bright); height:20px; margin-top:5px; font-family:monospace;">Connecting...</div>
+            <div id="loader-log" style="font-size:0.85rem; color:var(--cyan-bright); height:20px; margin-top:6px; font-family:monospace;">Generating Planets...</div>
         </div>
     </div>
 
     <!-- 2. AUTHENTICATION SCREEN -->
     <div id="auth-screen" class="screen">
-        <div class="glass-panel" style="width: 380px; max-width:90vw; padding:35px; text-align:center;">
-            <div class="logo-title" style="font-size: 2.4rem;">NUBRIC</div>
+        <div class="glass-panel" style="width: 400px; max-width:90vw; padding:40px; text-align:center;">
+            <div class="logo-title" style="font-size: 2.5rem;">NUBRIC</div>
             <div class="logo-subtitle">ENTER THE VOID</div>
             
-            <div id="active-user-badge" style="margin-bottom: 15px; font-size:0.9rem; color:var(--cyan-bright); display:none;">
+            <div id="active-user-badge" style="margin-bottom: 18px; font-size:0.95rem; color:var(--cyan-bright); display:none;">
                 Logged in as: <strong id="logged-user-name">None</strong>
             </div>
 
-            <button class="btn btn-auth" style="margin-bottom: 10px;" onclick="openAuthModal('google')">
+            <button class="btn btn-auth" style="margin-bottom: 12px;" onclick="openAuthModal('google')">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.29 21.39 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
                 SIGN IN WITH GOOGLE
             </button>
@@ -439,7 +456,7 @@
                 SIGN IN WITH APPLE
             </button>
 
-            <div style="margin-top: 15px; display:flex; gap:10px;">
+            <div style="margin-top: 18px; display:flex; gap:12px;">
                 <button class="btn btn-primary" style="flex:1; min-width:0;" onclick="enterGameAsCurrent()">PLAY NOW</button>
                 <button class="btn" style="flex:1; min-width:0;" onclick="enterGameAsGuest()">GUEST</button>
             </div>
@@ -449,28 +466,28 @@
     <!-- 3. MAIN MENU -->
     <div id="menu-screen" class="screen">
         <div class="logo-title">NUBRIC</div>
-        <div class="logo-subtitle">ODYSSEY</div>
+        <div class="logo-subtitle">SOLAR ODYSSEY</div>
         
-        <div style="display:flex; flex-direction:column; gap:10px; width:260px;">
-            <button class="btn btn-primary" onclick="startGame()">PLAY</button>
-            <button class="btn" onclick="showScreen('progress-screen')">PROGRESS</button>
+        <div style="display:flex; flex-direction:column; gap:12px; width:270px;">
+            <button class="btn btn-primary" onclick="startGame()">PLAY RUN</button>
+            <button class="btn" onclick="showScreen('progress-screen')">TELEMETRY</button>
             <button class="btn" onclick="showScreen('settings-screen')">SETTINGS</button>
-            <button class="btn" style="opacity:0.7;" onclick="showScreen('auth-screen')">SWITCH PILOT</button>
+            <button class="btn" style="opacity:0.75;" onclick="showScreen('auth-screen')">SWITCH PILOT</button>
         </div>
     </div>
 
     <!-- 4. PROGRESS SCREEN -->
     <div id="progress-screen" class="screen">
         <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">PILOT TELEMETRY</div>
+            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 22px;">PILOT TELEMETRY</div>
             <div class="setting-row"><span class="stat-label">Active Pilot</span><span id="st-pilot" style="color:var(--cyan-bright); font-weight:bold;">Guest</span></div>
             <div class="setting-row"><span class="stat-label">Best Distance</span><span id="st-dist" style="color:var(--cyan-bright);">0 m</span></div>
             <div class="setting-row"><span class="stat-label">High Score</span><span id="st-score" style="color:var(--cyan-bright);">0</span></div>
-            <div class="setting-row"><span class="stat-label">Max Speed Level</span><span id="st-speed" style="color:var(--cyan-bright);">Speed 1</span></div>
+            <div class="setting-row"><span class="stat-label">Max Rocks Dodged</span><span id="st-rocks" style="color:var(--cyan-bright);">0 Rocks</span></div>
             <div class="setting-row"><span class="stat-label">Substance Boosts Collected</span><span id="st-substance" style="color:var(--cyan-bright);">0</span></div>
             
-            <div style="margin-top: 25px; text-align: center;">
-                <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
+            <div style="margin-top: 28px; text-align: center;">
+                <button class="btn" onclick="showScreen('menu-screen')">BACK TO MENU</button>
             </div>
         </div>
     </div>
@@ -478,31 +495,31 @@
     <!-- 5. ADVANCED SETTINGS -->
     <div id="settings-screen" class="screen">
         <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">SYSTEM CONFIGURATION</div>
+            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 22px;">SYSTEM CONFIGURATION</div>
             
             <div class="setting-row">
                 <span>Space Environment</span>
                 <select id="cfg-time" onchange="toggleDayNight(this.value)">
-                    <option value="night">Night Mode (Void)</option>
-                    <option value="day">Day Mode (Solar Nebula)</option>
+                    <option value="night">Deep Space Void (Night)</option>
+                    <option value="day">Solar Nebula Atmosphere (Day)</option>
                 </select>
             </div>
 
             <div class="setting-row">
-                <span>Joystick Control</span>
+                <span>Joystick Style</span>
                 <select id="cfg-joystick" onchange="applyJoystickStyle(this.value)">
-                    <option value="round">Round Halo</option>
-                    <option value="square">Square Frame</option>
-                    <option value="dpad">D-Pad Arrows</option>
+                    <option value="round">Round Glow Halo</option>
+                    <option value="square">Square Metallic Frame</option>
+                    <option value="dpad">D-Pad Directional Arrows</option>
                 </select>
             </div>
 
             <div class="setting-row">
-                <span>Sound FX Volume</span>
+                <span>Engine Audio Volume</span>
                 <input type="range" id="cfg-vol" min="0" max="100" value="80">
             </div>
 
-            <div style="margin-top: 25px; text-align: center;">
+            <div style="margin-top: 28px; text-align: center;">
                 <button class="btn btn-primary" onclick="showScreen('menu-screen')">SAVE & RETURN</button>
             </div>
         </div>
@@ -511,16 +528,17 @@
     <!-- 6. GAME OVER SCREEN -->
     <div id="gameover-screen" class="screen">
         <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-title" style="font-size: 2rem;">CRITICAL COLLISION</div>
-            <div class="logo-subtitle" style="margin-bottom: 20px;">SHIP DESTROYED</div>
+            <div class="logo-title" style="font-size: 2.1rem;">CRITICAL COLLISION</div>
+            <div class="logo-subtitle" style="margin-bottom: 22px;">HULL DESTROYED</div>
             
             <div class="setting-row"><span>Distance Traveled</span><span id="go-dist" style="color:var(--cyan-bright); font-weight:bold;">0 m</span></div>
             <div class="setting-row"><span>Final Score</span><span id="go-score" style="color:var(--cyan-bright); font-weight:bold;">0</span></div>
-            <div class="setting-row"><span>Max Speed</span><span id="go-speed" style="color:var(--cyan-bright); font-weight:bold;">Speed 1</span></div>
+            <div class="setting-row"><span>Rocks Passed</span><span id="go-rocks" style="color:var(--cyan-bright); font-weight:bold;">0 Rocks</span></div>
+            <div class="setting-row"><span>Final Speed Level</span><span id="go-speed" style="color:var(--cyan-bright); font-weight:bold;">Speed 1</span></div>
             
-            <div style="margin-top: 25px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="startGame()">RETRY</button>
-                <button class="btn" onclick="showScreen('menu-screen')">MENU</button>
+            <div style="margin-top: 28px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="startGame()">RETRY RUN</button>
+                <button class="btn" onclick="showScreen('menu-screen')">MAIN MENU</button>
             </div>
         </div>
     </div>
@@ -530,12 +548,13 @@
         <div class="hud-card glass-panel hud-top-left">
             <div class="hud-label">DISTANCE</div>
             <div class="hud-value" id="hud-dist">0 m</div>
+            <div class="hud-label" style="margin-top:4px;" id="hud-rocks-count">ROCKS PASSED: 0</div>
         </div>
         <div class="hud-card glass-panel hud-top-right">
             <div class="hud-label">SCORE</div>
             <div class="hud-value" id="hud-score">0</div>
             <div style="margin-top: 6px;">
-                <div class="hud-label" id="hud-speed-lvl">SPEED 1</div>
+                <div class="hud-label" id="hud-speed-lvl">SPEED 1 (SLOW)</div>
                 <div class="speed-bar-hud"><div id="hud-speed-progress" class="speed-bar-hud-fill"></div></div>
             </div>
         </div>
@@ -544,7 +563,7 @@
     <!-- SPEED UP NOTIFICATION -->
     <div id="speed-notify">
         <div class="logo-title" id="notify-title" style="font-size: 2rem;">SPEED INCREASED!</div>
-        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1rem;">SPEED +1</div>
+        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1rem;">SPEED +1 (50 ROCKS PASSED)</div>
     </div>
 
     <!-- TOUCH CONTROLS OVERLAY -->
@@ -564,10 +583,10 @@
     <!-- ACCOUNT AUTH MODAL -->
     <div id="auth-modal" class="auth-modal-overlay">
         <div class="auth-modal-card">
-            <h3 id="auth-provider-title" style="margin-bottom:8px; font-size:1.2rem;">Select Account</h3>
-            <p style="font-size:0.85rem; color:#5f6368; margin-bottom:15px;">Choose your pilot profile:</p>
+            <h3 id="auth-provider-title" style="margin-bottom:8px; font-size:1.25rem;">Select Pilot Account</h3>
+            <p style="font-size:0.88rem; color:#5f6368; margin-bottom:16px;">Choose your pilot profile to sync progress:</p>
             <div id="account-list"></div>
-            <button onclick="closeAuthModal()" style="margin-top:20px; border:none; background:none; color:#1a73e8; cursor:pointer; font-weight:bold; font-size:0.85rem;">Cancel</button>
+            <button onclick="closeAuthModal()" style="margin-top:22px; border:none; background:none; color:#1a73e8; cursor:pointer; font-weight:bold; font-size:0.9rem;">Cancel</button>
         </div>
     </div>
 
@@ -593,8 +612,8 @@ class SoundController {
         } catch(e){}
     }
     playHover() { this.playTone(350, 'sine', 0.04, 0.02); }
-    playClick() { this.playTone(700, 'triangle', 0.06, 0.05); }
-    playBoost() { this.playTone(900, 'sawtooth', 0.25, 0.08); }
+    playClick() { this.playTone(650, 'triangle', 0.06, 0.05); }
+    playBoost() { this.playTone(850, 'sawtooth', 0.25, 0.08); }
     playSpeedUp() {
         this.playTone(400, 'sawtooth', 0.1, 0.08);
         setTimeout(() => this.playTone(800, 'sawtooth', 0.15, 0.08), 80);
@@ -608,7 +627,7 @@ class SoundController {
         let noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
         let gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
         noise.connect(gain);
         gain.connect(this.ctx.destination);
@@ -624,14 +643,14 @@ document.getElementById('sound-toggle').addEventListener('click', () => {
 
 /* --- MULTI-ACCOUNT AUTH & DATA --- */
 let activeUser = 'Guest Pilot';
-let userData = { distance: 0, score: 0, speed: 1, substances: 0 };
+let userData = { distance: 0, score: 0, maxRocks: 0, substances: 0 };
 
 function loadUserData() {
     let saved = localStorage.getItem('NUBRIC_SAVE_' + activeUser);
     if(saved) {
         try { userData = JSON.parse(saved); } catch(e){}
     } else {
-        userData = { distance: 0, score: 0, speed: 1, substances: 0 };
+        userData = { distance: 0, score: 0, maxRocks: 0, substances: 0 };
     }
     updateProgressUI();
 }
@@ -645,7 +664,7 @@ function updateProgressUI() {
     document.getElementById('st-pilot').innerText = activeUser;
     document.getElementById('st-dist').innerText = Math.floor(userData.distance) + ' m';
     document.getElementById('st-score').innerText = Math.floor(userData.score);
-    document.getElementById('st-speed').innerText = 'Speed ' + userData.speed;
+    document.getElementById('st-rocks').innerText = (userData.maxRocks || 0) + ' Rocks';
     document.getElementById('st-substance').innerText = userData.substances;
 }
 
@@ -690,9 +709,9 @@ function selectAccount(name) {
 function enterGameAsCurrent() { loadUserData(); showScreen('menu-screen'); }
 function enterGameAsGuest() { activeUser = 'Guest Pilot'; loadUserData(); showScreen('menu-screen'); }
 
-/* --- THREE.JS ENGINE & PLANETS --- */
-let scene, camera, renderer, ambientLight, mainLight;
-let playerCraft, starField, planetGroup;
+/* --- THREE.JS ENGINE, PLANETS & SHADOWS --- */
+let scene, camera, renderer, ambientLight, mainLight, dayLight;
+let playerCraft, shieldAura, starField, planetGroup;
 let asteroids = [], substances = [];
 let gameActive = false;
 
@@ -701,7 +720,7 @@ let distanceTraveled = 0;
 let currentScore = 0;
 let speedLevel = 1;
 let dodgedCount = 0;
-let dodgesToNextLevel = 6;
+let totalRocksPassed = 0;
 
 // Physics Vector
 let inputVector = { x: 0, y: 0 };
@@ -714,25 +733,30 @@ const BOUNDS_Y = 13;
 function initEngine() {
     let container = document.getElementById('webgl-container');
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020408, 0.007);
+    scene.fog = new THREE.FogExp2(0x020408, 0.005);
 
-    camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1200);
     camera.position.set(0, 2.5, 9);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    ambientLight = new THREE.AmbientLight(0x081026, 2.2);
+    ambientLight = new THREE.AmbientLight(0x0c1a38, 2.0);
     scene.add(ambientLight);
 
-    mainLight = new THREE.DirectionalLight(0x00f0ff, 2.8);
-    mainLight.position.set(10, 20, 10);
+    mainLight = new THREE.DirectionalLight(0x00f0ff, 3.2);
+    mainLight.position.set(20, 40, 20);
+    mainLight.castShadow = true;
+    mainLight.shadow.mapSize.width = 1024;
+    mainLight.shadow.mapSize.height = 1024;
     scene.add(mainLight);
 
     buildStarfield();
-    buildPlanets();
+    buildSolarSystemPlanets();
     buildPlayerCraft();
 
     window.addEventListener('resize', onWindowResize);
@@ -744,56 +768,88 @@ function initEngine() {
 
 function toggleDayNight(mode) {
     if(mode === 'day') {
-        scene.background = new THREE.Color(0x224488);
-        scene.fog.color.setHex(0x224488);
+        scene.background = new THREE.Color(0x1a3366);
+        scene.fog.color.setHex(0x1a3366);
         ambientLight.color.setHex(0xffffff);
-        ambientLight.intensity = 2.5;
+        ambientLight.intensity = 2.8;
     } else {
         scene.background = null;
         scene.fog.color.setHex(0x020408);
-        ambientLight.color.setHex(0x081026);
-        ambientLight.intensity = 2.2;
+        ambientLight.color.setHex(0x0c1a38);
+        ambientLight.intensity = 2.0;
     }
 }
 
-function buildPlanets() {
+/* SOLAR SYSTEM PLANETS (EARTH, JUPITER, SATURN, URANUS, NEPTUNE) */
+function buildSolarSystemPlanets() {
     planetGroup = new THREE.Group();
 
-    // Planet 1: Gas Giant
-    let g1 = new THREE.SphereGeometry(25, 32, 32);
-    let m1 = new THREE.MeshStandardMaterial({ color: 0x004488, roughness: 0.6, flatShading: true });
-    let planet1 = new THREE.Mesh(g1, m1);
-    planet1.position.set(-90, 40, -300);
-    planetGroup.add(planet1);
+    // 1. EARTH
+    let earthGeo = new THREE.SphereGeometry(14, 32, 32);
+    let earthMat = new THREE.MeshStandardMaterial({ color: 0x1b55aa, roughness: 0.5, metalness: 0.1 });
+    let earth = new THREE.Mesh(earthGeo, earthMat);
+    earth.position.set(-110, 35, -280);
+    planetGroup.add(earth);
 
-    // Planet 2: Ringed World
-    let g2 = new THREE.SphereGeometry(16, 32, 32);
-    let m2 = new THREE.MeshStandardMaterial({ color: 0x884422, roughness: 0.8 });
-    let planet2 = new THREE.Mesh(g2, m2);
-    planet2.position.set(100, -30, -280);
+    // Earth Atmosphere Glow
+    let eGlowGeo = new THREE.SphereGeometry(15, 32, 32);
+    let eGlowMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.25, side: THREE.BackSide });
+    earth.add(new THREE.Mesh(eGlowGeo, eGlowMat));
 
-    // Ring
-    let rGeo = new THREE.RingGeometry(20, 30, 32);
-    let rMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
-    let ring = new THREE.Mesh(rGeo, rMat);
-    ring.rotation.x = Math.PI / 3;
-    planet2.add(ring);
+    // 2. JUPITER
+    let jupGeo = new THREE.SphereGeometry(28, 32, 32);
+    let jupMat = new THREE.MeshStandardMaterial({ color: 0xc49a6c, roughness: 0.7, flatShading: true });
+    let jupiter = new THREE.Mesh(jupGeo, jupMat);
+    jupiter.position.set(130, -20, -380);
+    planetGroup.add(jupiter);
 
-    planetGroup.add(planet2);
+    // 3. SATURN + RINGS
+    let satGeo = new THREE.SphereGeometry(20, 32, 32);
+    let satMat = new THREE.MeshStandardMaterial({ color: 0xe2c589, roughness: 0.8 });
+    let saturn = new THREE.Mesh(satGeo, satMat);
+    saturn.position.set(-140, -50, -420);
+
+    let satRingGeo = new THREE.RingGeometry(26, 42, 32);
+    let satRingMat = new THREE.MeshStandardMaterial({ color: 0xd2b579, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
+    let satRing = new THREE.Mesh(satRingGeo, satRingMat);
+    satRing.rotation.x = Math.PI / 2.8;
+    saturn.add(satRing);
+    planetGroup.add(saturn);
+
+    // 4. URANUS
+    let urGeo = new THREE.SphereGeometry(15, 32, 32);
+    let urMat = new THREE.MeshStandardMaterial({ color: 0x4bdeed, roughness: 0.4 });
+    let uranus = new THREE.Mesh(urGeo, urMat);
+    uranus.position.set(100, 60, -320);
+
+    let urRingGeo = new THREE.RingGeometry(18, 22, 32);
+    let urRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+    let urRing = new THREE.Mesh(urRingGeo, urRingMat);
+    urRing.rotation.y = Math.PI / 2.2;
+    uranus.add(urRing);
+    planetGroup.add(uranus);
+
+    // 5. NEPTUNE
+    let nepGeo = new THREE.SphereGeometry(14, 32, 32);
+    let nepMat = new THREE.MeshStandardMaterial({ color: 0x2244bb, roughness: 0.3 });
+    let neptune = new THREE.Mesh(nepGeo, nepMat);
+    neptune.position.set(-60, -70, -350);
+    planetGroup.add(neptune);
+
     scene.add(planetGroup);
 }
 
 function buildStarfield() {
-    let count = 3000;
+    let count = 3500;
     let geo = new THREE.BufferGeometry();
     let pos = new Float32Array(count * 3);
     for(let i=0; i<count*3; i+=3) {
-        pos[i] = (Math.random() - 0.5) * 400;
-        pos[i+1] = (Math.random() - 0.5) * 400;
-        pos[i+2] = (Math.random() - 0.5) * 500;
+        pos[i] = (Math.random() - 0.5) * 500;
+        pos[i+1] = (Math.random() - 0.5) * 500;
+        pos[i+2] = (Math.random() - 0.5) * 600;
     }
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    let mat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 1.1, transparent: true, opacity: 0.85 });
+    let mat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 1.2, transparent: true, opacity: 0.85 });
     starField = new THREE.Points(geo, mat);
     scene.add(starField);
 }
@@ -801,54 +857,68 @@ function buildStarfield() {
 function buildPlayerCraft() {
     playerCraft = new THREE.Group();
 
-    let bodyGeo = new THREE.ConeGeometry(0.85, 3.4, 5);
+    // Main Craft Body
+    let bodyGeo = new THREE.ConeGeometry(0.85, 3.4, 6);
     bodyGeo.rotateX(Math.PI / 2);
-    let bodyMat = new THREE.MeshStandardMaterial({ color: 0x060e20, metalness: 0.9, roughness: 0.2 });
+    let bodyMat = new THREE.MeshStandardMaterial({ color: 0x061226, metalness: 0.95, roughness: 0.15 });
     let mainBody = new THREE.Mesh(bodyGeo, bodyMat);
+    mainBody.castShadow = true;
+    mainBody.receiveShadow = true;
     playerCraft.add(mainBody);
 
-    let wingGeo = new THREE.BoxGeometry(3.2, 0.06, 1.1);
-    let wingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+    // Wings
+    let wingGeo = new THREE.BoxGeometry(3.4, 0.08, 1.2);
+    let wingMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, metalness: 0.8, roughness: 0.2 });
     let wings = new THREE.Mesh(wingGeo, wingMat);
     wings.position.set(0, 0, 0.2);
+    wings.castShadow = true;
     playerCraft.add(wings);
 
-    let glassGeo = new THREE.SphereGeometry(0.45, 8, 8);
+    // Cockpit Glass
+    let glassGeo = new THREE.SphereGeometry(0.48, 12, 12);
     glassGeo.scale(0.8, 0.5, 1.6);
-    let glassMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, roughness: 0.1, transmission: 0.8, transparent: true });
+    let glassMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, roughness: 0.05, transmission: 0.9, transparent: true });
     let cockpit = new THREE.Mesh(glassGeo, glassMat);
-    cockpit.position.set(0, 0.3, -0.2);
+    cockpit.position.set(0, 0.32, -0.2);
     playerCraft.add(cockpit);
+
+    // ANIMATED GLOWING SHIELD AURA
+    let auraGeo = new THREE.SphereGeometry(2.1, 16, 16);
+    auraGeo.scale(1.0, 0.6, 1.3);
+    let auraMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.25, wireframe: true });
+    shieldAura = new THREE.Mesh(auraGeo, auraMat);
+    playerCraft.add(shieldAura);
 
     scene.add(playerCraft);
 }
 
 function spawnAsteroid() {
-    let size = 1.3 + Math.random() * 2.3;
+    let size = 1.2 + Math.random() * 2.2;
     let geo = new THREE.DodecahedronGeometry(size, 1);
-    let mat = new THREE.MeshStandardMaterial({ color: 0x141f36, roughness: 0.85, flatShading: true });
+    let mat = new THREE.MeshStandardMaterial({ color: 0x162238, roughness: 0.8, flatShading: true });
     let mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
     let posX = (Math.random() - 0.5) * (BOUNDS_X * 2);
     let posY = (Math.random() - 0.5) * (BOUNDS_Y * 2);
-    let posZ = -160 - Math.random() * 60;
+    let posZ = -180 - Math.random() * 60;
 
     mesh.position.set(posX, posY, posZ);
-    let rotSpeed = { x: (Math.random() - 0.5) * 0.04, y: (Math.random() - 0.5) * 0.04 };
+    let rotSpeed = { x: (Math.random() - 0.5) * 0.03, y: (Math.random() - 0.5) * 0.03 };
 
-    asteroids.push({ mesh, rotSpeed, radius: size * 0.85, passed: false });
+    asteroids.push({ mesh, rotSpeed, radius: size * 0.8, passed: false });
     scene.add(mesh);
 }
 
-/* SPAWN BOOST SUBSTANCE FIELDS */
 function spawnSubstance() {
-    let geo = new THREE.TorusGeometry(2.5, 0.15, 12, 24);
+    let geo = new THREE.TorusGeometry(2.6, 0.16, 12, 24);
     let mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
     let mesh = new THREE.Mesh(geo, mat);
 
     let posX = (Math.random() - 0.5) * (BOUNDS_X * 1.5);
     let posY = (Math.random() - 0.5) * (BOUNDS_Y * 1.5);
-    let posZ = -180 - Math.random() * 50;
+    let posZ = -200 - Math.random() * 50;
 
     mesh.position.set(posX, posY, posZ);
     substances.push({ mesh });
@@ -862,7 +932,7 @@ function runLoadingSequence() {
     let progress = 0;
 
     let interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 15) + 5;
+        progress += Math.floor(Math.random() * 15) + 6;
         if(progress > 100) progress = 100;
         bar.style.width = progress + '%';
         pct.innerText = `LOADING ${progress}%`;
@@ -893,14 +963,14 @@ function startGame() {
     currentScore = 0;
     speedLevel = 1;
     dodgedCount = 0;
-    dodgesToNextLevel = 5 + Math.floor(Math.random() * 5);
+    totalRocksPassed = 0;
 
     asteroids.forEach(a => scene.remove(a.mesh));
     substances.forEach(s => scene.remove(s.mesh));
     asteroids = [];
     substances = [];
 
-    for(let i=0; i<20; i++) spawnAsteroid();
+    for(let i=0; i<18; i++) spawnAsteroid();
     for(let i=0; i<3; i++) spawnSubstance();
 
     resetShip();
@@ -917,18 +987,29 @@ function resetShip() {
     craftVelocity = { x: 0, y: 0 };
 }
 
-function triggerSpeedIncrease() {
-    speedLevel += 1;
+/* SPEED MILESTONE: EVERY 50 ROCKS (+1 SPEED) OR 100 ROCKS (+10 SPEED) */
+function checkRockMilestones() {
+    totalRocksPassed++;
+    dodgedCount++;
+
+    if(totalRocksPassed % 100 === 0) {
+        speedLevel += 10;
+        triggerSpeedIncrease(`+10 SPEED BOOST! (${totalRocksPassed} ROCKS PASSED)`);
+        dodgedCount = 0;
+    } else if(dodgedCount >= 50) {
+        speedLevel += 1;
+        triggerSpeedIncrease(`SPEED +1! (${totalRocksPassed} ROCKS PASSED)`);
+        dodgedCount = 0;
+    }
+}
+
+function triggerSpeedIncrease(msg) {
     sound.playSpeedUp();
-
     let notify = document.getElementById('speed-notify');
-    document.getElementById('notify-title').innerText = "SPEED INCREASED!";
-    document.getElementById('speed-notify-val').innerText = `SPEED +1 (LEVEL ${speedLevel})`;
+    document.getElementById('notify-title').innerText = "SPEED MILESTONE!";
+    document.getElementById('speed-notify-val').innerText = msg;
     notify.classList.add('active');
-    setTimeout(() => notify.classList.remove('active'), 1400);
-
-    dodgedCount = 0;
-    dodgesToNextLevel = 5 + Math.floor(Math.random() * 6);
+    setTimeout(() => notify.classList.remove('active'), 1500);
 }
 
 function onGameOver() {
@@ -937,11 +1018,12 @@ function onGameOver() {
 
     if(currentScore > userData.score) userData.score = currentScore;
     if(distanceTraveled > userData.distance) userData.distance = distanceTraveled;
-    if(speedLevel > userData.speed) userData.speed = speedLevel;
+    if(totalRocksPassed > (userData.maxRocks || 0)) userData.maxRocks = totalRocksPassed;
     saveUserData();
 
     document.getElementById('go-dist').innerText = Math.floor(distanceTraveled) + ' m';
     document.getElementById('go-score').innerText = Math.floor(currentScore);
+    document.getElementById('go-rocks').innerText = totalRocksPassed + ' Rocks';
     document.getElementById('go-speed').innerText = 'Speed ' + speedLevel;
 
     setTimeout(() => {
@@ -950,7 +1032,7 @@ function onGameOver() {
     }, 800);
 }
 
-/* --- RENDER LOOP & SMOOTH NATURAL CAMERA MOTION --- */
+/* --- RENDER LOOP (CONTROLLED SLOW SPEED & ANIMATIONS) --- */
 let lastTime = performance.now();
 
 function renderLoop(time) {
@@ -959,19 +1041,27 @@ function renderLoop(time) {
     if(delta > 0.1) delta = 0.1;
     lastTime = time;
 
+    // Pulse Glowing Aura
+    if(shieldAura) {
+        shieldAura.rotation.y += 0.01;
+        shieldAura.rotation.z += 0.005;
+        shieldAura.material.opacity = 0.2 + Math.sin(time * 0.004) * 0.1;
+    }
+
     if(gameActive) {
-        let baseSpeed = 30 + (speedLevel - 1) * 8;
-        let speedMult = isBoosting ? baseSpeed * 1.5 : baseSpeed;
+        // SLOW CONTROLLED SPEED BASE
+        let baseSpeed = 16 + (speedLevel - 1) * 3;
+        let speedMult = isBoosting ? baseSpeed + 4 : baseSpeed; // Gentle +1/Controlled boost
 
-        distanceTraveled += (speedMult * 0.5) * delta;
-        currentScore += (speedMult * 0.8) * delta;
+        distanceTraveled += (speedMult * 0.4) * delta;
+        currentScore += (speedMult * 0.6) * delta;
 
-        // Smooth Controls Physics
-        let targetVelX = inputVector.x * 22;
-        let targetVelY = inputVector.y * 18;
+        // Steering Physics
+        let targetVelX = inputVector.x * 20;
+        let targetVelY = inputVector.y * 16;
         
-        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.12;
-        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.12;
+        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.1;
+        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.1;
 
         playerCraft.position.x += craftVelocity.x * delta;
         playerCraft.position.y += craftVelocity.y * delta;
@@ -979,27 +1069,27 @@ function renderLoop(time) {
         playerCraft.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, playerCraft.position.x));
         playerCraft.position.y = Math.max(-BOUNDS_Y, Math.min(BOUNDS_Y, playerCraft.position.y));
 
-        playerCraft.rotation.z = -craftVelocity.x * 0.04;
-        playerCraft.rotation.x = craftVelocity.y * 0.03;
+        playerCraft.rotation.z = -craftVelocity.x * 0.035;
+        playerCraft.rotation.x = craftVelocity.y * 0.025;
 
         // SUBSTANCE BOOST FIELDS LOGIC
         if(substances.length < 3) spawnSubstance();
         for(let i = substances.length - 1; i >= 0; i--) {
             let sub = substances[i];
             sub.mesh.position.z += speedMult * delta;
-            sub.mesh.rotation.z += 0.02;
+            sub.mesh.rotation.z += 0.015;
 
-            // Check if craft passes through substance ring
-            if(playerCraft.position.distanceTo(sub.mesh.position) < 2.5) {
-                currentScore += 250;
+            if(playerCraft.position.distanceTo(sub.mesh.position) < 2.6) {
+                currentScore += 300;
+                speedLevel += 1; // Controlled +1 boost
                 userData.substances++;
                 sound.playBoost();
 
                 let notify = document.getElementById('speed-notify');
-                document.getElementById('notify-title').innerText = "SUBSTANCE BOOST!";
-                document.getElementById('speed-notify-val').innerText = "+250 BONUS SCORE";
+                document.getElementById('notify-title').innerText = "SUBSTANCE POWER!";
+                document.getElementById('speed-notify-val').innerText = "+1 SPEED BOOST & +300 PTS";
                 notify.classList.add('active');
-                setTimeout(() => notify.classList.remove('active'), 1000);
+                setTimeout(() => notify.classList.remove('active'), 1200);
 
                 scene.remove(sub.mesh);
                 substances.splice(i, 1);
@@ -1010,7 +1100,7 @@ function renderLoop(time) {
         }
 
         // ASTEROIDS LOGIC
-        if(asteroids.length < 22 + speedLevel) spawnAsteroid();
+        if(asteroids.length < 18 + Math.floor(speedLevel * 0.5)) spawnAsteroid();
         for(let i = asteroids.length - 1; i >= 0; i--) {
             let ast = asteroids[i];
             ast.mesh.position.z += speedMult * delta;
@@ -1019,8 +1109,7 @@ function renderLoop(time) {
 
             if(!ast.passed && ast.mesh.position.z > playerCraft.position.z) {
                 ast.passed = true;
-                dodgedCount++;
-                if(dodgedCount >= dodgesToNextLevel) triggerSpeedIncrease();
+                checkRockMilestones();
             }
 
             if(playerCraft.position.distanceTo(ast.mesh.position) < (ast.radius + 0.85)) {
@@ -1036,28 +1125,29 @@ function renderLoop(time) {
         // HUD Updates
         document.getElementById('hud-dist').innerText = Math.floor(distanceTraveled) + ' m';
         document.getElementById('hud-score').innerText = Math.floor(currentScore);
+        document.getElementById('hud-rocks-count').innerText = `ROCKS PASSED: ${totalRocksPassed}`;
         document.getElementById('hud-speed-lvl').innerText = `SPEED ${speedLevel}`;
-        document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / dodgesToNextLevel) * 100) + '%';
+        document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / 50) * 100) + '%';
     }
 
-    // Starfield & Planet Movement
+    // Starfield & Planets Orbit
     if(starField) {
         let p = starField.geometry.attributes.position;
-        let starSpd = gameActive ? (35 + speedLevel * 10) : 10;
+        let starSpd = gameActive ? (18 + speedLevel * 2) : 8;
         for(let i=2; i<p.count*3; i+=3) {
             p.array[i] += starSpd * delta;
-            if(p.array[i] > 100) p.array[i] = -350;
+            if(p.array[i] > 100) p.array[i] = -400;
         }
         p.needsUpdate = true;
     }
 
     if(planetGroup) {
-        planetGroup.rotation.y += 0.0005;
+        planetGroup.rotation.y += 0.0003;
     }
 
-    // NATURAL DYNAMIC CAMERA DRIFT (Does not force lock onto pitch POV)
-    let targetCamX = gameActive ? playerCraft.position.x * 0.25 : 0;
-    let targetCamY = gameActive ? playerCraft.position.y * 0.25 + 2.5 : 2.5;
+    // Natural Smooth Camera Drift
+    let targetCamX = gameActive ? playerCraft.position.x * 0.22 : 0;
+    let targetCamY = gameActive ? playerCraft.position.y * 0.22 + 2.5 : 2.5;
 
     camera.position.x += (targetCamX - camera.position.x) * 0.05;
     camera.position.y += (targetCamY - camera.position.y) * 0.05;
@@ -1151,7 +1241,7 @@ function setupControls() {
     function moveJoystick(touch) {
         let dx = touch.clientX - origin.x;
         let dy = touch.clientY - origin.y;
-        let maxLen = 40;
+        let maxLen = 42;
 
         let dist = Math.hypot(dx, dy);
         if(dist > maxLen) {
