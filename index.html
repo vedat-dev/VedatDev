@@ -600,33 +600,43 @@ function countUp(el, target, opts={}){
   requestAnimationFrame(frame);
 }
 
-/* ============ HTTP w/ MULTI-PROXY FALLBACK ============ */
+/* ============ HTTP w/ ROBUST MULTI-PROXY FALLBACK ============ */
 const PROXIES = [
-  (u)=>u, // Direct connection first
-  (u)=>'https://corsproxy.io/?' + encodeURIComponent(u),
-  (u)=>'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-  (u)=>'https://thingproxy.freeboard.io/fetch/' + u
+  // 1. AllOrigins JSONP Proxy (Highest reliability in browser environments)
+  async (url) => {
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+    if (!res.ok) throw new Error('Proxy 1 error: ' + res.status);
+    const data = await res.json();
+    if (!data.contents) throw new Error('Proxy 1 returned empty response');
+    return JSON.parse(data.contents);
+  },
+  // 2. Corsproxy.io Fallback
+  async (url) => {
+    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+    if (!res.ok) throw new Error('Proxy 2 error: ' + res.status);
+    return await res.json();
+  },
+  // 3. CodeTabs Proxy Fallback
+  async (url) => {
+    const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
+    if (!res.ok) throw new Error('Proxy 3 error: ' + res.status);
+    return await res.json();
+  }
 ];
 
-async function fetchJSON(url, opts={}){
+async function fetchJSON(url) {
   let lastErr;
-  for(const wrap of PROXIES){
-    try{
-      const reqUrl = wrap(url);
-      const res = await fetch(reqUrl, {
-        ...opts, 
-        headers: { ...(opts.headers || {}), 'Accept': 'application/json' }
-      });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
+  for (const proxyFn of PROXIES) {
+    try {
+      const data = await proxyFn(url);
       setApiStatus(true);
       return data;
-    } catch(err) { 
-      lastErr = err; 
+    } catch (err) {
+      lastErr = err;
     }
   }
   setApiStatus(false);
-  throw lastErr || new Error('Request failed across all available endpoints');
+  throw lastErr || new Error('All CORS proxies failed to connect');
 }
 
 function setApiStatus(ok){
@@ -784,7 +794,7 @@ async function runScan(query){
   }
 
   if(!profile){
-    showError('REQUEST ERROR', 'Unable to resolve Roblox profile data via public proxy. Please try again.');
+    showError('REQUEST ERROR', 'Unable to resolve Roblox profile data. Please try again.');
     return;
   }
 
