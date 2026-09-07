@@ -222,9 +222,9 @@
 
   .disclaimer{font-size:12px; color:var(--ink-faint); margin-top:14px; line-height:1.5; border-top:1px solid var(--line); padding-top:14px;}
 
-  .badges-scroll{display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; scrollbar-width:thin;}
+  .badges-scroll{display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; scrollbar-width:thin;}
   .badge-card{flex:none; width:150px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; text-align:center;}
-  .badge-card img{width:52px; height:52px; border-radius:9px; margin-bottom:8px;}
+  .badge-card img{width:64px; height:64px; border-radius:50%; object-fit:cover; margin-bottom:8px; background:var(--panel);}
   .badge-card .bn{font-size:12px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .badge-card .bd{font-size:10.5px; color:var(--ink-faint); margin-top:3px;}
   .badge-search{width:100%; max-width:260px; background:var(--panel-2); border:1px solid var(--line); border-radius:9px; padding:9px 12px; color:var(--ink); font-size:13px; outline:none; margin-bottom:14px;}
@@ -600,26 +600,35 @@ function countUp(el, target, opts={}){
   requestAnimationFrame(frame);
 }
 
-/* ============ HTTP w/ CORS fallback ============ */
+/* ============ HTTP w/ MULTI-PROXY FALLBACK ============ */
 const PROXIES = [
-  (u)=>u, // try direct first
-  (u)=>'https://corsproxy.io/?url='+encodeURIComponent(u),
-  (u)=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+  (u)=>u, // Direct connection first
+  (u)=>'https://corsproxy.io/?' + encodeURIComponent(u),
+  (u)=>'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  (u)=>'https://thingproxy.freeboard.io/fetch/' + u
 ];
+
 async function fetchJSON(url, opts={}){
   let lastErr;
   for(const wrap of PROXIES){
     try{
-      const res = await fetch(wrap(url), {...opts, headers:{...(opts.headers||{}), 'Accept':'application/json'}});
-      if(!res.ok) throw new Error('HTTP '+res.status);
+      const reqUrl = wrap(url);
+      const res = await fetch(reqUrl, {
+        ...opts, 
+        headers: { ...(opts.headers || {}), 'Accept': 'application/json' }
+      });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       setApiStatus(true);
       return data;
-    }catch(err){ lastErr = err; }
+    } catch(err) { 
+      lastErr = err; 
+    }
   }
   setApiStatus(false);
-  throw lastErr || new Error('Request failed');
+  throw lastErr || new Error('Request failed across all available endpoints');
 }
+
 function setApiStatus(ok){
   const dot = document.getElementById('apiDot');
   const state = document.getElementById('apiState');
@@ -651,6 +660,7 @@ const RBX = {
   followersCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followers/count`),
   followingCount: (id)=> fetchJSON(`https://friends.roblox.com/v1/users/${id}/followings/count`),
   badges: (id)=> fetchJSON(`https://badges.roblox.com/v1/users/${id}/badges?limit=100&sortOrder=Desc`),
+  badgeIcons: (badgeIds)=> fetchJSON(`https://thumbnails.roblox.com/v1/badges/icons?badgeIds=${badgeIds.join(',')}&size=150x150&format=Png`),
   collectibles: (id)=> fetchJSON(`https://inventory.roblox.com/v1/users/${id}/assets/collectibles?limit=100&sortOrder=Asc`),
 };
 
@@ -725,7 +735,7 @@ async function runScan(query){
   setRing(0);
 
   const stepDelay = 260;
-  let profile, headshotData, fullAvatarData, friends, followers, following, badgesData, collectiblesData;
+  let profile, headshotData, fullAvatarData, friends, followers, following, badgesData, badgeIconsMap = {}, collectiblesData;
   let stepErrors = {};
 
   const substeps = [
@@ -734,7 +744,19 @@ async function runScan(query){
     async ()=>{ if(!profile) return; try{ headshotData = await RBX.headshot(profile.id); }catch(e){ stepErrors.headshot=e; } },
     async ()=>{ await sleep(stepDelay); },
     async ()=>{ if(!profile) return; try{ fullAvatarData = await RBX.fullAvatar(profile.id); }catch(e){ stepErrors.avatar=e; } },
-    async ()=>{ if(!profile) return; try{ badgesData = await RBX.badges(profile.id); }catch(e){ stepErrors.badges=e; } },
+    async ()=>{ 
+      if(!profile) return; 
+      try{ 
+        badgesData = await RBX.badges(profile.id); 
+        if(badgesData?.data?.length){
+          const badgeIds = badgesData.data.map(b => b.id).slice(0, 100);
+          const iconsRes = await RBX.badgeIcons(badgeIds);
+          if(iconsRes?.data){
+            iconsRes.data.forEach(img => { badgeIconsMap[img.targetId] = img.imageUrl; });
+          }
+        }
+      }catch(e){ stepErrors.badges=e; } 
+    },
     async ()=>{ if(!profile) return; try{ collectiblesData = await RBX.collectibles(profile.id); }catch(e){ stepErrors.collectibles=e; } },
     async ()=>{ await sleep(stepDelay); },
     async ()=>{
@@ -762,13 +784,13 @@ async function runScan(query){
   }
 
   if(!profile){
-    showError('TOO MANY REQUESTS', 'Please wait a moment before scanning another profile.');
+    showError('REQUEST ERROR', 'Unable to resolve Roblox profile data via public proxy. Please try again.');
     return;
   }
 
   document.getElementById('scanStatusText').textContent = 'SCAN COMPLETE';
   await sleep(500);
-  renderResults({profile, headshotData, fullAvatarData, friends, followers, following, badgesData, collectiblesData, stepErrors});
+  renderResults({profile, headshotData, fullAvatarData, friends, followers, following, badgesData, badgeIconsMap, collectiblesData, stepErrors});
 }
 
 function renderResults(d){
@@ -788,7 +810,7 @@ function renderResults(d){
   document.getElementById('pfUserId').textContent = profile.id;
   document.getElementById('pfCreated').textContent = createdStr;
   document.getElementById('pfAge').textContent = `${age.years} years`;
-  document.getElementById('pfStatus').textContent = profile.isBanned ? 'Banned' : 'Unavailable';
+  document.getElementById('pfStatus').textContent = profile.isBanned ? 'Banned' : 'Active';
   document.getElementById('pfProfileLink').href = profileUrl;
   document.getElementById('pfPicBtn').href = fullAvatarUrl || profileUrl;
 
@@ -804,8 +826,8 @@ function renderResults(d){
   document.getElementById('aiSince').textContent = 'Since '+createdStr;
 
   document.getElementById('avFull').src = fullAvatarUrl;
-  document.getElementById('avType').textContent = d.fullAvatarData?.data?.[0]?.state === 'Completed' ? 'Rendered (R6/R15 dependent on avatar)' : 'Unavailable';
-  document.getElementById('avEquipped').textContent = 'Unavailable';
+  document.getElementById('avType').textContent = d.fullAvatarData?.data?.[0]?.state === 'Completed' ? 'Rendered (R6/R15)' : 'Unavailable';
+  document.getElementById('avEquipped').textContent = 'Public View Only';
   document.getElementById('avProfileBtn').href = profileUrl;
 
   // Limited items
@@ -864,12 +886,15 @@ function renderResults(d){
   const badgeScroll = document.getElementById('badgeScroll');
   const allBadges = d.badgesData?.data || [];
   function renderBadges(list){
-    badgeScroll.innerHTML = list.length ? list.map(b=>`
+    badgeScroll.innerHTML = list.length ? list.map(b=>{
+      const iconUrl = d.badgeIconsMap?.[b.id] || '';
+      return `
       <div class="badge-card">
-        <img src="${b.iconImageId ? '' : ''}" onerror="this.style.display='none'" alt="">
-        <div class="bn">${b.name}</div>
+        <img src="${iconUrl}" onerror="this.style.opacity='0.2'" alt="${b.name}">
+        <div class="bn" title="${b.name}">${b.name}</div>
         <div class="bd">${b.awardedDate ? new Date(b.awardedDate).toLocaleDateString() : ''}</div>
-      </div>`).join('') : `<div class="unavailable" style="padding:20px;">Unavailable</div>`;
+      </div>`;
+    }).join('') : `<div class="unavailable" style="padding:20px;">No public badges found.</div>`;
   }
   renderBadges(allBadges);
   document.getElementById('badgeSearch').oninput = (e)=>{
