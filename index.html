@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NUBRIC — DODGE THE VOID</title>
+    <!-- Pixelated / Retro Arcade Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-black: #030508;
             --navy-deep: #0a1128;
             --electric-blue: #0066ff;
             --cyan-bright: #00f0ff;
-            --cyan-glow: rgba(0, 240, 255, 0.4);
-            --text-white: #f0f6ff;
-            --glass-bg: rgba(10, 17, 40, 0.55);
-            --glass-border: rgba(0, 240, 255, 0.25);
-            --glass-border-focus: rgba(0, 240, 255, 0.8);
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --cyan-glow: rgba(0, 240, 255, 0.5);
+            --text-white: #ffffff;
+            --glass-bg: rgba(6, 12, 28, 0.75);
+            --glass-border: rgba(0, 240, 255, 0.4);
+            --font-pixel: 'Press Start 2P', monospace;
+            --font-ui: 'Rajdhani', sans-serif;
         }
 
         * {
@@ -33,7 +35,7 @@
             height: 100%;
             overflow: hidden;
             background-color: var(--bg-black);
-            font-family: var(--font-main);
+            font-family: var(--font-ui);
             color: var(--text-white);
         }
 
@@ -46,17 +48,25 @@
             z-index: 1;
         }
 
-        /* Glassmorphism Classes */
+        /* Pixelated Glass Panel Styling */
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 240, 255, 0.05);
-            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 3px solid var(--cyan-bright);
+            box-shadow: 
+                0 0 15px var(--cyan-glow),
+                inset 0 0 15px rgba(0, 240, 255, 0.2);
+            /* Pixelated corner feel using clip-path */
+            clip-path: polygon(
+                0 8px, 8px 8px, 8px 0,
+                calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px,
+                100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%,
+                8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px)
+            );
         }
 
-        /* UI Overlay Screen Management */
+        /* Screen Manager */
         .screen {
             position: absolute;
             top: 0;
@@ -70,8 +80,8 @@
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: scale(0.98);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: scale(0.96);
             padding: 20px;
         }
 
@@ -81,164 +91,107 @@
             transform: scale(1);
         }
 
-        /* Typography & Glowing Elements */
+        /* Pixel Typography */
         .logo-title {
-            font-size: 4rem;
-            font-weight: 900;
-            letter-spacing: 0.35em;
+            font-family: var(--font-pixel);
+            font-size: 2.5rem;
             color: #fff;
-            text-shadow: 0 0 20px var(--cyan-bright), 0 0 40px var(--electric-blue);
-            margin-bottom: 5px;
-            text-transform: uppercase;
+            text-shadow: 4px 4px 0px var(--electric-blue), 0 0 20px var(--cyan-bright);
+            margin-bottom: 12px;
             text-align: center;
+            letter-spacing: 2px;
         }
 
         .logo-subtitle {
-            font-size: 0.9rem;
-            letter-spacing: 0.4em;
+            font-family: var(--font-pixel);
+            font-size: 0.65rem;
             color: var(--cyan-bright);
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            opacity: 0.85;
+            margin-bottom: 25px;
+            line-height: 1.6;
             text-shadow: 0 0 8px var(--cyan-glow);
             text-align: center;
         }
 
-        /* Standard Futuristic Buttons */
+        /* RETRO PIXEL BUTTONS */
         .btn {
             position: relative;
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 240, 255, 0.05));
-            border: 1px solid var(--glass-border);
+            font-family: var(--font-pixel);
+            font-size: 0.75rem;
+            background: rgba(0, 102, 255, 0.25);
+            border: 2px solid var(--cyan-bright);
             color: var(--text-white);
-            padding: 16px 36px;
-            margin: 8px;
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            border-radius: 6px;
+            padding: 16px 24px;
+            margin: 8px 0;
             cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             outline: none;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--electric-blue);
+            transition: all 0.1s ease;
             display: inline-flex;
             justify-content: center;
             align-items: center;
             min-width: 220px;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
-            transition: left 0.5s ease;
-        }
-
         .btn:hover {
-            border-color: var(--cyan-bright);
-            box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 240, 255, 0.3);
-            transform: translateY(-2px);
-            color: #fff;
-        }
-
-        .btn:hover::before {
-            left: 100%;
+            background: var(--cyan-bright);
+            color: #000;
+            box-shadow: 4px 4px 0px #fff, 0 0 15px var(--cyan-bright);
+            transform: translate(-2px, -2px);
         }
 
         .btn:active {
-            transform: translateY(1px);
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px transparent;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.4));
-            border-color: var(--cyan-bright);
-            box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
+            background: var(--electric-blue);
+            border-color: #fff;
+            box-shadow: 4px 4px 0px var(--cyan-bright);
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 0 30px var(--cyan-bright);
-        }
-
-        /* 1. LOADING SCREEN */
+        /* LOADING BAR */
         #loader-panel {
-            width: 380px;
+            width: 360px;
             max-width: 90vw;
-            padding: 40px 30px;
+            padding: 30px;
             text-align: center;
         }
 
         .progress-bar-container {
             width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 20px 0 10px 0;
-            position: relative;
+            height: 16px;
+            background: #000;
+            border: 2px solid var(--cyan-bright);
+            margin: 20px 0 15px 0;
+            padding: 2px;
         }
 
         .progress-bar-fill {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright));
-            box-shadow: 0 0 12px var(--cyan-bright);
-            transition: width 0.1s linear;
+            background: var(--cyan-bright);
+            box-shadow: 0 0 10px var(--cyan-bright);
         }
 
         .sys-log {
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
+            font-family: var(--font-pixel);
+            font-size: 0.5rem;
             color: var(--cyan-bright);
-            height: 18px;
-            opacity: 0.7;
-            font-family: monospace;
+            height: 20px;
+            opacity: 0.8;
         }
 
-        /* 2. AUTH SCREEN */
-        #auth-panel {
-            width: 420px;
-            max-width: 90vw;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .google-btn {
-            background: #ffffff;
-            color: #333333;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0;
-            text-transform: none;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            margin: 15px 0;
-            padding: 14px;
-            border-radius: 6px;
-        }
-        .google-btn:hover {
-            background: #f1f1f1;
-            box-shadow: 0 0 15px rgba(255,255,255,0.4);
-            color: #000;
-        }
-
-        /* 3. MAIN MENU */
+        /* MENU SETUP */
         #menu-screen .menu-items {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 280px;
+            gap: 10px;
+            width: 260px;
         }
 
-        /* HUD OVERLAY */
+        /* HUD */
         #hud {
             position: absolute;
             top: 0;
@@ -248,220 +201,198 @@
             z-index: 5;
             pointer-events: none;
             display: none;
-            padding: 20px;
+            padding: 15px;
         }
 
         .hud-card {
-            padding: 10px 20px;
+            padding: 10px 16px;
             position: absolute;
+            font-family: var(--font-pixel);
         }
 
-        .hud-top-left { top: 20px; left: 20px; }
-        .hud-top-center { top: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
-        .hud-top-right { top: 20px; right: 20px; text-align: right; }
+        .hud-top-left { top: 15px; left: 15px; }
+        .hud-top-right { top: 15px; right: 15px; text-align: right; }
 
         .hud-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.2em;
+            font-size: 0.5rem;
             color: var(--cyan-bright);
-            opacity: 0.8;
-            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .hud-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-shadow: 0 0 8px var(--cyan-glow);
+            font-size: 0.9rem;
+            color: #fff;
+            text-shadow: 2px 2px 0px var(--electric-blue);
         }
 
         .speed-bar-hud {
-            width: 120px;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
+            width: 100px;
+            height: 8px;
+            background: #000;
+            border: 1px solid var(--cyan-bright);
             margin-top: 4px;
-            overflow: hidden;
         }
         .speed-bar-hud-fill {
             width: 0%;
             height: 100%;
             background: var(--cyan-bright);
-            box-shadow: 0 0 8px var(--cyan-bright);
         }
 
-        /* MOBILE CONTROLS */
+        /* SQUARE RETRO PIXEL JOYSTICK & CONTROLS */
         #touch-controls {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 20;
             pointer-events: none;
-            display: none;
+            display: block; /* Always ready for touch */
         }
 
+        /* Square Outer Bounds */
         #joystick-zone {
             position: absolute;
             bottom: 30px;
             left: 30px;
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            border: 2px solid var(--glass-border);
-            background: rgba(0, 102, 255, 0.05);
-            backdrop-filter: blur(4px);
+            width: 120px;
+            height: 120px;
+            background: rgba(10, 17, 40, 0.7);
+            border: 3px solid var(--cyan-bright);
+            box-shadow: 0 0 15px var(--cyan-glow), inset 0 0 10px rgba(0, 240, 255, 0.2);
             pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Square Pixel Knob */
         #joystick-knob {
+            width: 44px;
+            height: 44px;
+            background: var(--cyan-bright);
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 12px var(--cyan-bright), 3px 3px 0px var(--electric-blue);
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 50px;
-            height: 50px;
-            margin-top: -25px;
-            margin-left: -25px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--cyan-bright), var(--electric-blue));
-            box-shadow: 0 0 15px var(--cyan-bright);
-            transition: transform 0.05s ease-out;
+            margin-top: -22px;
+            margin-left: -22px;
+            pointer-events: none;
         }
 
+        /* Square Pixel Boost Button */
         #boost-btn {
             position: absolute;
             bottom: 40px;
             right: 30px;
             width: 80px;
             height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--cyan-bright);
-            background: rgba(0, 240, 255, 0.1);
-            backdrop-filter: blur(8px);
-            color: var(--cyan-bright);
-            font-weight: 800;
-            font-size: 0.8rem;
-            letter-spacing: 0.1em;
+            background: var(--electric-blue);
+            border: 3px solid var(--cyan-bright);
+            box-shadow: 4px 4px 0px #000, 0 0 15px var(--cyan-glow);
+            color: #fff;
+            font-family: var(--font-pixel);
+            font-size: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: center;
             pointer-events: auto;
-            box-shadow: 0 0 15px var(--glass-border);
-        }
-        #boost-btn:active {
-            background: rgba(0, 240, 255, 0.4);
-            box-shadow: 0 0 25px var(--cyan-bright);
+            cursor: pointer;
         }
 
-        /* SPEED UP NOTIFICATION */
+        #boost-btn:active {
+            background: var(--cyan-bright);
+            color: #000;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        /* SPEED UP NOTIFY */
         #speed-notify {
             position: absolute;
-            top: 40%;
+            top: 35%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
             text-align: center;
             pointer-events: none;
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 6;
+            font-family: var(--font-pixel);
         }
         #speed-notify.active {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1.2);
+            transform: translate(-50%, -50%) scale(1);
         }
 
-        /* MODAL / OVERLAY PANELS */
         .modal-body {
-            width: 480px;
+            width: 440px;
             max-width: 90vw;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 30px;
+            padding: 25px;
+            font-family: var(--font-ui);
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            font-size: 1rem;
+            font-weight: 700;
         }
-        .stat-label { color: rgba(255,255,255,0.6); }
-        .stat-val { color: var(--cyan-bright); font-weight: 700; }
+        .stat-label { color: rgba(255,255,255,0.7); }
+        .stat-val { color: var(--cyan-bright); }
 
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-        }
-
-        select, input[type="range"] {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        /* AUDIO TOGGLE */
         #sound-toggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             z-index: 100;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
+            background: var(--glass-bg);
+            border: 2px solid var(--cyan-bright);
         }
 
         @media (max-width: 600px) {
-            .logo-title { font-size: 2.5rem; letter-spacing: 0.2em; }
-            .logo-subtitle { font-size: 0.75rem; letter-spacing: 0.25em; }
-            .hud-top-center { display: none; }
+            .logo-title { font-size: 1.6rem; }
+            .logo-subtitle { font-size: 0.5rem; }
         }
     </style>
-    <!-- Three.js 3D Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <div id="webgl-container"></div>
-
-    <div id="sound-toggle" class="glass-panel">🔊</div>
+    <div id="sound-toggle">🔊</div>
 
     <!-- 1. LOADING SCREEN -->
     <div id="loader-screen" class="screen active">
         <div id="loader-panel" class="glass-panel">
-            <div class="logo-title" style="font-size:2.5rem; margin-bottom: 0;">NUBRIC</div>
-            <div class="logo-subtitle" style="font-size:0.65rem; margin-bottom:20px;">SYSTEM INITIALIZATION</div>
+            <div class="logo-title">NUBRIC</div>
+            <div class="logo-subtitle">INITIALIZING SPACE SYSTEMS</div>
             <div class="progress-bar-container">
                 <div id="loader-bar" class="progress-bar-fill"></div>
             </div>
-            <div id="loader-percent" style="font-size: 0.8rem; letter-spacing: 0.1em; margin-bottom: 8px;">LOADING 0%</div>
-            <div id="loader-log" class="sys-log">Connecting to NUBRIC servers...</div>
+            <div id="loader-percent" class="logo-subtitle" style="margin-bottom:8px;">LOADING 0%</div>
+            <div id="loader-log" class="sys-log">Connecting to NUBRIC...</div>
         </div>
     </div>
 
     <!-- 2. AUTH SCREEN -->
     <div id="auth-screen" class="screen">
-        <div id="auth-panel" class="glass-panel">
-            <div class="logo-title" style="font-size:2.8rem; margin-bottom:0;">NUBRIC</div>
-            <div class="logo-subtitle">ENTER THE UNIVERSE. SURVIVE THE VOID.</div>
+        <div class="glass-panel" style="width: 360px; max-width:90vw; padding:30px; text-align:center;">
+            <div class="logo-title">NUBRIC</div>
+            <div class="logo-subtitle">ENTER THE VOID</div>
             
-            <button class="btn google-btn" onclick="simulatedLogin('Google Pilot')">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.29 21.39 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                CONTINUE WITH GOOGLE
-            </button>
-            <button class="btn btn-primary" style="width:100%; margin: 5px 0 15px 0;" onclick="simulatedLogin('Guest Pilot')">SIGN IN AS GUEST</button>
-            
-            <div style="font-size: 0.65rem; opacity: 0.5; letter-spacing: 0.05em;">Progress is saved locally to your telemetry bank.</div>
+            <button class="btn btn-primary" style="width:100%;" onclick="simulatedLogin('Pilot')">CONTINUE WITH GOOGLE</button>
+            <button class="btn" style="width:100%; margin-top:10px;" onclick="simulatedLogin('Guest')">GUEST PILOT</button>
         </div>
     </div>
 
@@ -473,7 +404,6 @@
         <div class="menu-items">
             <button class="btn btn-primary" onclick="startGame()">PLAY</button>
             <button class="btn" onclick="showScreen('progress-screen')">PROGRESS</button>
-            <button class="btn" onclick="showScreen('settings-screen')">SETTINGS</button>
             <button class="btn" onclick="showScreen('help-screen')">HOW TO PLAY</button>
         </div>
     </div>
@@ -481,105 +411,73 @@
     <!-- 4. PROGRESS SCREEN -->
     <div id="progress-screen" class="screen">
         <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 20px;">YOUR JOURNEY</div>
-            <div class="stat-row"><span class="stat-label">Total Distance Traveled</span><span class="stat-val" id="st-dist">0 m</span></div>
+            <div class="logo-subtitle" style="font-size: 0.8rem; margin-bottom: 15px;">YOUR STATS</div>
+            <div class="stat-row"><span class="stat-label">Best Distance</span><span class="stat-val" id="st-dist">0 m</span></div>
             <div class="stat-row"><span class="stat-label">Best Score</span><span class="stat-val" id="st-score">0</span></div>
-            <div class="stat-row"><span class="stat-label">Highest Speed</span><span class="stat-val" id="st-speed">1</span></div>
+            <div class="stat-row"><span class="stat-label">Max Speed Reached</span><span class="stat-val" id="st-speed">Speed 1</span></div>
             <div class="stat-row"><span class="stat-label">Asteroids Dodged</span><span class="stat-val" id="st-dodged">0</span></div>
-            <div class="stat-row"><span class="stat-label">Sorties Launched</span><span class="stat-val" id="st-runs">0</span></div>
             
-            <div style="margin-top: 25px; text-align: center;">
+            <div style="margin-top: 20px; text-align: center;">
                 <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
             </div>
         </div>
     </div>
 
-    <!-- 5. SETTINGS SCREEN -->
-    <div id="settings-screen" class="screen">
-        <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 20px;">SYSTEM SETTINGS</div>
-            <div class="setting-row">
-                <span class="stat-label">Graphics Quality</span>
-                <select id="cfg-graphics"><option>Ultra</option><option>High</option><option>Medium</option></select>
-            </div>
-            <div class="setting-row">
-                <span class="stat-label">Motion Blur</span>
-                <select id="cfg-blur"><option>ON</option><option>OFF</option></select>
-            </div>
-            <div class="setting-row">
-                <span class="stat-label">Screen Shake</span>
-                <select id="cfg-shake"><option>ON</option><option>OFF</option></select>
-            </div>
-            <div style="margin-top: 25px; text-align: center;">
-                <button class="btn" onclick="showScreen('menu-screen')">SAVE & BACK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 6. HOW TO PLAY SCREEN -->
+    <!-- 5. HOW TO PLAY -->
     <div id="help-screen" class="screen">
         <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 15px;">PILOT MANUAL</div>
-            <p style="font-size: 0.85rem; line-height: 1.6; opacity: 0.8; margin-bottom: 15px;">
-                Navigate your high-speed craft through dense procedural asteroid belts. Avoid all dark rock collisions at all costs.
+            <div class="logo-subtitle" style="font-size: 0.8rem; margin-bottom: 15px;">PILOT CONTROLS</div>
+            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
+                Dodge procedural asteroid fields. Speed increases by +1 every 5-10 successful dodges!
             </p>
-            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 20px;">
-                <div><strong>DESKTOP:</strong> WASD or Arrow Keys to steer. Shift / Space for Boost.</div>
-                <div style="margin-top: 8px;"><strong>MOBILE:</strong> Dynamic touch joystick on bottom-left. Boost button on bottom-right.</div>
+            <div style="background: rgba(0,0,0,0.5); padding: 12px; border: 1px solid var(--cyan-bright); font-family: var(--font-pixel); font-size: 0.55rem; text-align: left; line-height: 1.8; margin-bottom: 15px;">
+                <div>[DESKTOP] WASD / Arrow Keys to move. Space to Boost.</div>
+                <div style="margin-top:5px;">[MOBILE] Drag Square Joystick on left. Tap Boost on right.</div>
             </div>
-            <button class="btn" onclick="showScreen('menu-screen')">UNDERSTOOD</button>
+            <button class="btn" onclick="showScreen('menu-screen')">OK</button>
         </div>
     </div>
 
-    <!-- 7. GAME OVER SCREEN -->
+    <!-- 6. GAME OVER SCREEN -->
     <div id="gameover-screen" class="screen">
         <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-title" style="font-size: 2.2rem; color: #00f0ff;">MISSION FAILED</div>
-            <div class="logo-subtitle" style="margin-bottom: 20px;">CRITICAL HULL COLLISION</div>
+            <div class="logo-title" style="font-size: 1.5rem;">MISSION FAILED</div>
+            <div class="logo-subtitle" style="margin-bottom: 15px;">CRITICAL COLLISION</div>
             
-            <div class="stat-row"><span class="stat-label">Final Distance</span><span class="stat-val" id="go-dist">0 m</span></div>
-            <div class="stat-row"><span class="stat-label">Final Score</span><span class="stat-val" id="go-score">0</span></div>
-            <div class="stat-row"><span class="stat-label">Max Speed Reached</span><span class="stat-val" id="go-speed">1</span></div>
+            <div class="stat-row"><span class="stat-label">Distance</span><span class="stat-val" id="go-dist">0 m</span></div>
+            <div class="stat-row"><span class="stat-label">Score</span><span class="stat-val" id="go-score">0</span></div>
+            <div class="stat-row"><span class="stat-label">Final Speed</span><span class="stat-val" id="go-speed">Speed 1</span></div>
             
-            <div style="margin-top: 25px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="startGame()">TRY AGAIN</button>
-                <button class="btn" onclick="showScreen('menu-screen')">MAIN MENU</button>
+                <button class="btn" onclick="showScreen('menu-screen')">MENU</button>
             </div>
         </div>
     </div>
 
-    <!-- GAMEPLAY HUD OVERLAY -->
+    <!-- HUD OVERLAY -->
     <div id="hud">
         <div class="hud-card glass-panel hud-top-left">
             <div class="hud-label">DISTANCE</div>
             <div class="hud-value" id="hud-dist">0 m</div>
         </div>
-        <div class="hud-top-center">
-            <div class="logo-title" style="font-size: 1.5rem; letter-spacing: 0.2em; margin:0;">NUBRIC</div>
-        </div>
         <div class="hud-card glass-panel hud-top-right">
             <div class="hud-label">SCORE</div>
             <div class="hud-value" id="hud-score">0</div>
-            <div style="display: flex; gap: 15px; margin-top: 5px;">
-                <div>
-                    <div class="hud-label">SPEED</div>
-                    <div style="font-size: 1.1rem; font-weight:700;" id="hud-speed">1</div>
-                </div>
-                <div>
-                    <div class="hud-label">NEXT LEVEL</div>
-                    <div class="speed-bar-hud"><div id="hud-speed-progress" class="speed-bar-hud-fill"></div></div>
-                </div>
+            <div style="margin-top: 6px;">
+                <div class="hud-label" id="hud-speed-lvl">SPEED 1</div>
+                <div class="speed-bar-hud"><div id="hud-speed-progress" class="speed-bar-hud-fill"></div></div>
             </div>
         </div>
     </div>
 
-    <!-- SPEED UP NOTIFICATION -->
+    <!-- SPEED UP NOTIFY -->
     <div id="speed-notify">
-        <div class="logo-title" style="font-size:2rem; text-shadow: 0 0 30px var(--cyan-bright);">SPEED INCREASED</div>
-        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1.2rem;">LEVEL 2</div>
+        <div class="logo-title" style="font-size:1.5rem;">SPEED INCREASED!</div>
+        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 0.8rem;">SPEED +1</div>
     </div>
 
-    <!-- MOBILE VIRTUAL CONTROLS -->
+    <!-- SQUARE RETRO TOUCH JOYSTICK & CONTROLS -->
     <div id="touch-controls">
         <div id="joystick-zone">
             <div id="joystick-knob"></div>
@@ -588,17 +486,10 @@
     </div>
 
 <script>
-/* --- AUDIO SYSTEM (Web Audio API Synthesizer) --- */
+/* --- AUDIO SYNTHESIZER --- */
 class SoundController {
-    constructor() {
-        this.ctx = null;
-        this.muted = false;
-    }
-    init() {
-        if(!this.ctx) {
-            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    }
+    constructor() { this.ctx = null; this.muted = false; }
+    init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
     playTone(freq, type, duration, vol=0.1) {
         if(this.muted || !this.ctx) return;
         try {
@@ -614,427 +505,226 @@ class SoundController {
             osc.stop(this.ctx.currentTime + duration);
         } catch(e){}
     }
-    playHover() { this.playTone(400, 'sine', 0.05, 0.02); }
-    playClick() { this.playTone(800, 'triangle', 0.08, 0.05); }
+    playHover() { this.playTone(300, 'square', 0.04, 0.02); }
+    playClick() { this.playTone(600, 'square', 0.08, 0.04); }
     playSpeedUp() {
-        if(this.muted || !this.ctx) return;
-        this.playTone(300, 'sawtooth', 0.1, 0.08);
-        setTimeout(() => this.playTone(600, 'sawtooth', 0.2, 0.08), 80);
+        this.playTone(400, 'sawtooth', 0.1, 0.06);
+        setTimeout(() => this.playTone(800, 'sawtooth', 0.15, 0.06), 80);
     }
     playExplosion() {
         if(this.muted || !this.ctx) return;
-        // White noise explosion
-        let bufferSize = this.ctx.sampleRate * 0.5;
-        let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        let bufSize = this.ctx.sampleRate * 0.4;
+        let buffer = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
         let data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+        for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
         let noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
         let gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
         noise.connect(gain);
         gain.connect(this.ctx.destination);
         noise.start();
     }
 }
 const sound = new SoundController();
-
 document.getElementById('sound-toggle').addEventListener('click', () => {
     sound.init();
     sound.muted = !sound.muted;
     document.getElementById('sound-toggle').innerText = sound.muted ? '🔇' : '🔊';
 });
 
-/* --- PERSISTENT USER DATA --- */
-let userData = {
-    distance: 0,
-    score: 0,
-    speed: 1,
-    dodged: 0,
-    runs: 0
-};
-
+/* --- PERSISTENT TELEMETRY DATA --- */
+let userData = { distance: 0, score: 0, speed: 1, dodged: 0 };
 function loadUserData() {
     let saved = localStorage.getItem('NUBRIC_DATA');
-    if(saved) {
-        try { userData = JSON.parse(saved); } catch(e){}
-    }
+    if(saved) { try { userData = JSON.parse(saved); } catch(e){} }
     updateProgressUI();
 }
-
 function saveUserData() {
     localStorage.setItem('NUBRIC_DATA', JSON.stringify(userData));
     updateProgressUI();
 }
-
 function updateProgressUI() {
     document.getElementById('st-dist').innerText = Math.floor(userData.distance) + ' m';
-    document.getElementById('st-score').innerText = userData.score;
-    document.getElementById('st-speed').innerText = userData.speed;
+    document.getElementById('st-score').innerText = Math.floor(userData.score);
+    document.getElementById('st-speed').innerText = 'Speed ' + userData.speed;
     document.getElementById('st-dodged').innerText = userData.dodged;
-    document.getElementById('st-runs').innerText = userData.runs;
 }
 
-/* --- GAME STATE MANAGEMENT --- */
-let currentState = 'LOADER';
-
-function showScreen(screenId) {
-    sound.init();
-    sound.playClick();
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    let target = document.getElementById(screenId);
-    if(target) target.classList.add('active');
-    
-    // Manage state specifics
-    if(screenId === 'menu-screen') {
-        document.getElementById('hud').style.display = 'none';
-        document.getElementById('touch-controls').style.display = 'none';
-        gameActive = false;
-        resetShipPosition();
-    }
-}
-
-function simulatedLogin(name) {
-    sound.playClick();
-    showScreen('menu-screen');
-}
-
-/* --- THREE.JS ENGINE & GRAPHICS SYSTEM --- */
+/* --- GAME ENGINE & THREE.JS --- */
 let scene, camera, renderer;
-let playerCraft, engineParticles, starField, nebulaClouds;
+let playerCraft, starField;
 let asteroids = [];
-let explosionParticles = [];
-
-// Game parameters
 let gameActive = false;
+
+// Game Progression Variables
 let distanceTraveled = 0;
 let currentScore = 0;
-let gameSpeed = 1;
-let targetSpeedLevel = 1;
+let speedLevel = 1; // Explicit Speed level: 1, 2, 3, 4...
 let dodgedCount = 0;
-let dodgesToNextLevel = 7;
-let speedProgress = 0;
+let dodgesToNextLevel = 6;
 
-// Ship input dynamics
+// Input vector
 let inputVector = { x: 0, y: 0 };
 let isBoosting = false;
 let craftVelocity = { x: 0, y: 0 };
-let cameraShake = 0;
 
-// Field setup bounds
-const BOUNDS_X = 22;
-const BOUNDS_Y = 14;
+const BOUNDS_X = 20;
+const BOUNDS_Y = 12;
 
 function initEngine() {
     let container = document.getElementById('webgl-container');
-    
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x030508, 0.008);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 3, 10);
+    camera.position.set(0, 2.5, 9);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
     container.appendChild(renderer.domElement);
 
-    // Lighting setup
-    let ambientLight = new THREE.AmbientLight(0x0a1128, 1.5);
+    let ambientLight = new THREE.AmbientLight(0x0a1128, 1.8);
     scene.add(ambientLight);
 
-    let mainLight = new THREE.DirectionalLight(0x00f0ff, 2);
+    let mainLight = new THREE.DirectionalLight(0x00f0ff, 2.5);
     mainLight.position.set(10, 20, 10);
     scene.add(mainLight);
 
-    let backLight = new THREE.DirectionalLight(0x0066ff, 3);
-    backLight.position.set(-10, -10, -20);
-    scene.add(backLight);
-
     buildStarfield();
-    buildNebulae();
     buildPlayerCraft();
 
     window.addEventListener('resize', onWindowResize);
     setupControls();
     
-    // Start Render Loop
     requestAnimationFrame(renderLoop);
-
-    // Simulated Loading Sequence
     runLoadingSequence();
 }
 
-/* --- PROCEDURAL CREATION FUNCTIONS --- */
 function buildStarfield() {
-    let count = 3000;
-    let geometry = new THREE.BufferGeometry();
-    let positions = new Float32Array(count * 3);
-    let colors = new Float32Array(count * 3);
-
+    let count = 2500;
+    let geo = new THREE.BufferGeometry();
+    let pos = new Float32Array(count * 3);
     for(let i=0; i<count*3; i+=3) {
-        positions[i] = (Math.random() - 0.5) * 400;
-        positions[i+1] = (Math.random() - 0.5) * 400;
-        positions[i+2] = (Math.random() - 0.5) * 600;
-
-        // Bright cyan/blue/white stars
-        let c = new THREE.Color().setHSL(0.5 + Math.random()*0.1, 0.8, 0.5 + Math.random()*0.5);
-        colors[i] = c.r; colors[i+1] = c.g; colors[i+2] = c.b;
+        pos[i] = (Math.random() - 0.5) * 400;
+        pos[i+1] = (Math.random() - 0.5) * 400;
+        pos[i+2] = (Math.random() - 0.5) * 500;
     }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    let material = new THREE.PointsMaterial({
-        size: 1.2,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.8
-    });
-
-    starField = new THREE.Points(geometry, material);
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    let mat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 1.2, transparent: true, opacity: 0.8 });
+    starField = new THREE.Points(geo, mat);
     scene.add(starField);
-}
-
-function buildNebulae() {
-    nebulaClouds = new THREE.Group();
-    let geo = new THREE.IcosahedronGeometry(20, 2);
-    for(let i=0; i<8; i++) {
-        let mat = new THREE.MeshBasicMaterial({
-            color: i % 2 === 0 ? 0x0066ff : 0x0a1128,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.05
-        });
-        let mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set((Math.random()-0.5)*200, (Math.random()-0.5)*200, -100 - Math.random()*200);
-        mesh.scale.setScalar(1 + Math.random()*2);
-        nebulaClouds.add(mesh);
-    }
-    scene.add(nebulaClouds);
 }
 
 function buildPlayerCraft() {
     playerCraft = new THREE.Group();
 
-    // Futuristic Sleek Body
-    let bodyGeo = new THREE.ConeGeometry(0.8, 3.5, 5);
+    // Sleek Jet
+    let bodyGeo = new THREE.ConeGeometry(0.8, 3.2, 4);
     bodyGeo.rotateX(Math.PI / 2);
-    let bodyMat = new THREE.MeshStandardMaterial({
-        color: 0x080f24,
-        metalness: 0.9,
-        roughness: 0.2,
-        wireframe: false
-    });
+    let bodyMat = new THREE.MeshStandardMaterial({ color: 0x080f24, metalness: 0.8, roughness: 0.2 });
     let mainBody = new THREE.Mesh(bodyGeo, bodyMat);
     playerCraft.add(mainBody);
 
-    // Glowing Neon Stripes/Wings
-    let wingGeo = new THREE.BoxGeometry(3.2, 0.05, 1.2);
-    let wingMat = new THREE.MeshStandardMaterial({
-        color: 0x00f0ff,
-        emissive: 0x00f0ff,
-        emissiveIntensity: 0.6,
-        metalness: 0.5
-    });
+    // Neon Wings
+    let wingGeo = new THREE.BoxGeometry(3.0, 0.08, 1.0);
+    let wingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
     let wings = new THREE.Mesh(wingGeo, wingMat);
     wings.position.set(0, 0, 0.3);
     playerCraft.add(wings);
 
     // Cockpit Glass
-    let glassGeo = new THREE.SphereGeometry(0.4, 8, 8);
-    glassGeo.scale(0.8, 0.5, 1.8);
-    let glassMat = new THREE.MeshPhysicalMaterial({
-        color: 0x00f0ff,
-        transparent: true,
-        opacity: 0.7,
-        roughness: 0.1,
-        transmission: 0.9
-    });
+    let glassGeo = new THREE.BoxGeometry(0.6, 0.4, 1.0);
+    let glassMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     let cockpit = new THREE.Mesh(glassGeo, glassMat);
-    cockpit.position.set(0, 0.25, -0.2);
+    cockpit.position.set(0, 0.3, -0.2);
     playerCraft.add(cockpit);
-
-    // Engine Exhaust Glow
-    let engineGeo = new THREE.CylinderGeometry(0.25, 0.01, 1, 8);
-    engineGeo.rotateX(-Math.PI / 2);
-    let engineMat = new THREE.MeshBasicMaterial({
-        color: 0x00f0ff,
-        transparent: true,
-        opacity: 0.9
-    });
-    let engine = new THREE.Mesh(engineGeo, engineMat);
-    engine.position.set(0, 0, 1.8);
-    playerCraft.add(engine);
-
-    // Engine Particles Trail
-    let pCount = 60;
-    let pGeo = new THREE.BufferGeometry();
-    let pPos = new Float32Array(pCount * 3);
-    for(let i=0; i<pCount*3; i++) pPos[i] = 0;
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    
-    let pMat = new THREE.PointsMaterial({
-        color: 0x00f0ff,
-        size: 0.4,
-        transparent: true,
-        opacity: 0.6,
-        blending: THREE.AdditiveBlending
-    });
-    engineParticles = new THREE.Points(pGeo, pMat);
-    scene.add(engineParticles);
 
     scene.add(playerCraft);
 }
 
 function spawnAsteroid() {
-    let size = 1.2 + Math.random() * 2.5;
+    let size = 1.2 + Math.random() * 2.2;
     let geo = new THREE.DodecahedronGeometry(size, 1);
-    
-    // Deform vertices for irregular rock shape
-    let posAttr = geo.attributes.position;
-    for (let i = 0; i < posAttr.count; i++) {
-        let x = posAttr.getX(i);
-        let y = posAttr.getY(i);
-        let z = posAttr.getZ(i);
-        let factor = 1 + (Math.random() - 0.5) * 0.35;
-        posAttr.setXYZ(i, x * factor, y * factor, z * factor);
-    }
-    geo.computeVertexNormals();
-
-    let mat = new THREE.MeshStandardMaterial({
-        color: 0x1a2238,
-        roughness: 0.9,
-        metalness: 0.1,
-        flatShading: true
-    });
-
+    let mat = new THREE.MeshStandardMaterial({ color: 0x162038, roughness: 0.8, flatShading: true });
     let mesh = new THREE.Mesh(geo, mat);
 
-    // Position far ahead with slight offset logic
     let posX = (Math.random() - 0.5) * (BOUNDS_X * 2);
     let posY = (Math.random() - 0.5) * (BOUNDS_Y * 2);
-    let posZ = -180 - Math.random() * 80;
+    let posZ = -160 - Math.random() * 60;
 
     mesh.position.set(posX, posY, posZ);
-    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
-
-    let rotSpeed = {
-        x: (Math.random() - 0.5) * 0.03,
-        y: (Math.random() - 0.5) * 0.03
-    };
+    let rotSpeed = { x: (Math.random() - 0.5) * 0.04, y: (Math.random() - 0.5) * 0.04 };
 
     asteroids.push({ mesh, rotSpeed, radius: size * 0.8, passed: false });
     scene.add(mesh);
 }
 
-function triggerExplosion(pos) {
-    sound.playExplosion();
-    let count = 80;
-    let geo = new THREE.BufferGeometry();
-    let positions = new Float32Array(count * 3);
-    let velocities = [];
-
-    for(let i=0; i<count; i++) {
-        positions[i*3] = pos.x;
-        positions[i*3+1] = pos.y;
-        positions[i*3+2] = pos.z;
-
-        velocities.push(new THREE.Vector3(
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 12
-        ));
-    }
-
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    let mat = new THREE.PointsMaterial({
-        color: 0x00f0ff,
-        size: 0.8,
-        transparent: true,
-        opacity: 1,
-        blending: THREE.AdditiveBlending
-    });
-
-    let pSys = new THREE.Points(geo, mat);
-    scene.add(pSys);
-    explosionParticles.push({ pSys, velocities, age: 0 });
-}
-
-/* --- LOADING FLOW --- */
 function runLoadingSequence() {
     let bar = document.getElementById('loader-bar');
     let pct = document.getElementById('loader-percent');
     let log = document.getElementById('loader-log');
     let progress = 0;
 
-    let logs = [
-        "Connecting to NUBRIC servers...",
-        "Calibrating navigation vectors...",
-        "Loading spacecraft telemetry...",
-        "Generating procedural asteroid field...",
-        "Synchronizing pilot progress..."
-    ];
-
+    let logs = ["CONNECTING...", "CALIBRATING NAV...", "LOADING SHIP...", "GENERATING VOID..."];
     let interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 12) + 3;
+        progress += Math.floor(Math.random() * 15) + 5;
         if(progress > 100) progress = 100;
 
         bar.style.width = progress + '%';
         pct.innerText = `LOADING ${progress}%`;
-        
-        let logIdx = Math.min(Math.floor((progress / 100) * logs.length), logs.length - 1);
-        log.innerText = logs[logIdx];
+        log.innerText = logs[Math.min(Math.floor((progress / 100) * logs.length), logs.length - 1)];
 
         if(progress >= 100) {
             clearInterval(interval);
             setTimeout(() => {
                 showScreen('auth-screen');
                 loadUserData();
-            }, 500);
+            }, 400);
         }
-    }, 120);
+    }, 100);
 }
 
-/* --- GAME LOOP & STATE HANDLERS --- */
+function showScreen(screenId) {
+    sound.init();
+    sound.playClick();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    if(screenId === 'menu-screen') {
+        document.getElementById('hud').style.display = 'none';
+        gameActive = false;
+        resetShip();
+    }
+}
+
+function simulatedLogin(type) {
+    sound.playClick();
+    showScreen('menu-screen');
+}
+
 function startGame() {
     sound.playClick();
     gameActive = true;
     distanceTraveled = 0;
     currentScore = 0;
-    gameSpeed = 1;
-    targetSpeedLevel = 1;
+    speedLevel = 1; // RESET TO SPEED LEVEL 1
     dodgedCount = 0;
-    dodgesToNextLevel = 6 + Math.floor(Math.random() * 4);
-    speedProgress = 0;
+    dodgesToNextLevel = 5 + Math.floor(Math.random() * 5); // 5 to 10 dodges
 
-    // Clear existing asteroids
     asteroids.forEach(a => scene.remove(a.mesh));
     asteroids = [];
 
-    // Pre-populate initial wave
-    for(let i=0; i<25; i++) {
-        spawnAsteroid();
-    }
+    for(let i=0; i<20; i++) spawnAsteroid();
 
-    resetShipPosition();
+    resetShip();
 
-    // UI Switches
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('hud').style.display = 'block';
-    
-    // Display Touch Controls on Mobile
-    if('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        document.getElementById('touch-controls').style.display = 'block';
-    }
-
-    userData.runs++;
-    saveUserData();
 }
 
-function resetShipPosition() {
+function resetShip() {
     if(playerCraft) {
         playerCraft.position.set(0, 0, 0);
         playerCraft.rotation.set(0, 0, 0);
@@ -1042,97 +732,81 @@ function resetShipPosition() {
     craftVelocity = { x: 0, y: 0 };
 }
 
+function triggerSpeedIncrease() {
+    speedLevel += 1; // Strict 1+ Increment
+    sound.playSpeedUp();
+
+    let notify = document.getElementById('speed-notify');
+    document.getElementById('speed-notify-val').innerText = `SPEED +1 (LEVEL ${speedLevel})`;
+    notify.classList.add('active');
+    setTimeout(() => notify.classList.remove('active'), 1400);
+
+    dodgedCount = 0;
+    dodgesToNextLevel = 5 + Math.floor(Math.random() * 6); // 5-10 dodges required for next speed level
+}
+
 function onGameOver() {
     gameActive = false;
-    cameraShake = 0.8;
+    sound.playExplosion();
 
-    if(playerCraft) triggerExplosion(playerCraft.position);
-
-    // Check High Score Updates
     if(currentScore > userData.score) userData.score = currentScore;
     if(distanceTraveled > userData.distance) userData.distance = distanceTraveled;
-    if(targetSpeedLevel > userData.speed) userData.speed = targetSpeedLevel;
+    if(speedLevel > userData.speed) userData.speed = speedLevel;
     saveUserData();
 
     document.getElementById('go-dist').innerText = Math.floor(distanceTraveled) + ' m';
     document.getElementById('go-score').innerText = Math.floor(currentScore);
-    document.getElementById('go-speed').innerText = targetSpeedLevel;
+    document.getElementById('go-speed').innerText = 'Speed ' + speedLevel;
 
     setTimeout(() => {
         document.getElementById('hud').style.display = 'none';
-        document.getElementById('touch-controls').style.display = 'none';
         showScreen('gameover-screen');
-    }, 1200);
+    }, 800);
 }
 
-function triggerSpeedIncrease() {
-    targetSpeedLevel++;
-    sound.playSpeedUp();
-    cameraShake = 0.4;
-
-    let notify = document.getElementById('speed-notify');
-    document.getElementById('speed-notify-val').innerText = `LEVEL ${targetSpeedLevel}`;
-    notify.classList.add('active');
-    
-    setTimeout(() => {
-        notify.classList.remove('active');
-    }, 1500);
-
-    dodgedCount = 0;
-    dodgesToNextLevel = 6 + Math.floor(Math.random() * 5);
-}
-
-/* --- MAIN RENDER LOOP --- */
+/* --- RENDER LOOP --- */
 let lastTime = performance.now();
 
 function renderLoop(time) {
     requestAnimationFrame(renderLoop);
-    
     let delta = (time - lastTime) / 1000;
-    if(delta > 0.1) delta = 0.1; // Cap extreme frame drops
+    if(delta > 0.1) delta = 0.1;
     lastTime = time;
 
-    // Smooth speed transitions
-    gameSpeed += (targetSpeedLevel - gameSpeed) * 0.05;
-
     if(gameActive) {
-        let speedMult = (isBoosting ? 1.6 : 1.0) * gameSpeed;
-        
-        // Distance & Score accrual
-        distanceTraveled += 25 * speedMult * delta;
-        currentScore += 10 * speedMult * delta;
+        // Controlled Base Speed based on Speed Level (Speed 1, 2, 3...)
+        let baseSpeed = 30 + (speedLevel - 1) * 8; 
+        let speedMult = isBoosting ? baseSpeed * 1.5 : baseSpeed;
 
-        // Ship Steering Acceleration
-        let targetVelX = inputVector.x * 18;
-        let targetVelY = inputVector.y * 14;
+        distanceTraveled += (speedMult * 0.5) * delta;
+        currentScore += (speedMult * 0.8) * delta;
+
+        // Smooth Movement
+        let targetVelX = inputVector.x * 20;
+        let targetVelY = inputVector.y * 16;
         
-        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.1;
-        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.1;
+        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.12;
+        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.12;
 
         playerCraft.position.x += craftVelocity.x * delta;
         playerCraft.position.y += craftVelocity.y * delta;
 
-        // Screen Boundary Constraints
         playerCraft.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, playerCraft.position.x));
         playerCraft.position.y = Math.max(-BOUNDS_Y, Math.min(BOUNDS_Y, playerCraft.position.y));
 
-        // Visual Banking / Banking Tilt
-        playerCraft.rotation.z = -craftVelocity.x * 0.04;
-        playerCraft.rotation.x = craftVelocity.y * 0.03;
+        playerCraft.rotation.z = -craftVelocity.x * 0.035;
+        playerCraft.rotation.x = craftVelocity.y * 0.025;
 
-        // Asteroid Updates
-        let spawnThreshold = 25 + targetSpeedLevel * 3;
-        if(asteroids.length < spawnThreshold) {
-            spawnAsteroid();
-        }
+        // Asteroids logic
+        if(asteroids.length < 22 + speedLevel) spawnAsteroid();
 
         for(let i = asteroids.length - 1; i >= 0; i--) {
             let ast = asteroids[i];
-            ast.mesh.position.z += (40 * speedMult) * delta;
+            ast.mesh.position.z += speedMult * delta;
             ast.mesh.rotation.x += ast.rotSpeed.x;
             ast.mesh.rotation.y += ast.rotSpeed.y;
 
-            // Dodged Asteroid Check
+            // Dodge check
             if(!ast.passed && ast.mesh.position.z > playerCraft.position.z) {
                 ast.passed = true;
                 dodgedCount++;
@@ -1142,14 +816,12 @@ function renderLoop(time) {
                 }
             }
 
-            // Collision Detection
-            let dist = playerCraft.position.distanceTo(ast.mesh.position);
-            if(dist < (ast.radius + 0.9)) {
+            // Collision Check
+            if(playerCraft.position.distanceTo(ast.mesh.position) < (ast.radius + 0.8)) {
                 onGameOver();
             }
 
-            // Cleanup recycled asteroids
-            if(ast.mesh.position.z > 20) {
+            if(ast.mesh.position.z > 15) {
                 scene.remove(ast.mesh);
                 asteroids.splice(i, 1);
             }
@@ -1158,85 +830,38 @@ function renderLoop(time) {
         // HUD Updates
         document.getElementById('hud-dist').innerText = Math.floor(distanceTraveled) + ' m';
         document.getElementById('hud-score').innerText = Math.floor(currentScore);
-        document.getElementById('hud-speed').innerText = targetSpeedLevel;
+        document.getElementById('hud-speed-lvl').innerText = `SPEED ${speedLevel}`;
         document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / dodgesToNextLevel) * 100) + '%';
     }
 
-    // Dynamic Starfield Velocity Effect
+    // Starfield Movement
     if(starField) {
         let p = starField.geometry.attributes.position;
-        let starSpeed = (gameActive ? 60 * gameSpeed : 10);
+        let starSpd = gameActive ? (30 + speedLevel * 10) : 10;
         for(let i=2; i<p.count*3; i+=3) {
-            p.array[i] += starSpeed * delta;
-            if(p.array[i] > 100) p.array[i] = -400;
+            p.array[i] += starSpd * delta;
+            if(p.array[i] > 100) p.array[i] = -350;
         }
         p.needsUpdate = true;
     }
 
-    // Dynamic Engine Exhaust Particles
-    if(engineParticles && playerCraft) {
-        let p = engineParticles.geometry.attributes.position;
-        for(let i = p.count*3 - 3; i >= 3; i-=3) {
-            p.array[i] = p.array[i-3];
-            p.array[i+1] = p.array[i-2];
-            p.array[i+2] = p.array[i-1];
-        }
-        p.array[0] = playerCraft.position.x + (Math.random()-0.5)*0.2;
-        p.array[1] = playerCraft.position.y + (Math.random()-0.5)*0.2;
-        p.array[2] = playerCraft.position.z + 1.8;
-        p.needsUpdate = true;
-    }
-
-    // Handle Explosion Particle Animations
-    for(let i = explosionParticles.length - 1; i >= 0; i--) {
-        let exp = explosionParticles[i];
-        exp.age += delta;
-        let pos = exp.pSys.geometry.attributes.position;
-        for(let j=0; j<exp.velocities.length; j++) {
-            pos.array[j*3] += exp.velocities[j].x * delta;
-            pos.array[j*3+1] += exp.velocities[j].y * delta;
-            pos.array[j*3+2] += exp.velocities[j].z * delta;
-        }
-        pos.needsUpdate = true;
-        exp.pSys.material.opacity = Math.max(0, 1 - exp.age * 2);
-
-        if(exp.age > 0.5) {
-            scene.remove(exp.pSys);
-            explosionParticles.splice(i, 1);
-        }
-    }
-
-    // Smooth Camera Follow & Shake
-    let targetCamX = gameActive ? playerCraft.position.x * 0.3 : 0;
-    let targetCamY = gameActive ? playerCraft.position.y * 0.3 + 2.5 : 3;
-    
-    camera.position.x += (targetCamX - camera.position.x) * 0.05;
-    camera.position.y += (targetCamY - camera.position.y) * 0.05;
-
-    if(cameraShake > 0) {
-        camera.position.x += (Math.random() - 0.5) * cameraShake;
-        camera.position.y += (Math.random() - 0.5) * cameraShake;
-        cameraShake *= 0.9;
-    }
+    // Smooth Camera Track
+    let targetCamX = gameActive ? playerCraft.position.x * 0.25 : 0;
+    let targetCamY = gameActive ? playerCraft.position.y * 0.25 + 2.2 : 2.5;
+    camera.position.x += (targetCamX - camera.position.x) * 0.08;
+    camera.position.y += (targetCamY - camera.position.y) * 0.08;
 
     renderer.render(scene, camera);
 }
 
-/* --- CONTROLS & INPUT HANDLERS --- */
+/* --- RETRO JOYSTICK & INPUT SYSTEM --- */
 function setupControls() {
     let keys = {};
 
-    window.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
-        updateKeyboardInput();
-    });
+    window.addEventListener('keydown', (e) => { keys[e.code] = true; updateKeyInput(); });
+    window.addEventListener('keyup', (e) => { keys[e.code] = false; updateKeyInput(); });
 
-    window.addEventListener('keyup', (e) => {
-        keys[e.code] = false;
-        updateKeyboardInput();
-    });
-
-    function updateKeyboardInput() {
+    function updateKeyInput() {
         if(!gameActive) return;
         let x = 0, y = 0;
         if(keys['KeyA'] || keys['ArrowLeft']) x -= 1;
@@ -1246,64 +871,70 @@ function setupControls() {
         
         inputVector.x = x;
         inputVector.y = y;
-
-        isBoosting = !!(keys['ShiftLeft'] || keys['Space']);
+        isBoosting = !!(keys['Space'] || keys['ShiftLeft']);
     }
 
-    // Touch Virtual Joystick Setup
-    let joystick = document.getElementById('joystick-zone');
+    // Touch Joystick Handling
+    let zone = document.getElementById('joystick-zone');
     let knob = document.getElementById('joystick-knob');
-    let touchId = null;
-    let center = { x: 0, y: 0 };
+    let activeTouchId = null;
+    let origin = { x: 0, y: 0 };
 
-    joystick.addEventListener('touchstart', (e) => {
+    function handleTouchStart(e) {
         e.preventDefault();
-        let touch = e.changedTouches[0];
-        touchId = touch.identifier;
-        let rect = joystick.getBoundingClientRect();
-        center = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
-        updateJoystick(touch);
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e) => {
-        if(touchId === null) return;
         for(let i=0; i<e.changedTouches.length; i++) {
-            if(e.changedTouches[i].identifier === touchId) {
-                updateJoystick(e.changedTouches[i]);
+            let touch = e.changedTouches[i];
+            let rect = zone.getBoundingClientRect();
+            activeTouchId = touch.identifier;
+            origin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+            moveJoystick(touch);
+            break;
+        }
+    }
+
+    function handleTouchMove(e) {
+        if(activeTouchId === null) return;
+        for(let i=0; i<e.changedTouches.length; i++) {
+            if(e.changedTouches[i].identifier === activeTouchId) {
+                moveJoystick(e.changedTouches[i]);
                 break;
             }
         }
-    }, { passive: false });
+    }
 
-    window.addEventListener('touchend', (e) => {
-        if(touchId === null) return;
+    function handleTouchEnd(e) {
+        if(activeTouchId === null) return;
         for(let i=0; i<e.changedTouches.length; i++) {
-            if(e.changedTouches[i].identifier === touchId) {
-                touchId = null;
+            if(e.changedTouches[i].identifier === activeTouchId) {
+                activeTouchId = null;
                 knob.style.transform = `translate(0px, 0px)`;
                 inputVector = { x: 0, y: 0 };
                 break;
             }
         }
-    });
-
-    function updateJoystick(touch) {
-        let dx = touch.clientX - center.x;
-        let dy = touch.clientY - center.y;
-        let dist = Math.hypot(dx, dy);
-        let maxDist = 45;
-
-        if(dist > maxDist) {
-            dx = (dx / dist) * maxDist;
-            dy = (dy / dist) * maxDist;
-        }
-
-        knob.style.transform = `translate(${dx}px, ${dy}px)`;
-        inputVector.x = dx / maxDist;
-        inputVector.y = -dy / maxDist; // Invert touch Y axis for intuitive flight feeling
     }
 
-    // Mobile Boost Touch Control
+    function moveJoystick(touch) {
+        let dx = touch.clientX - origin.x;
+        let dy = touch.clientY - origin.y;
+        let maxLen = 38; // Square constraint
+
+        dx = Math.max(-maxLen, Math.min(maxLen, dx));
+        dy = Math.max(-maxLen, Math.min(maxLen, dy));
+
+        knob.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        // Inverted Y axis for smooth rocket flight feel
+        inputVector.x = dx / maxLen;
+        inputVector.y = -dy / maxLen; 
+    }
+
+    zone.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
+
+    // Boost Button Touch
     let boostBtn = document.getElementById('boost-btn');
     boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBoosting = true; }, { passive: false });
     boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); isBoosting = false; });
@@ -1315,12 +946,10 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// Hover Audio FX for UI elements
 document.addEventListener('mouseover', (e) => {
     if(e.target.classList.contains('btn')) sound.playHover();
 });
 
-// Initialize Engine on Page Load
 window.addEventListener('load', initEngine);
 </script>
 </body>
