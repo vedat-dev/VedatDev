@@ -1,1635 +1,1327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#050b16">
-<title>SHADOWZ — Roblox Profile Scanner</title>
-
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-:root{
-  --bg:#030711;
-  --panel:rgba(8,18,35,.72);
-  --panel2:rgba(10,27,50,.58);
-  --line:rgba(63,151,255,.20);
-  --blue:#168cff;
-  --blue2:#57b5ff;
-  --cyan:#00d9ff;
-  --text:#eef7ff;
-  --muted:#7890aa;
-  --danger:#ff5577;
-  --green:#32e49b;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  min-height:100vh;
-  overflow-x:hidden;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(circle at 15% 10%,rgba(0,125,255,.16),transparent 30%),
-    radial-gradient(circle at 85% 30%,rgba(0,217,255,.08),transparent 30%),
-    linear-gradient(145deg,#02050b,#06101e 55%,#02050a);
-}
-
-/* animated background */
-body:before,
-body:after{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:-2;
-}
-
-body:before{
-  background-image:
-    linear-gradient(rgba(40,130,255,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(40,130,255,.045) 1px,transparent 1px);
-  background-size:42px 42px;
-  mask-image:linear-gradient(to bottom,black,transparent);
-}
-
-body:after{
-  z-index:-1;
-  background:
-    radial-gradient(circle at 50% 0%,rgba(30,142,255,.15),transparent 38%);
-  animation:pulseBg 5s ease-in-out infinite alternate;
-}
-
-@keyframes pulseBg{
-  from{opacity:.55}
-  to{opacity:1}
-}
-
-::-webkit-scrollbar{
-  width:8px;
-}
-
-::-webkit-scrollbar-track{
-  background:#030711;
-}
-
-::-webkit-scrollbar-thumb{
-  background:#123a64;
-  border-radius:99px;
-}
-
-/* NAV */
-.nav{
-  width:min(1180px,calc(100% - 30px));
-  margin:18px auto 0;
-  min-height:70px;
-  padding:12px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  border:1px solid var(--line);
-  background:rgba(4,12,24,.67);
-  backdrop-filter:blur(22px);
-  border-radius:22px;
-  box-shadow:0 15px 60px rgba(0,0,0,.25);
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  font-weight:900;
-  letter-spacing:3px;
-}
-
-.logoMark{
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  color:#fff;
-  background:linear-gradient(145deg,#087cff,#00cfff);
-  box-shadow:0 0 30px rgba(0,151,255,.4);
-  font-size:18px;
-}
-
-.status{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:1.5px;
-}
-
-.statusDot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#75879a;
-  box-shadow:0 0 0 transparent;
-}
-
-.statusDot.online{
-  background:var(--green);
-  box-shadow:0 0 13px var(--green);
-}
-
-.statusDot.busy{
-  background:#38aaff;
-  box-shadow:0 0 13px #38aaff;
-  animation:blink .8s infinite;
-}
-
-.statusDot.error{
-  background:var(--danger);
-  box-shadow:0 0 13px var(--danger);
-}
-
-@keyframes blink{
-  50%{opacity:.25}
-}
-
-/* HERO */
-.hero{
-  width:min(950px,calc(100% - 30px));
-  margin:95px auto 50px;
-  text-align:center;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 13px;
-  border:1px solid rgba(46,153,255,.24);
-  background:rgba(10,55,100,.24);
-  color:#78c4ff;
-  border-radius:99px;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:2px;
-  margin-bottom:20px;
-}
-
-.badge span{
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:#19a3ff;
-  box-shadow:0 0 12px #19a3ff;
-}
-
-h1{
-  font-size:clamp(42px,9vw,86px);
-  line-height:.94;
-  letter-spacing:-5px;
-  font-weight:1000;
-  background:linear-gradient(110deg,#fff 10%,#73c8ff 45%,#008dff 85%);
-  -webkit-background-clip:text;
-  color:transparent;
-  text-shadow:0 0 50px rgba(0,142,255,.12);
-}
-
-.heroText{
-  max-width:650px;
-  margin:23px auto 0;
-  color:#8098b2;
-  line-height:1.7;
-  font-size:14px;
-}
-
-/* SEARCH */
-.searchBox{
-  margin:34px auto 0;
-  max-width:720px;
-  padding:8px;
-  display:flex;
-  gap:8px;
-  border:1px solid rgba(46,153,255,.28);
-  background:rgba(4,15,30,.82);
-  border-radius:18px;
-  box-shadow:
-    0 0 0 1px rgba(0,119,255,.04),
-    0 20px 70px rgba(0,91,180,.12);
-}
-
-.inputWrap{
-  flex:1;
-  display:flex;
-  align-items:center;
-  min-width:0;
-}
-
-.searchIcon{
-  width:45px;
-  text-align:center;
-  color:#3daaff;
-  font-size:18px;
-}
-
-input{
-  width:100%;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#fff;
-  font-size:15px;
-  min-width:0;
-}
-
-input::placeholder{
-  color:#526a83;
-}
-
-.scanBtn{
-  border:0;
-  border-radius:13px;
-  padding:0 24px;
-  min-height:52px;
-  color:#fff;
-  background:linear-gradient(135deg,#087cff,#00a9ff);
-  font-weight:950;
-  letter-spacing:.7px;
-  cursor:pointer;
-  box-shadow:0 9px 30px rgba(0,128,255,.22);
-  transition:.2s;
-}
-
-.scanBtn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 13px 35px rgba(0,128,255,.35);
-}
-
-.scanBtn:active{
-  transform:scale(.97);
-}
-
-.scanBtn:disabled{
-  cursor:not-allowed;
-  opacity:.6;
-}
-
-/* MAIN */
-.container{
-  width:min(1120px,calc(100% - 30px));
-  margin:0 auto 90px;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.panel{
-  border:1px solid var(--line);
-  background:linear-gradient(145deg,rgba(8,21,40,.82),rgba(4,12,24,.68));
-  backdrop-filter:blur(22px);
-  border-radius:24px;
-  box-shadow:0 25px 80px rgba(0,0,0,.25);
-  overflow:hidden;
-}
-
-/* SCANNER */
-.scanner{
-  padding:45px 25px;
-  text-align:center;
-}
-
-.scanOrb{
-  width:105px;
-  height:105px;
-  margin:0 auto 25px;
-  border-radius:50%;
-  border:1px solid rgba(44,157,255,.5);
-  display:grid;
-  place-items:center;
-  position:relative;
-  background:radial-gradient(circle,rgba(18,137,255,.2),rgba(0,0,0,.2));
-  box-shadow:
-    0 0 40px rgba(0,137,255,.2),
-    inset 0 0 35px rgba(0,137,255,.12);
-}
-
-.scanOrb:before,
-.scanOrb:after{
-  content:"";
-  position:absolute;
-  inset:-15px;
-  border:1px solid rgba(40,156,255,.15);
-  border-radius:50%;
-  animation:orbit 2.4s linear infinite;
-}
-
-.scanOrb:after{
-  inset:-28px;
-  border-color:rgba(0,211,255,.09);
-  animation-duration:3.6s;
-  animation-direction:reverse;
-}
-
-@keyframes orbit{
-  to{transform:rotate(360deg)}
-}
-
-.scanCore{
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  background:linear-gradient(145deg,#16a1ff,#006eff);
-  box-shadow:0 0 35px #008cff;
-  animation:corePulse 1s infinite alternate;
-}
-
-@keyframes corePulse{
-  to{transform:scale(1.25);opacity:.7}
-}
-
-.scanTitle{
-  font-size:23px;
-  font-weight:900;
-}
-
-.scanStep{
-  color:#65819e;
-  margin-top:8px;
-  font-size:13px;
-}
-
-.progress{
-  width:min(560px,90%);
-  height:5px;
-  margin:25px auto 0;
-  border-radius:99px;
-  background:#091829;
-  overflow:hidden;
-}
-
-.progressBar{
-  height:100%;
-  width:0;
-  background:linear-gradient(90deg,#087cff,#00d8ff);
-  box-shadow:0 0 15px #008cff;
-  transition:width .4s ease;
-}
-
-/* PROFILE */
-.profileTop{
-  padding:30px;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  gap:22px;
-  align-items:center;
-}
-
-.avatar{
-  width:115px;
-  height:115px;
-  border-radius:25px;
-  object-fit:cover;
-  border:1px solid rgba(69,170,255,.35);
-  box-shadow:0 0 45px rgba(0,130,255,.2);
-  background:#071321;
-}
-
-.profileName{
-  font-size:29px;
-  font-weight:950;
-}
-
-.profileUser{
-  margin-top:4px;
-  color:#66819d;
-}
-
-.profileId{
-  margin-top:12px;
-  display:inline-block;
-  padding:6px 9px;
-  border-radius:8px;
-  background:rgba(32,126,219,.1);
-  border:1px solid rgba(45,143,255,.14);
-  color:#66baff;
-  font-size:11px;
-  font-family:monospace;
-}
-
-.robloxBtn{
-  text-decoration:none;
-  color:#fff;
-  border:1px solid rgba(54,156,255,.28);
-  background:rgba(15,79,135,.2);
-  padding:12px 16px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:900;
-  transition:.2s;
-}
-
-.robloxBtn:hover{
-  background:rgba(20,110,200,.3);
-  transform:translateY(-2px);
-}
-
-/* GRID */
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  padding:0 30px 30px;
-}
-
-.stat{
-  padding:20px;
-  border:1px solid rgba(67,145,220,.12);
-  background:rgba(3,12,24,.42);
-  border-radius:17px;
-}
-
-.statLabel{
-  color:#5f7891;
-  font-size:10px;
-  letter-spacing:1.3px;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.statValue{
-  margin-top:9px;
-  font-size:19px;
-  font-weight:900;
-}
-
-.statSub{
-  margin-top:4px;
-  color:#587089;
-  font-size:10px;
-}
-
-/* SECTIONS */
-.section{
-  margin-top:18px;
-}
-
-.sectionHead{
-  padding:22px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  border-bottom:1px solid rgba(63,151,255,.10);
-}
-
-.sectionTitle{
-  font-size:16px;
-  font-weight:950;
-}
-
-.sectionMeta{
-  color:#5f7891;
-  font-size:11px;
-}
-
-.sectionBody{
-  padding:22px;
-}
-
-/* LIMITED ITEMS */
-.items{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:13px;
-}
-
-.item{
-  min-width:0;
-  border:1px solid rgba(65,151,235,.12);
-  background:rgba(3,11,23,.48);
-  border-radius:16px;
-  overflow:hidden;
-  transition:.22s;
-}
-
-.item:hover{
-  transform:translateY(-4px);
-  border-color:rgba(56,159,255,.35);
-  box-shadow:0 15px 35px rgba(0,105,220,.12);
-}
-
-.itemImg{
-  width:100%;
-  aspect-ratio:1;
-  object-fit:cover;
-  background:#071321;
-}
-
-.itemInfo{
-  padding:12px;
-}
-
-.itemName{
-  font-size:12px;
-  font-weight:850;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.itemPrice{
-  color:#58b7ff;
-  margin-top:5px;
-  font-size:11px;
-  font-weight:800;
-}
-
-.itemId{
-  color:#4d657e;
-  margin-top:4px;
-  font-size:9px;
-}
-
-/* BADGES */
-.badges{
-  display:flex;
-  flex-wrap:wrap;
-  gap:9px;
-}
-
-.badgeItem{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:9px 11px;
-  border:1px solid rgba(60,145,220,.13);
-  background:rgba(2,12,24,.45);
-  border-radius:12px;
-}
-
-.badgeImg{
-  width:30px;
-  height:30px;
-  object-fit:cover;
-  border-radius:7px;
-}
-
-.badgeName{
-  font-size:11px;
-  font-weight:800;
-}
-
-/* ANALYTICS */
-.analytics{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:13px;
-}
-
-.metric{
-  padding:20px;
-  border:1px solid rgba(62,145,220,.12);
-  border-radius:15px;
-  background:rgba(3,12,24,.45);
-}
-
-.metricTop{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  color:#607991;
-  font-size:11px;
-}
-
-.metricNumber{
-  margin-top:8px;
-  font-size:25px;
-  font-weight:950;
-}
-
-.bar{
-  margin-top:13px;
-  height:6px;
-  background:#081727;
-  border-radius:99px;
-  overflow:hidden;
-}
-
-.bar div{
-  height:100%;
-  width:0;
-  background:linear-gradient(90deg,#0b83ff,#00d9ff);
-  transition:width 1s ease;
-}
-
-/* EMPTY/ERROR */
-.message{
-  padding:28px;
-  text-align:center;
-  color:#698199;
-}
-
-.message strong{
-  display:block;
-  color:#dcecff;
-  margin-bottom:8px;
-}
-
-/* FOOTER */
-footer{
-  width:min(1120px,calc(100% - 30px));
-  margin:0 auto 35px;
-  text-align:center;
-  color:#3f566c;
-  font-size:10px;
-  letter-spacing:1px;
-}
-
-/* MOBILE */
-@media(max-width:800px){
-  .hero{
-    margin-top:65px;
-  }
-
-  .nav{
-    min-height:60px;
-  }
-
-  .status{
-    display:none;
-  }
-
-  .searchBox{
-    flex-direction:column;
-  }
-
-  .scanBtn{
-    width:100%;
-  }
-
-  .profileTop{
-    grid-template-columns:auto 1fr;
-  }
-
-  .robloxBtn{
-    grid-column:1/-1;
-    text-align:center;
-  }
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .items{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .analytics{
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:480px){
-  .hero{
-    width:calc(100% - 24px);
-    margin-top:50px;
-  }
-
-  h1{
-    letter-spacing:-3px;
-    font-size:48px;
-  }
-
-  .heroText{
-    font-size:13px;
-  }
-
-  .container{
-    width:calc(100% - 20px);
-  }
-
-  .profileTop{
-    padding:20px;
-  }
-
-  .avatar{
-    width:82px;
-    height:82px;
-    border-radius:18px;
-  }
-
-  .profileName{
-    font-size:20px;
-  }
-
-  .stats{
-    padding:0 20px 20px;
-    gap:8px;
-  }
-
-  .stat{
-    padding:14px;
-  }
-
-  .statValue{
-    font-size:15px;
-  }
-
-  .sectionHead{
-    padding:18px;
-  }
-
-  .sectionBody{
-    padding:15px;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<nav class="nav">
-  <div class="logo">
-    <div class="logoMark">S</div>
-    <div>SHADOWZ</div>
-  </div>
-
-  <div class="status">
-    <span id="statusDot" class="statusDot"></span>
-    <span id="statusText">READY TO SCAN</span>
-  </div>
-</nav>
-
-<section class="hero">
-  <div class="badge">
-    <span></span>
-    ROBLOX PROFILE INTELLIGENCE
-  </div>
-
-  <h1>SHADOWZ</h1>
-
-  <p class="heroText">
-    Scan a Roblox username and analyze publicly available profile
-    information, account age, avatar data, Limited inventory and badges.
-  </p>
-
-  <div class="searchBox">
-    <div class="inputWrap">
-      <div class="searchIcon">⌕</div>
-      <input
-        id="username"
-        autocomplete="off"
-        spellcheck="false"
-        placeholder="Enter Roblox username..."
-        maxlength="20"
-      >
-    </div>
-
-    <button id="scanBtn" class="scanBtn">
-      SCAN PROFILE
-    </button>
-  </div>
-</section>
-
-<main class="container">
-
-  <div id="scanner" class="panel scanner hidden">
-    <div class="scanOrb">
-      <div class="scanCore"></div>
-    </div>
-
-    <div id="scanTitle" class="scanTitle">
-      Initializing scanner
-    </div>
-
-    <div id="scanStep" class="scanStep">
-      Connecting to Roblox services...
-    </div>
-
-    <div class="progress">
-      <div id="progressBar" class="progressBar"></div>
-    </div>
-  </div>
-
-  <div id="errorPanel" class="panel message hidden">
-    <strong id="errorTitle">Unable to scan</strong>
-    <span id="errorText"></span>
-  </div>
-
-  <div id="result" class="hidden">
-
-    <section class="panel">
-      <div class="profileTop">
-
-        <img id="avatar" class="avatar" alt="Roblox avatar">
-
-        <div>
-          <div id="displayName" class="profileName">—</div>
-          <div id="usernameResult" class="profileUser">@—</div>
-          <div id="userId" class="profileId">ID: —</div>
-        </div>
-
-        <a
-          id="profileLink"
-          class="robloxBtn"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OPEN ROBLOX PROFILE ↗
-        </a>
-
-      </div>
-
-      <div class="stats">
-
-        <div class="stat">
-          <div class="statLabel">Joined Roblox</div>
-          <div id="joined" class="statValue">—</div>
-          <div id="joinedExact" class="statSub">—</div>
-        </div>
-
-        <div class="stat">
-          <div class="statLabel">Account Age</div>
-          <div id="accountAge" class="statValue">—</div>
-          <div class="statSub">Calculated from creation date</div>
-        </div>
-
-        <div class="stat">
-          <div class="statLabel">Limited Items</div>
-          <div id="limitedCount" class="statValue">—</div>
-          <div class="statSub">Publicly returned items</div>
-        </div>
-
-        <div class="stat">
-          <div class="statLabel">Estimated RAP</div>
-          <div id="rap" class="statValue">—</div>
-          <div class="statSub">From returned Limited data</div>
-        </div>
-
-      </div>
-    </section>
-
-    <section class="panel section">
-      <div class="sectionHead">
-        <div class="sectionTitle">LIMITED INVENTORY</div>
-        <div id="inventoryMeta" class="sectionMeta">Scanning...</div>
-      </div>
-
-      <div id="items" class="sectionBody items"></div>
-    </section>
-
-    <section class="panel section">
-      <div class="sectionHead">
-        <div class="sectionTitle">PROFILE ANALYTICS</div>
-        <div class="sectionMeta">Public data</div>
-      </div>
-
-      <div class="sectionBody analytics">
-
-        <div class="metric">
-          <div class="metricTop">
-            <span>ACCOUNT MATURITY</span>
-            <span id="maturityPercent">—</span>
-          </div>
-
-          <div id="maturity" class="metricNumber">—</div>
-
-          <div class="bar">
-            <div id="maturityBar"></div>
-          </div>
-        </div>
-
-        <div class="metric">
-          <div class="metricTop">
-            <span>LIMITED COLLECTION</span>
-            <span id="collectionPercent">—</span>
-          </div>
-
-          <div id="collection" class="metricNumber">—</div>
-
-          <div class="bar">
-            <div id="collectionBar"></div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <section class="panel section">
-      <div class="sectionHead">
-        <div class="sectionTitle">BADGES</div>
-        <div id="badgeMeta" class="sectionMeta">—</div>
-      </div>
-
-      <div id="badges" class="sectionBody badges"></div>
-    </section>
-
-  </div>
-</main>
-
-<footer>
-  SHADOWZ • PUBLIC ROBLOX DATA ONLY • NEVER ENTER YOUR ROBLOX PASSWORD
-</footer>
-
-<script>
-"use strict";
-
-/*
-  SHADOWZ
-  Single-file Roblox profile scanner.
-
-  IMPORTANT:
-  This is a frontend-only GitHub Pages application.
-  Roblox may block browser requests with CORS or rate limits.
-  This app NEVER uses passwords, cookies or .ROBLOSECURITY.
-*/
-
-const $ = id => document.getElementById(id);
-
-const API = {
-  usersByUsername:
-    "https://users.roblox.com/v1/usernames/users",
-
-  user:
-    id => `https://users.roblox.com/v1/users/${id}`,
-
-  avatar:
-    id => `https://thumbnails.roblox.com/v1/users/avatar?userIds=${id}&size=420x420&format=Png&isCircular=false`,
-
-  inventory:
-    id => `https://inventory.roblox.com/v1/users/${id}/items/Asset?sortOrder=Desc&limit=100`,
-
-  catalog:
-    id => `https://catalog.roblox.com/v1/catalog/items/${id}/details?itemType=Asset`,
-
-  badges:
-    id => `https://badges.roblox.com/v1/users/${id}/badges?sortOrder=Desc&limit=50`
-};
-
-let currentUser = null;
-let currentItems = [];
-
-function setStatus(text, state=""){
-  $("statusText").textContent = text;
-  $("statusDot").className = "statusDot " + state;
-}
-
-function sleep(ms){
-  return new Promise(resolve => setTimeout(resolve,ms));
-}
-
-function escapeHTML(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-/*
-  Safe JSON fetch.
-
-  A CORS failure is caught and turned into a useful error
-  instead of fake profile information.
-*/
-async function fetchJSON(url, options = {}){
-  const response = await fetch(url, {
-    ...options,
-    mode:"cors",
-    headers:{
-      "Accept":"application/json",
-      ...(options.headers || {})
-    }
-  });
-
-  if(!response.ok){
-    throw new Error(`HTTP ${response.status}`);
-  }
-
-  return await response.json();
-}
-
-/* ACCOUNT AGE */
-function dateParts(fromDate){
-  const from = new Date(fromDate);
-  const now = new Date();
-
-  if(Number.isNaN(from.getTime())){
-    return {
-      text:"Unknown",
-      years:0,
-      months:0,
-      days:0
-    };
-  }
-
-  let years = now.getFullYear() - from.getFullYear();
-  let months = now.getMonth() - from.getMonth();
-  let days = now.getDate() - from.getDate();
-
-  if(days < 0){
-    months--;
-
-    const previousMonth =
-      new Date(now.getFullYear(), now.getMonth(), 0);
-
-    days += previousMonth.getDate();
-  }
-
-  if(months < 0){
-    years--;
-    months += 12;
-  }
-
-  return {
-    text:`${years}y ${months}m ${days}d`,
-    years,
-    months,
-    days
-  };
-}
-
-function formatDate(date){
-  const d = new Date(date);
-
-  if(Number.isNaN(d.getTime())){
-    return "Unknown";
-  }
-
-  return d.toLocaleDateString(undefined,{
-    year:"numeric",
-    month:"long",
-    day:"numeric"
-  });
-}
-
-function formatNumber(number){
-  return Number(number || 0).toLocaleString();
-}
-
-function formatRobux(number){
-  return `${formatNumber(number)} R$`;
-}
-
-/*
-  Username lookup.
-
-  Roblox's endpoint expects POST JSON.
-*/
-async function findUser(username){
-
-  const data = await fetchJSON(API.usersByUsername,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      usernames:[username],
-      excludeBannedUsers:false
-    })
-  });
-
-  if(!data || !Array.isArray(data.data) || !data.data.length){
-    throw new Error("Roblox user not found.");
-  }
-
-  return data.data[0];
-}
-
-/* USER PROFILE */
-async function getUser(id){
-  return await fetchJSON(API.user(id));
-}
-
-/* AVATAR */
-async function getAvatar(id){
-
-  const data = await fetchJSON(API.avatar(id));
-
-  if(
-    data &&
-    Array.isArray(data.data) &&
-    data.data[0] &&
-    data.data[0].imageUrl
-  ){
-    return data.data[0].imageUrl;
-  }
-
-  return "";
-}
-
-/*
-  Inventory retrieval.
-
-  The endpoint returns owned Asset inventory.
-  We inspect each returned asset with Catalog details
-  and keep only Limited/Limited Unique style assets.
-*/
-async function getInventory(id){
-
-  const data = await fetchJSON(API.inventory(id));
-
-  if(!data || !Array.isArray(data.data)){
-    return [];
-  }
-
-  const raw = data.data;
-
-  const results = [];
-
-  /*
-    Do not hammer the catalog service with hundreds
-    of simultaneous requests.
-  */
-  const batchSize = 6;
-
-  for(let i = 0; i < raw.length; i += batchSize){
-
-    const batch = raw.slice(i,i + batchSize);
-
-    const details = await Promise.all(
-      batch.map(async asset => {
-
-        try{
-
-          const catalog = await fetchJSON(
-            API.catalog(asset.id)
-          );
-
-          const collectible =
-            catalog.isLimited === true ||
-            catalog.isLimitedUnique === true ||
-            catalog.collectibleItemId ||
-            catalog.collectibleProductId ||
-            catalog.itemRestrictions?.includes("Limited") ||
-            catalog.itemRestrictions?.includes("LimitedUnique");
-
-          if(!collectible){
-            return null;
-          }
-
-          return {
-            id:asset.id,
-            name:
-              catalog.name ||
-              asset.name ||
-              `Asset ${asset.id}`,
-
-            price:
-              Number(
-                catalog.recentAveragePrice ||
-                catalog.price ||
-                catalog.lowestPrice ||
-                0
-              ),
-
-            image:
-              catalog.thumbnail?.url ||
-              `https://tr.rbxcdn.com/${asset.id}/420/420/Image/Png`,
-
-            limited:
-              catalog.isLimited === true,
-
-            limitedUnique:
-              catalog.isLimitedUnique === true
-          };
-
-        }catch{
-          return null;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NUBRIC — DODGE THE VOID</title>
+    <style>
+        :root {
+            --bg-black: #030508;
+            --navy-deep: #0a1128;
+            --electric-blue: #0066ff;
+            --cyan-bright: #00f0ff;
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --text-white: #f0f6ff;
+            --glass-bg: rgba(10, 17, 40, 0.55);
+            --glass-border: rgba(0, 240, 255, 0.25);
+            --glass-border-focus: rgba(0, 240, 255, 0.8);
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-      })
-    );
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    for(const item of details){
-      if(item){
-        results.push(item);
-      }
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-black);
+            font-family: var(--font-main);
+            color: var(--text-white);
+        }
 
-    /*
-      Avoid unnecessarily huge scans on a browser-only
-      application.
-    */
-    if(results.length >= 100){
-      break;
-    }
-  }
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
 
-  return results;
-}
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 240, 255, 0.05);
+            border-radius: 12px;
+        }
 
-/* BADGES */
-async function getBadges(id){
+        /* UI Overlay Screen Management */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: scale(0.98);
+            padding: 20px;
+        }
 
-  const data = await fetchJSON(API.badges(id));
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
 
-  if(!data || !Array.isArray(data.data)){
-    return [];
-  }
+        /* Typography & Glowing Elements */
+        .logo-title {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 0.35em;
+            color: #fff;
+            text-shadow: 0 0 20px var(--cyan-bright), 0 0 40px var(--electric-blue);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            text-align: center;
+        }
 
-  return data.data;
-}
+        .logo-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 0.4em;
+            color: var(--cyan-bright);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            opacity: 0.85;
+            text-shadow: 0 0 8px var(--cyan-glow);
+            text-align: center;
+        }
 
-/* SCAN ANIMATION */
-async function scanAnimation(){
+        /* Standard Futuristic Buttons */
+        .btn {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 240, 255, 0.05));
+            border: 1px solid var(--glass-border);
+            color: var(--text-white);
+            padding: 16px 36px;
+            margin: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 220px;
+        }
 
-  const steps = [
-    ["Resolving Roblox username...",15],
-    ["Fetching profile identity...",32],
-    ["Loading account information...",48],
-    ["Analyzing Limited inventory...",70],
-    ["Checking badges...",87],
-    ["Building intelligence report...",100]
-  ];
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
 
-  $("scanner").classList.remove("hidden");
+        .btn:hover {
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+            color: #fff;
+        }
 
-  for(const [text,percent] of steps){
+        .btn:hover::before {
+            left: 100%;
+        }
 
-    $("scanStep").textContent = text;
-    $("progressBar").style.width = percent + "%";
+        .btn:active {
+            transform: translateY(1px);
+        }
 
-    await sleep(480);
-  }
-}
+        .btn-primary {
+            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.4));
+            border-color: var(--cyan-bright);
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
+        }
 
-/* PROFILE RENDER */
-function renderProfile(user, avatar){
+        .btn-primary:hover {
+            box-shadow: 0 0 30px var(--cyan-bright);
+        }
 
-  currentUser = user;
+        /* 1. LOADING SCREEN */
+        #loader-panel {
+            width: 380px;
+            max-width: 90vw;
+            padding: 40px 30px;
+            text-align: center;
+        }
 
-  $("avatar").src = avatar || "";
-  $("avatar").alt = `${user.name} avatar`;
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0 10px 0;
+            position: relative;
+        }
 
-  $("displayName").textContent =
-    user.displayName || user.name;
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright));
+            box-shadow: 0 0 12px var(--cyan-bright);
+            transition: width 0.1s linear;
+        }
 
-  $("usernameResult").textContent =
-    "@" + user.name;
+        .sys-log {
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--cyan-bright);
+            height: 18px;
+            opacity: 0.7;
+            font-family: monospace;
+        }
 
-  $("userId").textContent =
-    "ID: " + user.id;
+        /* 2. AUTH SCREEN */
+        #auth-panel {
+            width: 420px;
+            max-width: 90vw;
+            padding: 40px;
+            text-align: center;
+        }
 
-  $("profileLink").href =
-    `https://www.roblox.com/users/${user.id}/profile`;
+        .google-btn {
+            background: #ffffff;
+            color: #333333;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            margin: 15px 0;
+            padding: 14px;
+            border-radius: 6px;
+        }
+        .google-btn:hover {
+            background: #f1f1f1;
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
+            color: #000;
+        }
 
-  const created = new Date(user.created);
-  const age = dateParts(user.created);
+        /* 3. MAIN MENU */
+        #menu-screen .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 280px;
+        }
 
-  $("joined").textContent =
-    formatDate(user.created);
+        /* HUD OVERLAY */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            display: none;
+            padding: 20px;
+        }
 
-  $("joinedExact").textContent =
-    created.toISOString();
+        .hud-card {
+            padding: 10px 20px;
+            position: absolute;
+        }
 
-  $("accountAge").textContent =
-    age.text;
+        .hud-top-left { top: 20px; left: 20px; }
+        .hud-top-center { top: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+        .hud-top-right { top: 20px; right: 20px; text-align: right; }
 
-  /*
-    Simple maturity visualization.
-    It is not an official Roblox score.
-  */
-  const ageDays =
-    Math.max(
-      0,
-      (Date.now() - created.getTime()) / 86400000
-    );
+        .hud-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--cyan-bright);
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
 
-  const maturity =
-    Math.min(100,Math.round((ageDays / 3650) * 100));
+        .hud-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 8px var(--cyan-glow);
+        }
 
-  $("maturity").textContent =
-    maturity + "%";
+        .speed-bar-hud {
+            width: 120px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .speed-bar-hud-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--cyan-bright);
+            box-shadow: 0 0 8px var(--cyan-bright);
+        }
 
-  $("maturityPercent").textContent =
-    maturity + "%";
+        /* MOBILE CONTROLS */
+        #touch-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+        }
 
-  $("maturityBar").style.width =
-    maturity + "%";
-}
+        #joystick-zone {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            background: rgba(0, 102, 255, 0.05);
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+        }
 
-/* LIMITED RENDER */
-function renderItems(items){
+        #joystick-knob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            margin-top: -25px;
+            margin-left: -25px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--cyan-bright), var(--electric-blue));
+            box-shadow: 0 0 15px var(--cyan-bright);
+            transition: transform 0.05s ease-out;
+        }
 
-  currentItems = items;
+        #boost-btn {
+            position: absolute;
+            bottom: 40px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--cyan-bright);
+            background: rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(8px);
+            color: var(--cyan-bright);
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            box-shadow: 0 0 15px var(--glass-border);
+        }
+        #boost-btn:active {
+            background: rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 25px var(--cyan-bright);
+        }
 
-  $("limitedCount").textContent =
-    formatNumber(items.length);
+        /* SPEED UP NOTIFICATION */
+        #speed-notify {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 6;
+        }
+        #speed-notify.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
 
-  const rap =
-    items.reduce(
-      (total,item) =>
-        total + Number(item.price || 0),
-      0
-    );
+        /* MODAL / OVERLAY PANELS */
+        .modal-body {
+            width: 480px;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
 
-  $("rap").textContent =
-    formatRobux(rap);
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+        .stat-label { color: rgba(255,255,255,0.6); }
+        .stat-val { color: var(--cyan-bright); font-weight: 700; }
 
-  $("inventoryMeta").textContent =
-    `${items.length} Limited item${items.length === 1 ? "" : "s"}`;
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
 
-  const collectionScore =
-    Math.min(100,Math.round(items.length / 2));
+        select, input[type="range"] {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            outline: none;
+        }
 
-  $("collection").textContent =
-    collectionScore + "%";
+        /* AUDIO TOGGLE */
+        #sound-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
 
-  $("collectionPercent").textContent =
-    collectionScore + "%";
+        @media (max-width: 600px) {
+            .logo-title { font-size: 2.5rem; letter-spacing: 0.2em; }
+            .logo-subtitle { font-size: 0.75rem; letter-spacing: 0.25em; }
+            .hud-top-center { display: none; }
+        }
+    </style>
+    <!-- Three.js 3D Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
 
-  $("collectionBar").style.width =
-    collectionScore + "%";
+    <div id="webgl-container"></div>
 
-  const container = $("items");
+    <div id="sound-toggle" class="glass-panel">🔊</div>
 
-  container.innerHTML = "";
-
-  if(!items.length){
-
-    container.innerHTML = `
-      <div class="message" style="grid-column:1/-1">
-        <strong>No Limited items returned</strong>
-        Roblox did not return any detectable Limited/Limited Unique
-        assets for this scan.
-      </div>
-    `;
-
-    return;
-  }
-
-  for(const item of items){
-
-    const div = document.createElement("div");
-
-    div.className = "item";
-
-    div.innerHTML = `
-      <img
-        class="itemImg"
-        loading="lazy"
-        src="${escapeHTML(item.image)}"
-        alt=""
-        onerror="this.style.opacity='.2'"
-      >
-
-      <div class="itemInfo">
-
-        <div class="itemName"
-             title="${escapeHTML(item.name)}">
-          ${escapeHTML(item.name)}
+    <!-- 1. LOADING SCREEN -->
+    <div id="loader-screen" class="screen active">
+        <div id="loader-panel" class="glass-panel">
+            <div class="logo-title" style="font-size:2.5rem; margin-bottom: 0;">NUBRIC</div>
+            <div class="logo-subtitle" style="font-size:0.65rem; margin-bottom:20px;">SYSTEM INITIALIZATION</div>
+            <div class="progress-bar-container">
+                <div id="loader-bar" class="progress-bar-fill"></div>
+            </div>
+            <div id="loader-percent" style="font-size: 0.8rem; letter-spacing: 0.1em; margin-bottom: 8px;">LOADING 0%</div>
+            <div id="loader-log" class="sys-log">Connecting to NUBRIC servers...</div>
         </div>
+    </div>
 
-        <div class="itemPrice">
-          ${formatRobux(item.price)}
+    <!-- 2. AUTH SCREEN -->
+    <div id="auth-screen" class="screen">
+        <div id="auth-panel" class="glass-panel">
+            <div class="logo-title" style="font-size:2.8rem; margin-bottom:0;">NUBRIC</div>
+            <div class="logo-subtitle">ENTER THE UNIVERSE. SURVIVE THE VOID.</div>
+            
+            <button class="btn google-btn" onclick="simulatedLogin('Google Pilot')">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.29 21.39 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+                CONTINUE WITH GOOGLE
+            </button>
+            <button class="btn btn-primary" style="width:100%; margin: 5px 0 15px 0;" onclick="simulatedLogin('Guest Pilot')">SIGN IN AS GUEST</button>
+            
+            <div style="font-size: 0.65rem; opacity: 0.5; letter-spacing: 0.05em;">Progress is saved locally to your telemetry bank.</div>
         </div>
+    </div>
 
-        <div class="itemId">
-          Asset ID ${escapeHTML(item.id)}
+    <!-- 3. MAIN MENU -->
+    <div id="menu-screen" class="screen">
+        <div class="logo-title">NUBRIC</div>
+        <div class="logo-subtitle">DODGE THE VOID</div>
+        
+        <div class="menu-items">
+            <button class="btn btn-primary" onclick="startGame()">PLAY</button>
+            <button class="btn" onclick="showScreen('progress-screen')">PROGRESS</button>
+            <button class="btn" onclick="showScreen('settings-screen')">SETTINGS</button>
+            <button class="btn" onclick="showScreen('help-screen')">HOW TO PLAY</button>
         </div>
+    </div>
 
-      </div>
-    `;
+    <!-- 4. PROGRESS SCREEN -->
+    <div id="progress-screen" class="screen">
+        <div class="modal-body glass-panel">
+            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 20px;">YOUR JOURNEY</div>
+            <div class="stat-row"><span class="stat-label">Total Distance Traveled</span><span class="stat-val" id="st-dist">0 m</span></div>
+            <div class="stat-row"><span class="stat-label">Best Score</span><span class="stat-val" id="st-score">0</span></div>
+            <div class="stat-row"><span class="stat-label">Highest Speed</span><span class="stat-val" id="st-speed">1</span></div>
+            <div class="stat-row"><span class="stat-label">Asteroids Dodged</span><span class="stat-val" id="st-dodged">0</span></div>
+            <div class="stat-row"><span class="stat-label">Sorties Launched</span><span class="stat-val" id="st-runs">0</span></div>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
+            </div>
+        </div>
+    </div>
 
-    container.appendChild(div);
-  }
+    <!-- 5. SETTINGS SCREEN -->
+    <div id="settings-screen" class="screen">
+        <div class="modal-body glass-panel">
+            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 20px;">SYSTEM SETTINGS</div>
+            <div class="setting-row">
+                <span class="stat-label">Graphics Quality</span>
+                <select id="cfg-graphics"><option>Ultra</option><option>High</option><option>Medium</option></select>
+            </div>
+            <div class="setting-row">
+                <span class="stat-label">Motion Blur</span>
+                <select id="cfg-blur"><option>ON</option><option>OFF</option></select>
+            </div>
+            <div class="setting-row">
+                <span class="stat-label">Screen Shake</span>
+                <select id="cfg-shake"><option>ON</option><option>OFF</option></select>
+            </div>
+            <div style="margin-top: 25px; text-align: center;">
+                <button class="btn" onclick="showScreen('menu-screen')">SAVE & BACK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. HOW TO PLAY SCREEN -->
+    <div id="help-screen" class="screen">
+        <div class="modal-body glass-panel" style="text-align: center;">
+            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 15px;">PILOT MANUAL</div>
+            <p style="font-size: 0.85rem; line-height: 1.6; opacity: 0.8; margin-bottom: 15px;">
+                Navigate your high-speed craft through dense procedural asteroid belts. Avoid all dark rock collisions at all costs.
+            </p>
+            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 20px;">
+                <div><strong>DESKTOP:</strong> WASD or Arrow Keys to steer. Shift / Space for Boost.</div>
+                <div style="margin-top: 8px;"><strong>MOBILE:</strong> Dynamic touch joystick on bottom-left. Boost button on bottom-right.</div>
+            </div>
+            <button class="btn" onclick="showScreen('menu-screen')">UNDERSTOOD</button>
+        </div>
+    </div>
+
+    <!-- 7. GAME OVER SCREEN -->
+    <div id="gameover-screen" class="screen">
+        <div class="modal-body glass-panel" style="text-align: center;">
+            <div class="logo-title" style="font-size: 2.2rem; color: #00f0ff;">MISSION FAILED</div>
+            <div class="logo-subtitle" style="margin-bottom: 20px;">CRITICAL HULL COLLISION</div>
+            
+            <div class="stat-row"><span class="stat-label">Final Distance</span><span class="stat-val" id="go-dist">0 m</span></div>
+            <div class="stat-row"><span class="stat-label">Final Score</span><span class="stat-val" id="go-score">0</span></div>
+            <div class="stat-row"><span class="stat-label">Max Speed Reached</span><span class="stat-val" id="go-speed">1</span></div>
+            
+            <div style="margin-top: 25px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="startGame()">TRY AGAIN</button>
+                <button class="btn" onclick="showScreen('menu-screen')">MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAMEPLAY HUD OVERLAY -->
+    <div id="hud">
+        <div class="hud-card glass-panel hud-top-left">
+            <div class="hud-label">DISTANCE</div>
+            <div class="hud-value" id="hud-dist">0 m</div>
+        </div>
+        <div class="hud-top-center">
+            <div class="logo-title" style="font-size: 1.5rem; letter-spacing: 0.2em; margin:0;">NUBRIC</div>
+        </div>
+        <div class="hud-card glass-panel hud-top-right">
+            <div class="hud-label">SCORE</div>
+            <div class="hud-value" id="hud-score">0</div>
+            <div style="display: flex; gap: 15px; margin-top: 5px;">
+                <div>
+                    <div class="hud-label">SPEED</div>
+                    <div style="font-size: 1.1rem; font-weight:700;" id="hud-speed">1</div>
+                </div>
+                <div>
+                    <div class="hud-label">NEXT LEVEL</div>
+                    <div class="speed-bar-hud"><div id="hud-speed-progress" class="speed-bar-hud-fill"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPEED UP NOTIFICATION -->
+    <div id="speed-notify">
+        <div class="logo-title" style="font-size:2rem; text-shadow: 0 0 30px var(--cyan-bright);">SPEED INCREASED</div>
+        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1.2rem;">LEVEL 2</div>
+    </div>
+
+    <!-- MOBILE VIRTUAL CONTROLS -->
+    <div id="touch-controls">
+        <div id="joystick-zone">
+            <div id="joystick-knob"></div>
+        </div>
+        <div id="boost-btn">BOOST</div>
+    </div>
+
+<script>
+/* --- AUDIO SYSTEM (Web Audio API Synthesizer) --- */
+class SoundController {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+    }
+    init() {
+        if(!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+    playTone(freq, type, duration, vol=0.1) {
+        if(this.muted || !this.ctx) return;
+        try {
+            let osc = this.ctx.createOscillator();
+            let gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
+        } catch(e){}
+    }
+    playHover() { this.playTone(400, 'sine', 0.05, 0.02); }
+    playClick() { this.playTone(800, 'triangle', 0.08, 0.05); }
+    playSpeedUp() {
+        if(this.muted || !this.ctx) return;
+        this.playTone(300, 'sawtooth', 0.1, 0.08);
+        setTimeout(() => this.playTone(600, 'sawtooth', 0.2, 0.08), 80);
+    }
+    playExplosion() {
+        if(this.muted || !this.ctx) return;
+        // White noise explosion
+        let bufferSize = this.ctx.sampleRate * 0.5;
+        let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        let data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+        let noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        let gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+        noise.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+    }
+}
+const sound = new SoundController();
+
+document.getElementById('sound-toggle').addEventListener('click', () => {
+    sound.init();
+    sound.muted = !sound.muted;
+    document.getElementById('sound-toggle').innerText = sound.muted ? '🔇' : '🔊';
+});
+
+/* --- PERSISTENT USER DATA --- */
+let userData = {
+    distance: 0,
+    score: 0,
+    speed: 1,
+    dodged: 0,
+    runs: 0
+};
+
+function loadUserData() {
+    let saved = localStorage.getItem('NUBRIC_DATA');
+    if(saved) {
+        try { userData = JSON.parse(saved); } catch(e){}
+    }
+    updateProgressUI();
 }
 
-/* BADGES RENDER */
-function renderBadges(badges){
-
-  $("badgeMeta").textContent =
-    `${badges.length} returned`;
-
-  const container = $("badges");
-
-  container.innerHTML = "";
-
-  if(!badges.length){
-
-    container.innerHTML = `
-      <div class="message" style="width:100%">
-        <strong>No badges returned</strong>
-        Roblox did not return badge information.
-      </div>
-    `;
-
-    return;
-  }
-
-  for(const badge of badges){
-
-    const div = document.createElement("div");
-
-    div.className = "badgeItem";
-
-    div.innerHTML = `
-      <img
-        class="badgeImg"
-        src="${escapeHTML(
-          badge.iconImageId
-            ? `https://tr.rbxcdn.com/${badge.iconImageId}/150/150/Image/Png`
-            : ""
-        )}"
-        alt=""
-        onerror="this.style.opacity='.2'"
-      >
-
-      <div class="badgeName">
-        ${escapeHTML(
-          badge.name || "Unnamed Badge"
-        )}
-      </div>
-    `;
-
-    container.appendChild(div);
-  }
+function saveUserData() {
+    localStorage.setItem('NUBRIC_DATA', JSON.stringify(userData));
+    updateProgressUI();
 }
 
-/* MAIN SCAN */
-async function scan(){
+function updateProgressUI() {
+    document.getElementById('st-dist').innerText = Math.floor(userData.distance) + ' m';
+    document.getElementById('st-score').innerText = userData.score;
+    document.getElementById('st-speed').innerText = userData.speed;
+    document.getElementById('st-dodged').innerText = userData.dodged;
+    document.getElementById('st-runs').innerText = userData.runs;
+}
 
-  const username =
-    $("username").value.trim();
+/* --- GAME STATE MANAGEMENT --- */
+let currentState = 'LOADER';
 
-  if(!username){
-    showError(
-      "Username required",
-      "Enter a Roblox username before scanning."
-    );
-    return;
-  }
+function showScreen(screenId) {
+    sound.init();
+    sound.playClick();
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    let target = document.getElementById(screenId);
+    if(target) target.classList.add('active');
+    
+    // Manage state specifics
+    if(screenId === 'menu-screen') {
+        document.getElementById('hud').style.display = 'none';
+        document.getElementById('touch-controls').style.display = 'none';
+        gameActive = false;
+        resetShipPosition();
+    }
+}
 
-  $("result").classList.add("hidden");
-  $("errorPanel").classList.add("hidden");
-  $("scanner").classList.remove("hidden");
+function simulatedLogin(name) {
+    sound.playClick();
+    showScreen('menu-screen');
+}
 
-  $("scanBtn").disabled = true;
+/* --- THREE.JS ENGINE & GRAPHICS SYSTEM --- */
+let scene, camera, renderer;
+let playerCraft, engineParticles, starField, nebulaClouds;
+let asteroids = [];
+let explosionParticles = [];
 
-  setStatus(
-    "CONNECTING TO ROBLOX",
-    "busy"
-  );
+// Game parameters
+let gameActive = false;
+let distanceTraveled = 0;
+let currentScore = 0;
+let gameSpeed = 1;
+let targetSpeedLevel = 1;
+let dodgedCount = 0;
+let dodgesToNextLevel = 7;
+let speedProgress = 0;
 
-  $("progressBar").style.width = "0%";
+// Ship input dynamics
+let inputVector = { x: 0, y: 0 };
+let isBoosting = false;
+let craftVelocity = { x: 0, y: 0 };
+let cameraShake = 0;
 
-  try{
+// Field setup bounds
+const BOUNDS_X = 22;
+const BOUNDS_Y = 14;
 
-    /*
-      Run animation and first lookup together.
-      The real API request determines whether the
-      browser can actually communicate with Roblox.
-    */
-    const lookupPromise =
-      findUser(username);
+function initEngine() {
+    let container = document.getElementById('webgl-container');
+    
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x030508, 0.008);
 
-    const animationPromise =
-      scanAnimation();
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 3, 10);
 
-    const userSearch =
-      await lookupPromise;
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    container.appendChild(renderer.domElement);
 
-    await animationPromise;
+    // Lighting setup
+    let ambientLight = new THREE.AmbientLight(0x0a1128, 1.5);
+    scene.add(ambientLight);
 
-    const user =
-      await getUser(userSearch.id);
+    let mainLight = new THREE.DirectionalLight(0x00f0ff, 2);
+    mainLight.position.set(10, 20, 10);
+    scene.add(mainLight);
 
-    $("scanStep").textContent =
-      "Loading avatar...";
+    let backLight = new THREE.DirectionalLight(0x0066ff, 3);
+    backLight.position.set(-10, -10, -20);
+    scene.add(backLight);
 
-    const avatar =
-      await getAvatar(user.id);
+    buildStarfield();
+    buildNebulae();
+    buildPlayerCraft();
 
-    renderProfile(user,avatar);
+    window.addEventListener('resize', onWindowResize);
+    setupControls();
+    
+    // Start Render Loop
+    requestAnimationFrame(renderLoop);
 
-    $("scanStep").textContent =
-      "Scanning Limited inventory...";
+    // Simulated Loading Sequence
+    runLoadingSequence();
+}
 
-    let items = [];
+/* --- PROCEDURAL CREATION FUNCTIONS --- */
+function buildStarfield() {
+    let count = 3000;
+    let geometry = new THREE.BufferGeometry();
+    let positions = new Float32Array(count * 3);
+    let colors = new Float32Array(count * 3);
 
-    try{
-      items = await getInventory(user.id);
-    }catch(error){
-      console.warn(
-        "Inventory unavailable:",
-        error
-      );
+    for(let i=0; i<count*3; i+=3) {
+        positions[i] = (Math.random() - 0.5) * 400;
+        positions[i+1] = (Math.random() - 0.5) * 400;
+        positions[i+2] = (Math.random() - 0.5) * 600;
+
+        // Bright cyan/blue/white stars
+        let c = new THREE.Color().setHSL(0.5 + Math.random()*0.1, 0.8, 0.5 + Math.random()*0.5);
+        colors[i] = c.r; colors[i+1] = c.g; colors[i+2] = c.b;
     }
 
-    renderItems(items);
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    $("scanStep").textContent =
-      "Loading badges...";
-
-    let badges = [];
-
-    try{
-      badges = await getBadges(user.id);
-    }catch(error){
-      console.warn(
-        "Badges unavailable:",
-        error
-      );
-    }
-
-    renderBadges(badges);
-
-    $("scanner").classList.add("hidden");
-    $("result").classList.remove("hidden");
-
-    setStatus(
-      "ROBLOX SERVICES RESPONDED",
-      "online"
-    );
-
-    $("result").scrollIntoView({
-      behavior:"smooth",
-      block:"start"
+    let material = new THREE.PointsMaterial({
+        size: 1.2,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8
     });
 
-  }catch(error){
-
-    console.error(error);
-
-    $("scanner").classList.add("hidden");
-
-    setStatus(
-      "API REQUEST FAILED",
-      "error"
-    );
-
-    let message =
-      error?.message ||
-      "Unknown error.";
-
-    if(
-      message.includes("Failed to fetch") ||
-      message.includes("NetworkError") ||
-      message.includes("CORS")
-    ){
-      message =
-        "Your browser blocked the Roblox API request. " +
-        "This is a GitHub Pages/browser CORS restriction. " +
-        "A frontend-only website cannot bypass Roblox CORS.";
-    }
-
-    showError(
-      "Scan failed",
-      message
-    );
-
-  }finally{
-
-    $("scanBtn").disabled = false;
-  }
+    starField = new THREE.Points(geometry, material);
+    scene.add(starField);
 }
 
-/* ERROR */
-function showError(title,text){
-
-  $("result").classList.add("hidden");
-  $("scanner").classList.add("hidden");
-
-  $("errorTitle").textContent =
-    title;
-
-  $("errorText").textContent =
-    text;
-
-  $("errorPanel").classList.remove("hidden");
+function buildNebulae() {
+    nebulaClouds = new THREE.Group();
+    let geo = new THREE.IcosahedronGeometry(20, 2);
+    for(let i=0; i<8; i++) {
+        let mat = new THREE.MeshBasicMaterial({
+            color: i % 2 === 0 ? 0x0066ff : 0x0a1128,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.05
+        });
+        let mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set((Math.random()-0.5)*200, (Math.random()-0.5)*200, -100 - Math.random()*200);
+        mesh.scale.setScalar(1 + Math.random()*2);
+        nebulaClouds.add(mesh);
+    }
+    scene.add(nebulaClouds);
 }
 
-/* ENTER KEY */
-$("username").addEventListener(
-  "keydown",
-  event => {
-    if(event.key === "Enter"){
-      scan();
+function buildPlayerCraft() {
+    playerCraft = new THREE.Group();
+
+    // Futuristic Sleek Body
+    let bodyGeo = new THREE.ConeGeometry(0.8, 3.5, 5);
+    bodyGeo.rotateX(Math.PI / 2);
+    let bodyMat = new THREE.MeshStandardMaterial({
+        color: 0x080f24,
+        metalness: 0.9,
+        roughness: 0.2,
+        wireframe: false
+    });
+    let mainBody = new THREE.Mesh(bodyGeo, bodyMat);
+    playerCraft.add(mainBody);
+
+    // Glowing Neon Stripes/Wings
+    let wingGeo = new THREE.BoxGeometry(3.2, 0.05, 1.2);
+    let wingMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        emissive: 0x00f0ff,
+        emissiveIntensity: 0.6,
+        metalness: 0.5
+    });
+    let wings = new THREE.Mesh(wingGeo, wingMat);
+    wings.position.set(0, 0, 0.3);
+    playerCraft.add(wings);
+
+    // Cockpit Glass
+    let glassGeo = new THREE.SphereGeometry(0.4, 8, 8);
+    glassGeo.scale(0.8, 0.5, 1.8);
+    let glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0x00f0ff,
+        transparent: true,
+        opacity: 0.7,
+        roughness: 0.1,
+        transmission: 0.9
+    });
+    let cockpit = new THREE.Mesh(glassGeo, glassMat);
+    cockpit.position.set(0, 0.25, -0.2);
+    playerCraft.add(cockpit);
+
+    // Engine Exhaust Glow
+    let engineGeo = new THREE.CylinderGeometry(0.25, 0.01, 1, 8);
+    engineGeo.rotateX(-Math.PI / 2);
+    let engineMat = new THREE.MeshBasicMaterial({
+        color: 0x00f0ff,
+        transparent: true,
+        opacity: 0.9
+    });
+    let engine = new THREE.Mesh(engineGeo, engineMat);
+    engine.position.set(0, 0, 1.8);
+    playerCraft.add(engine);
+
+    // Engine Particles Trail
+    let pCount = 60;
+    let pGeo = new THREE.BufferGeometry();
+    let pPos = new Float32Array(pCount * 3);
+    for(let i=0; i<pCount*3; i++) pPos[i] = 0;
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    
+    let pMat = new THREE.PointsMaterial({
+        color: 0x00f0ff,
+        size: 0.4,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+    });
+    engineParticles = new THREE.Points(pGeo, pMat);
+    scene.add(engineParticles);
+
+    scene.add(playerCraft);
+}
+
+function spawnAsteroid() {
+    let size = 1.2 + Math.random() * 2.5;
+    let geo = new THREE.DodecahedronGeometry(size, 1);
+    
+    // Deform vertices for irregular rock shape
+    let posAttr = geo.attributes.position;
+    for (let i = 0; i < posAttr.count; i++) {
+        let x = posAttr.getX(i);
+        let y = posAttr.getY(i);
+        let z = posAttr.getZ(i);
+        let factor = 1 + (Math.random() - 0.5) * 0.35;
+        posAttr.setXYZ(i, x * factor, y * factor, z * factor);
     }
-  }
-);
+    geo.computeVertexNormals();
 
-/* BUTTON */
-$("scanBtn").addEventListener(
-  "click",
-  scan
-);
+    let mat = new THREE.MeshStandardMaterial({
+        color: 0x1a2238,
+        roughness: 0.9,
+        metalness: 0.1,
+        flatShading: true
+    });
 
-/* INITIAL STATUS */
-setStatus(
-  "READY TO SCAN",
-  ""
-);
+    let mesh = new THREE.Mesh(geo, mat);
+
+    // Position far ahead with slight offset logic
+    let posX = (Math.random() - 0.5) * (BOUNDS_X * 2);
+    let posY = (Math.random() - 0.5) * (BOUNDS_Y * 2);
+    let posZ = -180 - Math.random() * 80;
+
+    mesh.position.set(posX, posY, posZ);
+    mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+
+    let rotSpeed = {
+        x: (Math.random() - 0.5) * 0.03,
+        y: (Math.random() - 0.5) * 0.03
+    };
+
+    asteroids.push({ mesh, rotSpeed, radius: size * 0.8, passed: false });
+    scene.add(mesh);
+}
+
+function triggerExplosion(pos) {
+    sound.playExplosion();
+    let count = 80;
+    let geo = new THREE.BufferGeometry();
+    let positions = new Float32Array(count * 3);
+    let velocities = [];
+
+    for(let i=0; i<count; i++) {
+        positions[i*3] = pos.x;
+        positions[i*3+1] = pos.y;
+        positions[i*3+2] = pos.z;
+
+        velocities.push(new THREE.Vector3(
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 12
+        ));
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    let mat = new THREE.PointsMaterial({
+        color: 0x00f0ff,
+        size: 0.8,
+        transparent: true,
+        opacity: 1,
+        blending: THREE.AdditiveBlending
+    });
+
+    let pSys = new THREE.Points(geo, mat);
+    scene.add(pSys);
+    explosionParticles.push({ pSys, velocities, age: 0 });
+}
+
+/* --- LOADING FLOW --- */
+function runLoadingSequence() {
+    let bar = document.getElementById('loader-bar');
+    let pct = document.getElementById('loader-percent');
+    let log = document.getElementById('loader-log');
+    let progress = 0;
+
+    let logs = [
+        "Connecting to NUBRIC servers...",
+        "Calibrating navigation vectors...",
+        "Loading spacecraft telemetry...",
+        "Generating procedural asteroid field...",
+        "Synchronizing pilot progress..."
+    ];
+
+    let interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 12) + 3;
+        if(progress > 100) progress = 100;
+
+        bar.style.width = progress + '%';
+        pct.innerText = `LOADING ${progress}%`;
+        
+        let logIdx = Math.min(Math.floor((progress / 100) * logs.length), logs.length - 1);
+        log.innerText = logs[logIdx];
+
+        if(progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                showScreen('auth-screen');
+                loadUserData();
+            }, 500);
+        }
+    }, 120);
+}
+
+/* --- GAME LOOP & STATE HANDLERS --- */
+function startGame() {
+    sound.playClick();
+    gameActive = true;
+    distanceTraveled = 0;
+    currentScore = 0;
+    gameSpeed = 1;
+    targetSpeedLevel = 1;
+    dodgedCount = 0;
+    dodgesToNextLevel = 6 + Math.floor(Math.random() * 4);
+    speedProgress = 0;
+
+    // Clear existing asteroids
+    asteroids.forEach(a => scene.remove(a.mesh));
+    asteroids = [];
+
+    // Pre-populate initial wave
+    for(let i=0; i<25; i++) {
+        spawnAsteroid();
+    }
+
+    resetShipPosition();
+
+    // UI Switches
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('hud').style.display = 'block';
+    
+    // Display Touch Controls on Mobile
+    if('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.getElementById('touch-controls').style.display = 'block';
+    }
+
+    userData.runs++;
+    saveUserData();
+}
+
+function resetShipPosition() {
+    if(playerCraft) {
+        playerCraft.position.set(0, 0, 0);
+        playerCraft.rotation.set(0, 0, 0);
+    }
+    craftVelocity = { x: 0, y: 0 };
+}
+
+function onGameOver() {
+    gameActive = false;
+    cameraShake = 0.8;
+
+    if(playerCraft) triggerExplosion(playerCraft.position);
+
+    // Check High Score Updates
+    if(currentScore > userData.score) userData.score = currentScore;
+    if(distanceTraveled > userData.distance) userData.distance = distanceTraveled;
+    if(targetSpeedLevel > userData.speed) userData.speed = targetSpeedLevel;
+    saveUserData();
+
+    document.getElementById('go-dist').innerText = Math.floor(distanceTraveled) + ' m';
+    document.getElementById('go-score').innerText = Math.floor(currentScore);
+    document.getElementById('go-speed').innerText = targetSpeedLevel;
+
+    setTimeout(() => {
+        document.getElementById('hud').style.display = 'none';
+        document.getElementById('touch-controls').style.display = 'none';
+        showScreen('gameover-screen');
+    }, 1200);
+}
+
+function triggerSpeedIncrease() {
+    targetSpeedLevel++;
+    sound.playSpeedUp();
+    cameraShake = 0.4;
+
+    let notify = document.getElementById('speed-notify');
+    document.getElementById('speed-notify-val').innerText = `LEVEL ${targetSpeedLevel}`;
+    notify.classList.add('active');
+    
+    setTimeout(() => {
+        notify.classList.remove('active');
+    }, 1500);
+
+    dodgedCount = 0;
+    dodgesToNextLevel = 6 + Math.floor(Math.random() * 5);
+}
+
+/* --- MAIN RENDER LOOP --- */
+let lastTime = performance.now();
+
+function renderLoop(time) {
+    requestAnimationFrame(renderLoop);
+    
+    let delta = (time - lastTime) / 1000;
+    if(delta > 0.1) delta = 0.1; // Cap extreme frame drops
+    lastTime = time;
+
+    // Smooth speed transitions
+    gameSpeed += (targetSpeedLevel - gameSpeed) * 0.05;
+
+    if(gameActive) {
+        let speedMult = (isBoosting ? 1.6 : 1.0) * gameSpeed;
+        
+        // Distance & Score accrual
+        distanceTraveled += 25 * speedMult * delta;
+        currentScore += 10 * speedMult * delta;
+
+        // Ship Steering Acceleration
+        let targetVelX = inputVector.x * 18;
+        let targetVelY = inputVector.y * 14;
+        
+        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.1;
+        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.1;
+
+        playerCraft.position.x += craftVelocity.x * delta;
+        playerCraft.position.y += craftVelocity.y * delta;
+
+        // Screen Boundary Constraints
+        playerCraft.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, playerCraft.position.x));
+        playerCraft.position.y = Math.max(-BOUNDS_Y, Math.min(BOUNDS_Y, playerCraft.position.y));
+
+        // Visual Banking / Banking Tilt
+        playerCraft.rotation.z = -craftVelocity.x * 0.04;
+        playerCraft.rotation.x = craftVelocity.y * 0.03;
+
+        // Asteroid Updates
+        let spawnThreshold = 25 + targetSpeedLevel * 3;
+        if(asteroids.length < spawnThreshold) {
+            spawnAsteroid();
+        }
+
+        for(let i = asteroids.length - 1; i >= 0; i--) {
+            let ast = asteroids[i];
+            ast.mesh.position.z += (40 * speedMult) * delta;
+            ast.mesh.rotation.x += ast.rotSpeed.x;
+            ast.mesh.rotation.y += ast.rotSpeed.y;
+
+            // Dodged Asteroid Check
+            if(!ast.passed && ast.mesh.position.z > playerCraft.position.z) {
+                ast.passed = true;
+                dodgedCount++;
+                userData.dodged++;
+                if(dodgedCount >= dodgesToNextLevel) {
+                    triggerSpeedIncrease();
+                }
+            }
+
+            // Collision Detection
+            let dist = playerCraft.position.distanceTo(ast.mesh.position);
+            if(dist < (ast.radius + 0.9)) {
+                onGameOver();
+            }
+
+            // Cleanup recycled asteroids
+            if(ast.mesh.position.z > 20) {
+                scene.remove(ast.mesh);
+                asteroids.splice(i, 1);
+            }
+        }
+
+        // HUD Updates
+        document.getElementById('hud-dist').innerText = Math.floor(distanceTraveled) + ' m';
+        document.getElementById('hud-score').innerText = Math.floor(currentScore);
+        document.getElementById('hud-speed').innerText = targetSpeedLevel;
+        document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / dodgesToNextLevel) * 100) + '%';
+    }
+
+    // Dynamic Starfield Velocity Effect
+    if(starField) {
+        let p = starField.geometry.attributes.position;
+        let starSpeed = (gameActive ? 60 * gameSpeed : 10);
+        for(let i=2; i<p.count*3; i+=3) {
+            p.array[i] += starSpeed * delta;
+            if(p.array[i] > 100) p.array[i] = -400;
+        }
+        p.needsUpdate = true;
+    }
+
+    // Dynamic Engine Exhaust Particles
+    if(engineParticles && playerCraft) {
+        let p = engineParticles.geometry.attributes.position;
+        for(let i = p.count*3 - 3; i >= 3; i-=3) {
+            p.array[i] = p.array[i-3];
+            p.array[i+1] = p.array[i-2];
+            p.array[i+2] = p.array[i-1];
+        }
+        p.array[0] = playerCraft.position.x + (Math.random()-0.5)*0.2;
+        p.array[1] = playerCraft.position.y + (Math.random()-0.5)*0.2;
+        p.array[2] = playerCraft.position.z + 1.8;
+        p.needsUpdate = true;
+    }
+
+    // Handle Explosion Particle Animations
+    for(let i = explosionParticles.length - 1; i >= 0; i--) {
+        let exp = explosionParticles[i];
+        exp.age += delta;
+        let pos = exp.pSys.geometry.attributes.position;
+        for(let j=0; j<exp.velocities.length; j++) {
+            pos.array[j*3] += exp.velocities[j].x * delta;
+            pos.array[j*3+1] += exp.velocities[j].y * delta;
+            pos.array[j*3+2] += exp.velocities[j].z * delta;
+        }
+        pos.needsUpdate = true;
+        exp.pSys.material.opacity = Math.max(0, 1 - exp.age * 2);
+
+        if(exp.age > 0.5) {
+            scene.remove(exp.pSys);
+            explosionParticles.splice(i, 1);
+        }
+    }
+
+    // Smooth Camera Follow & Shake
+    let targetCamX = gameActive ? playerCraft.position.x * 0.3 : 0;
+    let targetCamY = gameActive ? playerCraft.position.y * 0.3 + 2.5 : 3;
+    
+    camera.position.x += (targetCamX - camera.position.x) * 0.05;
+    camera.position.y += (targetCamY - camera.position.y) * 0.05;
+
+    if(cameraShake > 0) {
+        camera.position.x += (Math.random() - 0.5) * cameraShake;
+        camera.position.y += (Math.random() - 0.5) * cameraShake;
+        cameraShake *= 0.9;
+    }
+
+    renderer.render(scene, camera);
+}
+
+/* --- CONTROLS & INPUT HANDLERS --- */
+function setupControls() {
+    let keys = {};
+
+    window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+        updateKeyboardInput();
+    });
+
+    window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+        updateKeyboardInput();
+    });
+
+    function updateKeyboardInput() {
+        if(!gameActive) return;
+        let x = 0, y = 0;
+        if(keys['KeyA'] || keys['ArrowLeft']) x -= 1;
+        if(keys['KeyD'] || keys['ArrowRight']) x += 1;
+        if(keys['KeyW'] || keys['ArrowUp']) y += 1;
+        if(keys['KeyS'] || keys['ArrowDown']) y -= 1;
+        
+        inputVector.x = x;
+        inputVector.y = y;
+
+        isBoosting = !!(keys['ShiftLeft'] || keys['Space']);
+    }
+
+    // Touch Virtual Joystick Setup
+    let joystick = document.getElementById('joystick-zone');
+    let knob = document.getElementById('joystick-knob');
+    let touchId = null;
+    let center = { x: 0, y: 0 };
+
+    joystick.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        let touch = e.changedTouches[0];
+        touchId = touch.identifier;
+        let rect = joystick.getBoundingClientRect();
+        center = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+        updateJoystick(touch);
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        if(touchId === null) return;
+        for(let i=0; i<e.changedTouches.length; i++) {
+            if(e.changedTouches[i].identifier === touchId) {
+                updateJoystick(e.changedTouches[i]);
+                break;
+            }
+        }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+        if(touchId === null) return;
+        for(let i=0; i<e.changedTouches.length; i++) {
+            if(e.changedTouches[i].identifier === touchId) {
+                touchId = null;
+                knob.style.transform = `translate(0px, 0px)`;
+                inputVector = { x: 0, y: 0 };
+                break;
+            }
+        }
+    });
+
+    function updateJoystick(touch) {
+        let dx = touch.clientX - center.x;
+        let dy = touch.clientY - center.y;
+        let dist = Math.hypot(dx, dy);
+        let maxDist = 45;
+
+        if(dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+        }
+
+        knob.style.transform = `translate(${dx}px, ${dy}px)`;
+        inputVector.x = dx / maxDist;
+        inputVector.y = -dy / maxDist; // Invert touch Y axis for intuitive flight feeling
+    }
+
+    // Mobile Boost Touch Control
+    let boostBtn = document.getElementById('boost-btn');
+    boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBoosting = true; }, { passive: false });
+    boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); isBoosting = false; });
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// Hover Audio FX for UI elements
+document.addEventListener('mouseover', (e) => {
+    if(e.target.classList.contains('btn')) sound.playHover();
+});
+
+// Initialize Engine on Page Load
+window.addEventListener('load', initEngine);
 </script>
-
 </body>
 </html>
