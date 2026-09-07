@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NUBRIC — DODGE THE VOID</title>
-    <!-- Sleek Modern Sci-Fi Typography -->
+    <title>NUBRIC — ODYSSEY</title>
+    <!-- Sleek Sci-Fi Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-black: #020408;
-            --navy-deep: #081026;
             --electric-blue: #0066ff;
             --cyan-bright: #00f0ff;
             --cyan-glow: rgba(0, 240, 255, 0.4);
             --text-white: #f0f6ff;
-            --glass-bg: rgba(6, 14, 32, 0.75);
+            --glass-bg: rgba(6, 14, 32, 0.8);
             --glass-border: rgba(0, 240, 255, 0.35);
-            --glass-border-focus: rgba(0, 240, 255, 0.8);
             --font-head: 'Orbitron', sans-serif;
             --font-ui: 'Rajdhani', sans-serif;
         }
@@ -49,7 +47,7 @@
             z-index: 1;
         }
 
-        /* Modern Glassmorphism Styling */
+        /* Glassmorphism Panels */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -87,7 +85,7 @@
             font-family: var(--font-head);
             font-size: 3.2rem;
             font-weight: 900;
-            letter-spacing: 0.25em;
+            letter-spacing: 0.2em;
             color: #fff;
             text-shadow: 0 0 20px var(--cyan-bright), 0 0 40px var(--electric-blue);
             margin-bottom: 5px;
@@ -105,23 +103,23 @@
             text-align: center;
         }
 
-        /* Futuristic Glass Buttons */
+        /* Buttons */
         .btn {
             position: relative;
             font-family: var(--font-head);
             font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.15em;
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.25), rgba(0, 240, 255, 0.05));
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.3), rgba(0, 240, 255, 0.1));
             border: 1px solid var(--glass-border);
             color: var(--text-white);
             padding: 14px 28px;
             margin: 6px 0;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             outline: none;
             text-transform: uppercase;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.25s ease;
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -131,17 +129,15 @@
 
         .btn:hover {
             border-color: var(--cyan-bright);
-            box-shadow: 0 0 20px var(--cyan-glow), inset 0 0 10px rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 20px var(--cyan-glow);
             transform: translateY(-2px);
             color: #fff;
         }
 
-        .btn:active {
-            transform: translateY(1px);
-        }
+        .btn:active { transform: translateY(1px); }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.5));
+            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.6));
             border-color: var(--cyan-bright);
             box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
         }
@@ -155,45 +151,7 @@
             border: none;
             width: 100%;
         }
-        .btn-auth:hover {
-            background: #fff;
-            color: #000;
-            box-shadow: 0 0 20px rgba(255,255,255,0.6);
-        }
-
-        /* LOADING BAR */
-        #loader-panel {
-            width: 380px;
-            max-width: 90vw;
-            padding: 35px;
-            text-align: center;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 5px;
-            margin: 20px 0 12px 0;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright));
-            box-shadow: 0 0 12px var(--cyan-bright);
-            transition: width 0.1s linear;
-        }
-
-        .sys-log {
-            font-size: 0.8rem;
-            color: var(--cyan-bright);
-            height: 20px;
-            opacity: 0.85;
-            font-family: monospace;
-        }
+        .btn-auth:hover { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.6); }
 
         /* HUD OVERLAY */
         #hud {
@@ -208,11 +166,7 @@
             padding: 20px;
         }
 
-        .hud-card {
-            padding: 10px 18px;
-            position: absolute;
-        }
-
+        .hud-card { padding: 10px 18px; position: absolute; }
         .hud-top-left { top: 20px; left: 20px; }
         .hud-top-right { top: 20px; right: 20px; text-align: right; }
 
@@ -246,7 +200,7 @@
             box-shadow: 0 0 8px var(--cyan-bright);
         }
 
-        /* TOUCH CONTROLS SUITE */
+        /* TOUCH CONTROLS */
         #touch-controls {
             position: absolute;
             top: 0;
@@ -258,7 +212,6 @@
             display: block;
         }
 
-        /* Dynamic Joystick Base */
         #joystick-zone {
             position: absolute;
             bottom: 30px;
@@ -275,7 +228,6 @@
             backdrop-filter: blur(8px);
         }
 
-        /* Joystick Shapes */
         #joystick-zone.shape-round { border-radius: 50%; }
         #joystick-zone.shape-square { border-radius: 8px; }
 
@@ -296,7 +248,6 @@
         #joystick-knob.shape-round { border-radius: 50%; }
         #joystick-knob.shape-square { border-radius: 6px; }
 
-        /* ARROW D-PAD OVERLAY */
         #dpad-overlay {
             display: none;
             width: 100%;
@@ -319,7 +270,6 @@
         .dpad-left { top: 45px; left: 5px; width: 38px; height: 40px; }
         .dpad-right { top: 45px; right: 5px; width: 38px; height: 40px; }
 
-        /* Boost Button */
         #boost-btn {
             position: absolute;
             bottom: 35px;
@@ -346,7 +296,7 @@
             box-shadow: 0 0 30px var(--cyan-bright);
         }
 
-        /* SPEED UP NOTIFY */
+        /* NOTIFICATIONS */
         #speed-notify {
             position: absolute;
             top: 35%;
@@ -388,7 +338,7 @@
             font-family: var(--font-ui);
         }
 
-        /* REALISTIC AUTH POPUP MODALS */
+        /* AUTH MODAL */
         .auth-modal-overlay {
             position: fixed;
             top: 0;
@@ -415,16 +365,17 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             cursor: pointer;
             border: 1px solid #dadce0;
             margin-top: 10px;
+            transition: background 0.2s;
         }
-        .account-item:hover { background: #f8f9fa; }
+        .account-item:hover { background: #f1f3f4; }
         .avatar-circle {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: #0066ff;
             color: #fff;
@@ -447,11 +398,6 @@
             cursor: pointer;
             font-size: 1.1rem;
         }
-
-        @media (max-width: 600px) {
-            .logo-title { font-size: 2rem; }
-            .logo-subtitle { font-size: 0.7rem; }
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -462,14 +408,14 @@
 
     <!-- 1. LOADING SCREEN -->
     <div id="loader-screen" class="screen active">
-        <div id="loader-panel" class="glass-panel">
+        <div class="glass-panel" style="width: 380px; max-width: 90vw; padding: 35px; text-align: center;">
             <div class="logo-title" style="font-size: 2.2rem;">NUBRIC</div>
-            <div class="logo-subtitle">INITIALIZING SPACE SYSTEMS</div>
-            <div class="progress-bar-container">
-                <div id="loader-bar" class="progress-bar-fill"></div>
+            <div class="logo-subtitle">INITIALIZING CELESTIAL ENGINE</div>
+            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 4px; margin: 20px 0 12px 0; overflow: hidden;">
+                <div id="loader-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright)); box-shadow: 0 0 12px var(--cyan-bright);"></div>
             </div>
-            <div id="loader-percent" class="hud-label" style="text-align:center; margin-bottom: 6px;">LOADING 0%</div>
-            <div id="loader-log" class="sys-log">Connecting to NUBRIC...</div>
+            <div id="loader-percent" class="hud-label" style="text-align:center;">LOADING 0%</div>
+            <div id="loader-log" style="font-size:0.8rem; color:var(--cyan-bright); height:20px; margin-top:5px; font-family:monospace;">Connecting...</div>
         </div>
     </div>
 
@@ -477,7 +423,7 @@
     <div id="auth-screen" class="screen">
         <div class="glass-panel" style="width: 380px; max-width:90vw; padding:35px; text-align:center;">
             <div class="logo-title" style="font-size: 2.4rem;">NUBRIC</div>
-            <div class="logo-subtitle">ENTER THE UNIVERSE</div>
+            <div class="logo-subtitle">ENTER THE VOID</div>
             
             <div id="active-user-badge" style="margin-bottom: 15px; font-size:0.9rem; color:var(--cyan-bright); display:none;">
                 Logged in as: <strong id="logged-user-name">None</strong>
@@ -485,7 +431,7 @@
 
             <button class="btn btn-auth" style="margin-bottom: 10px;" onclick="openAuthModal('google')">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.29 21.39 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                CONTINUE WITH GOOGLE
+                SIGN IN WITH GOOGLE
             </button>
 
             <button class="btn btn-auth" style="background:#000; color:#fff; border: 1px solid #444;" onclick="openAuthModal('apple')">
@@ -503,26 +449,25 @@
     <!-- 3. MAIN MENU -->
     <div id="menu-screen" class="screen">
         <div class="logo-title">NUBRIC</div>
-        <div class="logo-subtitle">DODGE THE VOID</div>
+        <div class="logo-subtitle">ODYSSEY</div>
         
         <div style="display:flex; flex-direction:column; gap:10px; width:260px;">
             <button class="btn btn-primary" onclick="startGame()">PLAY</button>
             <button class="btn" onclick="showScreen('progress-screen')">PROGRESS</button>
             <button class="btn" onclick="showScreen('settings-screen')">SETTINGS</button>
-            <button class="btn" onclick="showScreen('help-screen')">HOW TO PLAY</button>
-            <button class="btn" style="opacity:0.7;" onclick="showScreen('auth-screen')">LOGOUT / SWITCH</button>
+            <button class="btn" style="opacity:0.7;" onclick="showScreen('auth-screen')">SWITCH PILOT</button>
         </div>
     </div>
 
     <!-- 4. PROGRESS SCREEN -->
     <div id="progress-screen" class="screen">
         <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">PILOT DATA BANK</div>
+            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">PILOT TELEMETRY</div>
             <div class="setting-row"><span class="stat-label">Active Pilot</span><span id="st-pilot" style="color:var(--cyan-bright); font-weight:bold;">Guest</span></div>
             <div class="setting-row"><span class="stat-label">Best Distance</span><span id="st-dist" style="color:var(--cyan-bright);">0 m</span></div>
             <div class="setting-row"><span class="stat-label">High Score</span><span id="st-score" style="color:var(--cyan-bright);">0</span></div>
             <div class="setting-row"><span class="stat-label">Max Speed Level</span><span id="st-speed" style="color:var(--cyan-bright);">Speed 1</span></div>
-            <div class="setting-row"><span class="stat-label">Asteroids Dodged</span><span id="st-dodged" style="color:var(--cyan-bright);">0</span></div>
+            <div class="setting-row"><span class="stat-label">Substance Boosts Collected</span><span id="st-substance" style="color:var(--cyan-bright);">0</span></div>
             
             <div style="margin-top: 25px; text-align: center;">
                 <button class="btn" onclick="showScreen('menu-screen')">BACK</button>
@@ -530,33 +475,26 @@
         </div>
     </div>
 
-    <!-- 5. ADVANCED SETTINGS SCREEN -->
+    <!-- 5. ADVANCED SETTINGS -->
     <div id="settings-screen" class="screen">
         <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">SYSTEM SETTINGS</div>
+            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 20px;">SYSTEM CONFIGURATION</div>
             
             <div class="setting-row">
-                <span>Graphics Preset</span>
-                <select id="cfg-graphics"><option value="ultra">Ultra</option><option value="medium">Medium</option><option value="low">Low</option></select>
+                <span>Space Environment</span>
+                <select id="cfg-time" onchange="toggleDayNight(this.value)">
+                    <option value="night">Night Mode (Void)</option>
+                    <option value="day">Day Mode (Solar Nebula)</option>
+                </select>
             </div>
-            
+
             <div class="setting-row">
-                <span>Joystick Style</span>
+                <span>Joystick Control</span>
                 <select id="cfg-joystick" onchange="applyJoystickStyle(this.value)">
                     <option value="round">Round Halo</option>
                     <option value="square">Square Frame</option>
                     <option value="dpad">D-Pad Arrows</option>
                 </select>
-            </div>
-
-            <div class="setting-row">
-                <span>Motion Blur</span>
-                <select id="cfg-blur"><option value="on">ON</option><option value="off">OFF</option></select>
-            </div>
-
-            <div class="setting-row">
-                <span>Camera Shake</span>
-                <select id="cfg-shake"><option value="on">ON</option><option value="off">OFF</option></select>
             </div>
 
             <div class="setting-row">
@@ -570,30 +508,19 @@
         </div>
     </div>
 
-    <!-- 6. HOW TO PLAY -->
-    <div id="help-screen" class="screen">
-        <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-subtitle" style="font-size: 1.1rem; margin-bottom: 15px;">PILOT MANUAL</div>
-            <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; opacity:0.85;">
-                Dodge procedural asteroid waves in deep space. Camera dynamically tracks your ship pitched orientation. Every 5 to 10 dodges, speed increases by +1!
-            </p>
-            <button class="btn" onclick="showScreen('menu-screen')">UNDERSTOOD</button>
-        </div>
-    </div>
-
-    <!-- 7. GAME OVER SCREEN -->
+    <!-- 6. GAME OVER SCREEN -->
     <div id="gameover-screen" class="screen">
         <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-title" style="font-size: 2rem;">MISSION FAILED</div>
-            <div class="logo-subtitle" style="margin-bottom: 20px;">HULL DESTRUCT DETECTED</div>
+            <div class="logo-title" style="font-size: 2rem;">CRITICAL COLLISION</div>
+            <div class="logo-subtitle" style="margin-bottom: 20px;">SHIP DESTROYED</div>
             
             <div class="setting-row"><span>Distance Traveled</span><span id="go-dist" style="color:var(--cyan-bright); font-weight:bold;">0 m</span></div>
             <div class="setting-row"><span>Final Score</span><span id="go-score" style="color:var(--cyan-bright); font-weight:bold;">0</span></div>
-            <div class="setting-row"><span>Max Speed Level</span><span id="go-speed" style="color:var(--cyan-bright); font-weight:bold;">Speed 1</span></div>
+            <div class="setting-row"><span>Max Speed</span><span id="go-speed" style="color:var(--cyan-bright); font-weight:bold;">Speed 1</span></div>
             
             <div style="margin-top: 25px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="startGame()">TRY AGAIN</button>
-                <button class="btn" onclick="showScreen('menu-screen')">MAIN MENU</button>
+                <button class="btn btn-primary" onclick="startGame()">RETRY</button>
+                <button class="btn" onclick="showScreen('menu-screen')">MENU</button>
             </div>
         </div>
     </div>
@@ -616,7 +543,7 @@
 
     <!-- SPEED UP NOTIFICATION -->
     <div id="speed-notify">
-        <div class="logo-title" style="font-size: 2rem;">SPEED INCREASED!</div>
+        <div class="logo-title" id="notify-title" style="font-size: 2rem;">SPEED INCREASED!</div>
         <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1rem;">SPEED +1</div>
     </div>
 
@@ -634,22 +561,18 @@
         <div id="boost-btn">BOOST</div>
     </div>
 
-    <!-- REALISTIC GOOGLE / APPLE AUTH MODAL -->
+    <!-- ACCOUNT AUTH MODAL -->
     <div id="auth-modal" class="auth-modal-overlay">
         <div class="auth-modal-card">
-            <h3 id="auth-provider-title" style="margin-bottom:8px; font-size:1.2rem;">Choose an account</h3>
-            <p style="font-size:0.85rem; color:#5f6368; margin-bottom:15px;">to continue to <strong>NUBRIC Space Command</strong></p>
-            
-            <div id="account-list">
-                <!-- Dynamic Populated Accounts -->
-            </div>
-
+            <h3 id="auth-provider-title" style="margin-bottom:8px; font-size:1.2rem;">Select Account</h3>
+            <p style="font-size:0.85rem; color:#5f6368; margin-bottom:15px;">Choose your pilot profile:</p>
+            <div id="account-list"></div>
             <button onclick="closeAuthModal()" style="margin-top:20px; border:none; background:none; color:#1a73e8; cursor:pointer; font-weight:bold; font-size:0.85rem;">Cancel</button>
         </div>
     </div>
 
 <script>
-/* --- AUDIO SYNTHESIZER ENGINE --- */
+/* --- AUDIO SYNTHESIZER --- */
 class SoundController {
     constructor() { this.ctx = null; this.muted = false; }
     init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -671,6 +594,7 @@ class SoundController {
     }
     playHover() { this.playTone(350, 'sine', 0.04, 0.02); }
     playClick() { this.playTone(700, 'triangle', 0.06, 0.05); }
+    playBoost() { this.playTone(900, 'sawtooth', 0.25, 0.08); }
     playSpeedUp() {
         this.playTone(400, 'sawtooth', 0.1, 0.08);
         setTimeout(() => this.playTone(800, 'sawtooth', 0.15, 0.08), 80);
@@ -698,16 +622,16 @@ document.getElementById('sound-toggle').addEventListener('click', () => {
     document.getElementById('sound-toggle').innerText = sound.muted ? '🔇' : '🔊';
 });
 
-/* --- MULTI-ACCOUNT AUTH & PERSISTENT TELEMETRY --- */
+/* --- MULTI-ACCOUNT AUTH & DATA --- */
 let activeUser = 'Guest Pilot';
-let userData = { distance: 0, score: 0, speed: 1, dodged: 0 };
+let userData = { distance: 0, score: 0, speed: 1, substances: 0 };
 
 function loadUserData() {
     let saved = localStorage.getItem('NUBRIC_SAVE_' + activeUser);
     if(saved) {
         try { userData = JSON.parse(saved); } catch(e){}
     } else {
-        userData = { distance: 0, score: 0, speed: 1, dodged: 0 };
+        userData = { distance: 0, score: 0, speed: 1, substances: 0 };
     }
     updateProgressUI();
 }
@@ -722,10 +646,9 @@ function updateProgressUI() {
     document.getElementById('st-dist').innerText = Math.floor(userData.distance) + ' m';
     document.getElementById('st-score').innerText = Math.floor(userData.score);
     document.getElementById('st-speed').innerText = 'Speed ' + userData.speed;
-    document.getElementById('st-dodged').innerText = userData.dodged;
+    document.getElementById('st-substance').innerText = userData.substances;
 }
 
-// REALISTIC AUTHENTICATION DIALOG FLOW
 function openAuthModal(provider) {
     sound.playClick();
     let modal = document.getElementById('auth-modal');
@@ -753,9 +676,7 @@ function openAuthModal(provider) {
     modal.style.display = 'flex';
 }
 
-function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
-}
+function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
 
 function selectAccount(name) {
     activeUser = name;
@@ -766,37 +687,29 @@ function selectAccount(name) {
     showScreen('menu-screen');
 }
 
-function enterGameAsCurrent() {
-    loadUserData();
-    showScreen('menu-screen');
-}
+function enterGameAsCurrent() { loadUserData(); showScreen('menu-screen'); }
+function enterGameAsGuest() { activeUser = 'Guest Pilot'; loadUserData(); showScreen('menu-screen'); }
 
-function enterGameAsGuest() {
-    activeUser = 'Guest Pilot';
-    loadUserData();
-    showScreen('menu-screen');
-}
-
-/* --- THREE.JS GRAPHICS & DYNAMIC POV CAMERA --- */
-let scene, camera, renderer;
-let playerCraft, starField;
-let asteroids = [];
+/* --- THREE.JS ENGINE & PLANETS --- */
+let scene, camera, renderer, ambientLight, mainLight;
+let playerCraft, starField, planetGroup;
+let asteroids = [], substances = [];
 let gameActive = false;
 
-// Game Parameters
+// Telemetry
 let distanceTraveled = 0;
 let currentScore = 0;
 let speedLevel = 1;
 let dodgedCount = 0;
 let dodgesToNextLevel = 6;
 
-// Inputs & Velocities
+// Physics Vector
 let inputVector = { x: 0, y: 0 };
 let isBoosting = false;
 let craftVelocity = { x: 0, y: 0 };
 
-const BOUNDS_X = 20;
-const BOUNDS_Y = 12;
+const BOUNDS_X = 22;
+const BOUNDS_Y = 13;
 
 function initEngine() {
     let container = document.getElementById('webgl-container');
@@ -804,21 +717,22 @@ function initEngine() {
     scene.fog = new THREE.FogExp2(0x020408, 0.007);
 
     camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 2.8, 9);
+    camera.position.set(0, 2.5, 9);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    let ambientLight = new THREE.AmbientLight(0x081026, 2.0);
+    ambientLight = new THREE.AmbientLight(0x081026, 2.2);
     scene.add(ambientLight);
 
-    let mainLight = new THREE.DirectionalLight(0x00f0ff, 2.8);
+    mainLight = new THREE.DirectionalLight(0x00f0ff, 2.8);
     mainLight.position.set(10, 20, 10);
     scene.add(mainLight);
 
     buildStarfield();
+    buildPlanets();
     buildPlayerCraft();
 
     window.addEventListener('resize', onWindowResize);
@@ -826,6 +740,47 @@ function initEngine() {
     
     requestAnimationFrame(renderLoop);
     runLoadingSequence();
+}
+
+function toggleDayNight(mode) {
+    if(mode === 'day') {
+        scene.background = new THREE.Color(0x224488);
+        scene.fog.color.setHex(0x224488);
+        ambientLight.color.setHex(0xffffff);
+        ambientLight.intensity = 2.5;
+    } else {
+        scene.background = null;
+        scene.fog.color.setHex(0x020408);
+        ambientLight.color.setHex(0x081026);
+        ambientLight.intensity = 2.2;
+    }
+}
+
+function buildPlanets() {
+    planetGroup = new THREE.Group();
+
+    // Planet 1: Gas Giant
+    let g1 = new THREE.SphereGeometry(25, 32, 32);
+    let m1 = new THREE.MeshStandardMaterial({ color: 0x004488, roughness: 0.6, flatShading: true });
+    let planet1 = new THREE.Mesh(g1, m1);
+    planet1.position.set(-90, 40, -300);
+    planetGroup.add(planet1);
+
+    // Planet 2: Ringed World
+    let g2 = new THREE.SphereGeometry(16, 32, 32);
+    let m2 = new THREE.MeshStandardMaterial({ color: 0x884422, roughness: 0.8 });
+    let planet2 = new THREE.Mesh(g2, m2);
+    planet2.position.set(100, -30, -280);
+
+    // Ring
+    let rGeo = new THREE.RingGeometry(20, 30, 32);
+    let rMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+    let ring = new THREE.Mesh(rGeo, rMat);
+    ring.rotation.x = Math.PI / 3;
+    planet2.add(ring);
+
+    planetGroup.add(planet2);
+    scene.add(planetGroup);
 }
 
 function buildStarfield() {
@@ -846,21 +801,18 @@ function buildStarfield() {
 function buildPlayerCraft() {
     playerCraft = new THREE.Group();
 
-    // Fuselage
     let bodyGeo = new THREE.ConeGeometry(0.85, 3.4, 5);
     bodyGeo.rotateX(Math.PI / 2);
     let bodyMat = new THREE.MeshStandardMaterial({ color: 0x060e20, metalness: 0.9, roughness: 0.2 });
     let mainBody = new THREE.Mesh(bodyGeo, bodyMat);
     playerCraft.add(mainBody);
 
-    // Glowing Neon Wings
     let wingGeo = new THREE.BoxGeometry(3.2, 0.06, 1.1);
     let wingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
     let wings = new THREE.Mesh(wingGeo, wingMat);
     wings.position.set(0, 0, 0.2);
     playerCraft.add(wings);
 
-    // Dynamic Cockpit Canopy
     let glassGeo = new THREE.SphereGeometry(0.45, 8, 8);
     glassGeo.scale(0.8, 0.5, 1.6);
     let glassMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, roughness: 0.1, transmission: 0.8, transparent: true });
@@ -888,28 +840,38 @@ function spawnAsteroid() {
     scene.add(mesh);
 }
 
+/* SPAWN BOOST SUBSTANCE FIELDS */
+function spawnSubstance() {
+    let geo = new THREE.TorusGeometry(2.5, 0.15, 12, 24);
+    let mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
+    let mesh = new THREE.Mesh(geo, mat);
+
+    let posX = (Math.random() - 0.5) * (BOUNDS_X * 1.5);
+    let posY = (Math.random() - 0.5) * (BOUNDS_Y * 1.5);
+    let posZ = -180 - Math.random() * 50;
+
+    mesh.position.set(posX, posY, posZ);
+    substances.push({ mesh });
+    scene.add(mesh);
+}
+
 function runLoadingSequence() {
     let bar = document.getElementById('loader-bar');
     let pct = document.getElementById('loader-percent');
     let log = document.getElementById('loader-log');
     let progress = 0;
 
-    let logs = ["CONNECTING TO SERVERS...", "CALIBRATING NAV VECTORS...", "SYNCHRONIZING TELEMETRY...", "SYSTEM READY."];
     let interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 12) + 4;
+        progress += Math.floor(Math.random() * 15) + 5;
         if(progress > 100) progress = 100;
-
         bar.style.width = progress + '%';
         pct.innerText = `LOADING ${progress}%`;
-        log.innerText = logs[Math.min(Math.floor((progress / 100) * logs.length), logs.length - 1)];
 
         if(progress >= 100) {
             clearInterval(interval);
-            setTimeout(() => {
-                showScreen('auth-screen');
-            }, 400);
+            setTimeout(() => showScreen('auth-screen'), 400);
         }
-    }, 90);
+    }, 80);
 }
 
 function showScreen(screenId) {
@@ -934,9 +896,12 @@ function startGame() {
     dodgesToNextLevel = 5 + Math.floor(Math.random() * 5);
 
     asteroids.forEach(a => scene.remove(a.mesh));
+    substances.forEach(s => scene.remove(s.mesh));
     asteroids = [];
+    substances = [];
 
     for(let i=0; i<20; i++) spawnAsteroid();
+    for(let i=0; i<3; i++) spawnSubstance();
 
     resetShip();
 
@@ -957,6 +922,7 @@ function triggerSpeedIncrease() {
     sound.playSpeedUp();
 
     let notify = document.getElementById('speed-notify');
+    document.getElementById('notify-title').innerText = "SPEED INCREASED!";
     document.getElementById('speed-notify-val').innerText = `SPEED +1 (LEVEL ${speedLevel})`;
     notify.classList.add('active');
     setTimeout(() => notify.classList.remove('active'), 1400);
@@ -984,7 +950,7 @@ function onGameOver() {
     }, 800);
 }
 
-/* --- RENDER LOOP WITH THIRD-PERSON CAMERA POV FOLLOW --- */
+/* --- RENDER LOOP & SMOOTH NATURAL CAMERA MOTION --- */
 let lastTime = performance.now();
 
 function renderLoop(time) {
@@ -1000,7 +966,7 @@ function renderLoop(time) {
         distanceTraveled += (speedMult * 0.5) * delta;
         currentScore += (speedMult * 0.8) * delta;
 
-        // Smooth Craft Control Physics
+        // Smooth Controls Physics
         let targetVelX = inputVector.x * 22;
         let targetVelY = inputVector.y * 18;
         
@@ -1013,13 +979,38 @@ function renderLoop(time) {
         playerCraft.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, playerCraft.position.x));
         playerCraft.position.y = Math.max(-BOUNDS_Y, Math.min(BOUNDS_Y, playerCraft.position.y));
 
-        // Pitch & Roll Orientation
         playerCraft.rotation.z = -craftVelocity.x * 0.04;
         playerCraft.rotation.x = craftVelocity.y * 0.03;
 
-        // Asteroids Wave Logic
-        if(asteroids.length < 22 + speedLevel) spawnAsteroid();
+        // SUBSTANCE BOOST FIELDS LOGIC
+        if(substances.length < 3) spawnSubstance();
+        for(let i = substances.length - 1; i >= 0; i--) {
+            let sub = substances[i];
+            sub.mesh.position.z += speedMult * delta;
+            sub.mesh.rotation.z += 0.02;
 
+            // Check if craft passes through substance ring
+            if(playerCraft.position.distanceTo(sub.mesh.position) < 2.5) {
+                currentScore += 250;
+                userData.substances++;
+                sound.playBoost();
+
+                let notify = document.getElementById('speed-notify');
+                document.getElementById('notify-title').innerText = "SUBSTANCE BOOST!";
+                document.getElementById('speed-notify-val').innerText = "+250 BONUS SCORE";
+                notify.classList.add('active');
+                setTimeout(() => notify.classList.remove('active'), 1000);
+
+                scene.remove(sub.mesh);
+                substances.splice(i, 1);
+            } else if(sub.mesh.position.z > 15) {
+                scene.remove(sub.mesh);
+                substances.splice(i, 1);
+            }
+        }
+
+        // ASTEROIDS LOGIC
+        if(asteroids.length < 22 + speedLevel) spawnAsteroid();
         for(let i = asteroids.length - 1; i >= 0; i--) {
             let ast = asteroids[i];
             ast.mesh.position.z += speedMult * delta;
@@ -1029,10 +1020,7 @@ function renderLoop(time) {
             if(!ast.passed && ast.mesh.position.z > playerCraft.position.z) {
                 ast.passed = true;
                 dodgedCount++;
-                userData.dodged++;
-                if(dodgedCount >= dodgesToNextLevel) {
-                    triggerSpeedIncrease();
-                }
+                if(dodgedCount >= dodgesToNextLevel) triggerSpeedIncrease();
             }
 
             if(playerCraft.position.distanceTo(ast.mesh.position) < (ast.radius + 0.85)) {
@@ -1052,7 +1040,7 @@ function renderLoop(time) {
         document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / dodgesToNextLevel) * 100) + '%';
     }
 
-    // Dynamic Starfield Scrolling
+    // Starfield & Planet Movement
     if(starField) {
         let p = starField.geometry.attributes.position;
         let starSpd = gameActive ? (35 + speedLevel * 10) : 10;
@@ -1063,28 +1051,21 @@ function renderLoop(time) {
         p.needsUpdate = true;
     }
 
-    // --- POV CAMERA FOLLOW LOGIC ---
-    // Camera smoothly follows ship position AND tilts UP/DOWN when ship ascends/descends
-    let targetCamX = gameActive ? playerCraft.position.x * 0.4 : 0;
-    let targetCamY = gameActive ? playerCraft.position.y * 0.4 + 2.8 : 2.8;
-    let targetCamZ = gameActive ? playerCraft.position.z + 9.0 : 9.0;
-
-    camera.position.x += (targetCamX - camera.position.x) * 0.08;
-    camera.position.y += (targetCamY - camera.position.y) * 0.08;
-    camera.position.z += (targetCamZ - camera.position.z) * 0.08;
-
-    // Camera pitch angle following the craft direction
-    if(gameActive) {
-        camera.rotation.x = -craftVelocity.y * 0.015;
-        camera.rotation.y = -craftVelocity.x * 0.012;
-    } else {
-        camera.rotation.set(0,0,0);
+    if(planetGroup) {
+        planetGroup.rotation.y += 0.0005;
     }
+
+    // NATURAL DYNAMIC CAMERA DRIFT (Does not force lock onto pitch POV)
+    let targetCamX = gameActive ? playerCraft.position.x * 0.25 : 0;
+    let targetCamY = gameActive ? playerCraft.position.y * 0.25 + 2.5 : 2.5;
+
+    camera.position.x += (targetCamX - camera.position.x) * 0.05;
+    camera.position.y += (targetCamY - camera.position.y) * 0.05;
 
     renderer.render(scene, camera);
 }
 
-/* --- JOYSTICK SHAPE & CONTROLS --- */
+/* --- JOYSTICK STYLES & CONTROLS --- */
 function applyJoystickStyle(style) {
     let zone = document.getElementById('joystick-zone');
     let knob = document.getElementById('joystick-knob');
@@ -1180,7 +1161,6 @@ function setupControls() {
 
         knob.style.transform = `translate(${dx}px, ${dy}px)`;
 
-        // Inverted Y axis so dragging UP pitches spacecraft UP
         inputVector.x = dx / maxLen;
         inputVector.y = -dy / maxLen; 
     }
@@ -1189,7 +1169,7 @@ function setupControls() {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd);
 
-    // Boost Touch Handling
+    // Boost Control
     let boostBtn = document.getElementById('boost-btn');
     boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBoosting = true; }, { passive: false });
     boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); isBoosting = false; });
