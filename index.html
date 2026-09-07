@@ -1,850 +1,1635 @@
-const express = require('express');
-const cors = require('cors');
-const fetch = require('node-fetch');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#050b16">
+<title>SHADOWZ — Roblox Profile Scanner</title>
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
-
-// Helper for Roblox API Requests
-async function robloxFetch(url, options = {}) {
-    const headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-        ...options.headers
-    };
-    const res = await fetch(url, { ...options, headers });
-    if (!res.ok) {
-        const errorText = await res.text();
-        const err = new Error(`Roblox API HTTP ${res.status}: ${errorText}`);
-        err.status = res.status;
-        throw err;
-    }
-    return res.json();
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-// Service Status Check Endpoint
-app.get('/api/status', async (req, res) => {
-    try {
-        await robloxFetch('https://users.roblox.com/v1/users/1');
-        res.json({ status: 'ONLINE', timestamp: new Date().toISOString() });
-    } catch (e) {
-        res.status(503).json({ status: 'UNAVAILABLE', message: 'Roblox API reachability check failed' });
-    }
-});
+:root{
+  --bg:#030711;
+  --panel:rgba(8,18,35,.72);
+  --panel2:rgba(10,27,50,.58);
+  --line:rgba(63,151,255,.20);
+  --blue:#168cff;
+  --blue2:#57b5ff;
+  --cyan:#00d9ff;
+  --text:#eef7ff;
+  --muted:#7890aa;
+  --danger:#ff5577;
+  --green:#32e49b;
+}
 
-// Profile Scanner Intelligence API Endpoint
-app.get('/api/profile', async (req, res) => {
-    const { username } = req.query;
+html{
+  scroll-behavior:smooth;
+}
 
-    if (!username || typeof username !== 'string' || !username.trim()) {
-        return res.status(400).json({ error: 'USERNAME_REQUIRED', message: 'Please provide a valid Roblox username.' });
-    }
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% 10%,rgba(0,125,255,.16),transparent 30%),
+    radial-gradient(circle at 85% 30%,rgba(0,217,255,.08),transparent 30%),
+    linear-gradient(145deg,#02050b,#06101e 55%,#02050a);
+}
 
-    try {
-        // 1. Resolve Username to User ID
-        const resolveRes = await robloxFetch('https://users.roblox.com/v1/usernames/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usernames: [username.trim()], excludeBannedUsers: false })
-        });
+/* animated background */
+body:before,
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-2;
+}
 
-        if (!resolveRes.data || resolveRes.data.length === 0) {
-            return res.status(404).json({ error: 'USER_NOT_FOUND', message: `No Roblox account found with username "${username}".` });
-        }
+body:before{
+  background-image:
+    linear-gradient(rgba(40,130,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(40,130,255,.045) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent);
+}
 
-        const userBasic = resolveRes.data[0];
-        const userId = userBasic.id;
+body:after{
+  z-index:-1;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(30,142,255,.15),transparent 38%);
+  animation:pulseBg 5s ease-in-out infinite alternate;
+}
 
-        // 2. Fetch User Details & Thumbnails in Parallel
-        const [userDetails, avatarData, headshotData] = await Promise.allSettled([
-            robloxFetch(`https://users.roblox.com/v1/users/${userId}`),
-            robloxFetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png&isCircular=false`),
-            robloxFetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=420x420&format=Png&isCircular=false`)
-        ]);
+@keyframes pulseBg{
+  from{opacity:.55}
+  to{opacity:1}
+}
 
-        if (userDetails.status !== 'fulfilled') {
-            return res.status(500).json({ error: 'PROFILE_FETCH_FAILED', message: 'Failed to retrieve user profile details from Roblox.' });
-        }
+::-webkit-scrollbar{
+  width:8px;
+}
 
-        const profile = userDetails.value;
-        const avatarUrl = avatarData.status === 'fulfilled' && avatarData.value.data?.[0]?.imageUrl
-            ? avatarData.value.data[0].imageUrl
-            : null;
-        const headshotUrl = headshotData.status === 'fulfilled' && headshotData.value.data?.[0]?.imageUrl
-            ? headshotData.value.data[0].imageUrl
-            : null;
+::-webkit-scrollbar-track{
+  background:#030711;
+}
 
-        // 3. Fetch User Badges
-        let badges = [];
-        try {
-            const badgeRes = await robloxFetch(`https://badges.roblox.com/v1/users/${userId}/badges?limit=25&sortOrder=Desc`);
-            if (badgeRes && badgeRes.data) {
-                badges = badgeRes.data.map(b => ({
-                    id: b.id,
-                    name: b.name,
-                    description: b.description || 'No description provided.',
-                    awardDate: b.awardDate || null,
-                    iconUrl: b.iconImageId ? `https://assetgame.roblox.com/Game/Tools/Avatar.ashx?aid=${b.iconImageId}` : null
-                }));
-            }
-        } catch (e) {
-            badges = [];
-        }
+::-webkit-scrollbar-thumb{
+  background:#123a64;
+  border-radius:99px;
+}
 
-        // 4. Fetch Collectibles / Limited Items
-        let inventory = {
-            status: 'AVAILABLE',
-            items: [],
-            totalCount: 0,
-            totalRAP: 0,
-            highestRAP: 0,
-            averageRAP: 0,
-            limitedCount: 0,
-            limitedUCount: 0
-        };
+/* NAV */
+.nav{
+  width:min(1180px,calc(100% - 30px));
+  margin:18px auto 0;
+  min-height:70px;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  border:1px solid var(--line);
+  background:rgba(4,12,24,.67);
+  backdrop-filter:blur(22px);
+  border-radius:22px;
+  box-shadow:0 15px 60px rgba(0,0,0,.25);
+}
 
-        try {
-            const inventoryRes = await robloxFetch(`https://inventory.roblox.com/v1/users/${userId}/assets/collectibles?limit=100&sortOrder=Desc`);
-            
-            if (inventoryRes && inventoryRes.data) {
-                const rawItems = inventoryRes.data;
+.logo{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:900;
+  letter-spacing:3px;
+}
 
-                const processedItems = rawItems.map(item => {
-                    const isLimitedU = item.assetStock !== undefined && item.assetStock !== null;
-                    const rap = item.recentAveragePrice || 0;
-                    const value = item.originalPrice || rap;
+.logoMark{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(145deg,#087cff,#00cfff);
+  box-shadow:0 0 30px rgba(0,151,255,.4);
+  font-size:18px;
+}
 
-                    return {
-                        assetId: item.assetId,
-                        userAssetId: item.userAssetId,
-                        name: item.name,
-                        rap: rap,
-                        value: value,
-                        serialNumber: item.serialNumber || null,
-                        assetStock: item.assetStock || null,
-                        isLimited: true,
-                        isLimitedU: isLimitedU,
-                        assetType: item.assetType || 'Accessory',
-                        thumbnailUrl: `https://assetdelivery.roblox.com/v1/asset/?id=${item.assetId}`
-                    };
-                });
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.5px;
+}
 
-                const totalRAP = processedItems.reduce((acc, curr) => acc + curr.rap, 0);
-                const highestRAP = processedItems.length > 0 ? Math.max(...processedItems.map(i => i.rap)) : 0;
-                const limitedCount = processedItems.filter(i => !i.isLimitedU).length;
-                const limitedUCount = processedItems.filter(i => i.isLimitedU).length;
+.statusDot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#75879a;
+  box-shadow:0 0 0 transparent;
+}
 
-                inventory.items = processedItems;
-                inventory.totalCount = processedItems.length;
-                inventory.totalRAP = totalRAP;
-                inventory.highestRAP = highestRAP;
-                inventory.averageRAP = processedItems.length > 0 ? Math.round(totalRAP / processedItems.length) : 0;
-                inventory.limitedCount = limitedCount;
-                inventory.limitedUCount = limitedUCount;
-            }
-        } catch (invError) {
-            if (invError.status === 403) {
-                inventory.status = 'PRIVATE';
-            } else {
-                inventory.status = 'UNAVAILABLE';
-            }
-        }
+.statusDot.online{
+  background:var(--green);
+  box-shadow:0 0 13px var(--green);
+}
 
-        res.json({
-            user: {
-                id: profile.id,
-                username: profile.name,
-                displayName: profile.displayName,
-                created: profile.created,
-                isBanned: profile.isBanned || false,
-                description: profile.description || '',
-                externalUrl: `https://www.roblox.com/users/${profile.id}/profile`,
-                avatarUrl: avatarUrl,
-                headshotUrl: headshotUrl
-            },
-            inventory: inventory,
-            badges: badges,
-            scannedAt: new Date().toISOString()
-        });
+.statusDot.busy{
+  background:#38aaff;
+  box-shadow:0 0 13px #38aaff;
+  animation:blink .8s infinite;
+}
 
-    } catch (error) {
-        console.error('Scan Error:', error.message);
-        if (error.status === 429) {
-            return res.status(429).json({ error: 'RATE_LIMITED', message: 'Roblox API rate limit reached. Please wait a moment before trying again.' });
-        }
-        res.status(500).json({ error: 'SERVER_ERROR', message: 'An internal error occurred while analyzing the profile.' });
-    }
-});
+.statusDot.error{
+  background:var(--danger);
+  box-shadow:0 0 13px var(--danger);
+}
 
-// Serve Full Frontend Client HTML Directly from Root
-app.get('/', (req, res) => {
-    res.send(`
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHADOWZ // Roblox Profile Intelligence</title>
+@keyframes blink{
+  50%{opacity:.25}
+}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            950: '#030712',
-                            900: '#060d1e',
-                            800: '#0b1736',
-                            700: '#102354',
-                        },
-                        electric: {
-                            500: '#0066ff',
-                            400: '#1a75ff',
-                            300: '#4d94ff',
-                        },
-                        cyanGlow: '#00f0ff'
-                    },
-                    fontFamily: {
-                        sans: ['Space Grotesk', 'Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
-                    }
-                }
-            }
-        }
-    </script>
+/* HERO */
+.hero{
+  width:min(950px,calc(100% - 30px));
+  margin:95px auto 50px;
+  text-align:center;
+}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 13px;
+  border:1px solid rgba(46,153,255,.24);
+  background:rgba(10,55,100,.24);
+  color:#78c4ff;
+  border-radius:99px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+  margin-bottom:20px;
+}
 
-    <style>
-        body {
-            background-color: #030712;
-            color: #f3f4f6;
-            font-family: 'Space Grotesk', sans-serif;
-            overflow-x: hidden;
-        }
+.badge span{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#19a3ff;
+  box-shadow:0 0 12px #19a3ff;
+}
 
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: 
-                linear-gradient(to right, rgba(0, 102, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0, 102, 255, 0.05) 1px, transparent 1px);
-        }
+h1{
+  font-size:clamp(42px,9vw,86px);
+  line-height:.94;
+  letter-spacing:-5px;
+  font-weight:1000;
+  background:linear-gradient(110deg,#fff 10%,#73c8ff 45%,#008dff 85%);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 0 50px rgba(0,142,255,.12);
+}
 
-        .scanlines {
-            background: linear-gradient(
-                rgba(18, 16, 16, 0) 50%, 
-                rgba(0, 102, 255, 0.03) 50%
-            );
-            background-size: 100% 4px;
-        }
+.heroText{
+  max-width:650px;
+  margin:23px auto 0;
+  color:#8098b2;
+  line-height:1.7;
+  font-size:14px;
+}
 
-        .glass-card {
-            background: rgba(6, 13, 30, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 102, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
+/* SEARCH */
+.searchBox{
+  margin:34px auto 0;
+  max-width:720px;
+  padding:8px;
+  display:flex;
+  gap:8px;
+  border:1px solid rgba(46,153,255,.28);
+  background:rgba(4,15,30,.82);
+  border-radius:18px;
+  box-shadow:
+    0 0 0 1px rgba(0,119,255,.04),
+    0 20px 70px rgba(0,91,180,.12);
+}
 
-        .glass-card:hover {
-            border-color: rgba(0, 240, 255, 0.4);
-            box-shadow: 0 0 25px rgba(0, 102, 255, 0.25);
-        }
+.inputWrap{
+  flex:1;
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
 
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
+.searchIcon{
+  width:45px;
+  text-align:center;
+  color:#3daaff;
+  font-size:18px;
+}
 
-        .glow-blob {
-            animation: pulseGlow 8s infinite ease-in-out;
-        }
+input{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#fff;
+  font-size:15px;
+  min-width:0;
+}
 
-        @keyframes rotateRing {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+input::placeholder{
+  color:#526a83;
+}
 
-        .rotate-scanner {
-            animation: rotateRing 12s linear infinite;
-        }
+.scanBtn{
+  border:0;
+  border-radius:13px;
+  padding:0 24px;
+  min-height:52px;
+  color:#fff;
+  background:linear-gradient(135deg,#087cff,#00a9ff);
+  font-weight:950;
+  letter-spacing:.7px;
+  cursor:pointer;
+  box-shadow:0 9px 30px rgba(0,128,255,.22);
+  transition:.2s;
+}
 
-        .rotate-scanner-reverse {
-            animation: rotateRing 8s linear infinite reverse;
-        }
+.scanBtn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 13px 35px rgba(0,128,255,.35);
+}
 
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #030712;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #0066ff;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00f0ff;
-        }
-    </style>
+.scanBtn:active{
+  transform:scale(.97);
+}
+
+.scanBtn:disabled{
+  cursor:not-allowed;
+  opacity:.6;
+}
+
+/* MAIN */
+.container{
+  width:min(1120px,calc(100% - 30px));
+  margin:0 auto 90px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.panel{
+  border:1px solid var(--line);
+  background:linear-gradient(145deg,rgba(8,21,40,.82),rgba(4,12,24,.68));
+  backdrop-filter:blur(22px);
+  border-radius:24px;
+  box-shadow:0 25px 80px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+
+/* SCANNER */
+.scanner{
+  padding:45px 25px;
+  text-align:center;
+}
+
+.scanOrb{
+  width:105px;
+  height:105px;
+  margin:0 auto 25px;
+  border-radius:50%;
+  border:1px solid rgba(44,157,255,.5);
+  display:grid;
+  place-items:center;
+  position:relative;
+  background:radial-gradient(circle,rgba(18,137,255,.2),rgba(0,0,0,.2));
+  box-shadow:
+    0 0 40px rgba(0,137,255,.2),
+    inset 0 0 35px rgba(0,137,255,.12);
+}
+
+.scanOrb:before,
+.scanOrb:after{
+  content:"";
+  position:absolute;
+  inset:-15px;
+  border:1px solid rgba(40,156,255,.15);
+  border-radius:50%;
+  animation:orbit 2.4s linear infinite;
+}
+
+.scanOrb:after{
+  inset:-28px;
+  border-color:rgba(0,211,255,.09);
+  animation-duration:3.6s;
+  animation-direction:reverse;
+}
+
+@keyframes orbit{
+  to{transform:rotate(360deg)}
+}
+
+.scanCore{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#16a1ff,#006eff);
+  box-shadow:0 0 35px #008cff;
+  animation:corePulse 1s infinite alternate;
+}
+
+@keyframes corePulse{
+  to{transform:scale(1.25);opacity:.7}
+}
+
+.scanTitle{
+  font-size:23px;
+  font-weight:900;
+}
+
+.scanStep{
+  color:#65819e;
+  margin-top:8px;
+  font-size:13px;
+}
+
+.progress{
+  width:min(560px,90%);
+  height:5px;
+  margin:25px auto 0;
+  border-radius:99px;
+  background:#091829;
+  overflow:hidden;
+}
+
+.progressBar{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#087cff,#00d8ff);
+  box-shadow:0 0 15px #008cff;
+  transition:width .4s ease;
+}
+
+/* PROFILE */
+.profileTop{
+  padding:30px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:22px;
+  align-items:center;
+}
+
+.avatar{
+  width:115px;
+  height:115px;
+  border-radius:25px;
+  object-fit:cover;
+  border:1px solid rgba(69,170,255,.35);
+  box-shadow:0 0 45px rgba(0,130,255,.2);
+  background:#071321;
+}
+
+.profileName{
+  font-size:29px;
+  font-weight:950;
+}
+
+.profileUser{
+  margin-top:4px;
+  color:#66819d;
+}
+
+.profileId{
+  margin-top:12px;
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:8px;
+  background:rgba(32,126,219,.1);
+  border:1px solid rgba(45,143,255,.14);
+  color:#66baff;
+  font-size:11px;
+  font-family:monospace;
+}
+
+.robloxBtn{
+  text-decoration:none;
+  color:#fff;
+  border:1px solid rgba(54,156,255,.28);
+  background:rgba(15,79,135,.2);
+  padding:12px 16px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:900;
+  transition:.2s;
+}
+
+.robloxBtn:hover{
+  background:rgba(20,110,200,.3);
+  transform:translateY(-2px);
+}
+
+/* GRID */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  padding:0 30px 30px;
+}
+
+.stat{
+  padding:20px;
+  border:1px solid rgba(67,145,220,.12);
+  background:rgba(3,12,24,.42);
+  border-radius:17px;
+}
+
+.statLabel{
+  color:#5f7891;
+  font-size:10px;
+  letter-spacing:1.3px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.statValue{
+  margin-top:9px;
+  font-size:19px;
+  font-weight:900;
+}
+
+.statSub{
+  margin-top:4px;
+  color:#587089;
+  font-size:10px;
+}
+
+/* SECTIONS */
+.section{
+  margin-top:18px;
+}
+
+.sectionHead{
+  padding:22px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  border-bottom:1px solid rgba(63,151,255,.10);
+}
+
+.sectionTitle{
+  font-size:16px;
+  font-weight:950;
+}
+
+.sectionMeta{
+  color:#5f7891;
+  font-size:11px;
+}
+
+.sectionBody{
+  padding:22px;
+}
+
+/* LIMITED ITEMS */
+.items{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:13px;
+}
+
+.item{
+  min-width:0;
+  border:1px solid rgba(65,151,235,.12);
+  background:rgba(3,11,23,.48);
+  border-radius:16px;
+  overflow:hidden;
+  transition:.22s;
+}
+
+.item:hover{
+  transform:translateY(-4px);
+  border-color:rgba(56,159,255,.35);
+  box-shadow:0 15px 35px rgba(0,105,220,.12);
+}
+
+.itemImg{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  background:#071321;
+}
+
+.itemInfo{
+  padding:12px;
+}
+
+.itemName{
+  font-size:12px;
+  font-weight:850;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.itemPrice{
+  color:#58b7ff;
+  margin-top:5px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.itemId{
+  color:#4d657e;
+  margin-top:4px;
+  font-size:9px;
+}
+
+/* BADGES */
+.badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.badgeItem{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 11px;
+  border:1px solid rgba(60,145,220,.13);
+  background:rgba(2,12,24,.45);
+  border-radius:12px;
+}
+
+.badgeImg{
+  width:30px;
+  height:30px;
+  object-fit:cover;
+  border-radius:7px;
+}
+
+.badgeName{
+  font-size:11px;
+  font-weight:800;
+}
+
+/* ANALYTICS */
+.analytics{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.metric{
+  padding:20px;
+  border:1px solid rgba(62,145,220,.12);
+  border-radius:15px;
+  background:rgba(3,12,24,.45);
+}
+
+.metricTop{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  color:#607991;
+  font-size:11px;
+}
+
+.metricNumber{
+  margin-top:8px;
+  font-size:25px;
+  font-weight:950;
+}
+
+.bar{
+  margin-top:13px;
+  height:6px;
+  background:#081727;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.bar div{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#0b83ff,#00d9ff);
+  transition:width 1s ease;
+}
+
+/* EMPTY/ERROR */
+.message{
+  padding:28px;
+  text-align:center;
+  color:#698199;
+}
+
+.message strong{
+  display:block;
+  color:#dcecff;
+  margin-bottom:8px;
+}
+
+/* FOOTER */
+footer{
+  width:min(1120px,calc(100% - 30px));
+  margin:0 auto 35px;
+  text-align:center;
+  color:#3f566c;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+/* MOBILE */
+@media(max-width:800px){
+  .hero{
+    margin-top:65px;
+  }
+
+  .nav{
+    min-height:60px;
+  }
+
+  .status{
+    display:none;
+  }
+
+  .searchBox{
+    flex-direction:column;
+  }
+
+  .scanBtn{
+    width:100%;
+  }
+
+  .profileTop{
+    grid-template-columns:auto 1fr;
+  }
+
+  .robloxBtn{
+    grid-column:1/-1;
+    text-align:center;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .items{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .analytics{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:480px){
+  .hero{
+    width:calc(100% - 24px);
+    margin-top:50px;
+  }
+
+  h1{
+    letter-spacing:-3px;
+    font-size:48px;
+  }
+
+  .heroText{
+    font-size:13px;
+  }
+
+  .container{
+    width:calc(100% - 20px);
+  }
+
+  .profileTop{
+    padding:20px;
+  }
+
+  .avatar{
+    width:82px;
+    height:82px;
+    border-radius:18px;
+  }
+
+  .profileName{
+    font-size:20px;
+  }
+
+  .stats{
+    padding:0 20px 20px;
+    gap:8px;
+  }
+
+  .stat{
+    padding:14px;
+  }
+
+  .statValue{
+    font-size:15px;
+  }
+
+  .sectionHead{
+    padding:18px;
+  }
+
+  .sectionBody{
+    padding:15px;
+  }
+}
+</style>
 </head>
-<body class="relative min-h-screen flex flex-col justify-between selection:bg-electric-500 selection:text-white">
 
-    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
-    <div class="fixed inset-0 bg-grid pointer-events-none z-0 opacity-60"></div>
-    <div class="fixed inset-0 scanlines pointer-events-none z-10"></div>
+<body>
 
-    <div class="fixed top-1/4 -left-32 w-96 h-96 bg-electric-500/15 rounded-full blur-3xl pointer-events-none glow-blob"></div>
-    <div class="fixed bottom-1/4 -right-32 w-96 h-96 bg-cyanGlow/10 rounded-full blur-3xl pointer-events-none glow-blob" style="animation-delay: -4s;"></div>
+<nav class="nav">
+  <div class="logo">
+    <div class="logoMark">S</div>
+    <div>SHADOWZ</div>
+  </div>
 
-    <header class="relative z-20 border-b border-blue-900/40 bg-navy-950/80 backdrop-blur-md px-4 lg:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToHome()">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-electric-500 to-cyanGlow p-0.5 shadow-lg shadow-electric-500/30">
-                    <div class="w-full h-full bg-navy-950 rounded-[10px] flex items-center justify-center">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-cyanGlow"></i>
-                    </div>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-electric-400">SHADOWZ</h1>
-                    <p class="text-[10px] font-mono tracking-widest text-blue-400/80 uppercase">Profile Intelligence</p>
-                </div>
-            </div>
+  <div class="status">
+    <span id="statusDot" class="statusDot"></span>
+    <span id="statusText">READY TO SCAN</span>
+  </div>
+</nav>
 
-            <div id="statusBadge" class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-blue-950/50 border border-blue-800/40 text-xs font-mono">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-blue-200">SERVICES ONLINE</span>
-            </div>
+<section class="hero">
+  <div class="badge">
+    <span></span>
+    ROBLOX PROFILE INTELLIGENCE
+  </div>
+
+  <h1>SHADOWZ</h1>
+
+  <p class="heroText">
+    Scan a Roblox username and analyze publicly available profile
+    information, account age, avatar data, Limited inventory and badges.
+  </p>
+
+  <div class="searchBox">
+    <div class="inputWrap">
+      <div class="searchIcon">⌕</div>
+      <input
+        id="username"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Enter Roblox username..."
+        maxlength="20"
+      >
+    </div>
+
+    <button id="scanBtn" class="scanBtn">
+      SCAN PROFILE
+    </button>
+  </div>
+</section>
+
+<main class="container">
+
+  <div id="scanner" class="panel scanner hidden">
+    <div class="scanOrb">
+      <div class="scanCore"></div>
+    </div>
+
+    <div id="scanTitle" class="scanTitle">
+      Initializing scanner
+    </div>
+
+    <div id="scanStep" class="scanStep">
+      Connecting to Roblox services...
+    </div>
+
+    <div class="progress">
+      <div id="progressBar" class="progressBar"></div>
+    </div>
+  </div>
+
+  <div id="errorPanel" class="panel message hidden">
+    <strong id="errorTitle">Unable to scan</strong>
+    <span id="errorText"></span>
+  </div>
+
+  <div id="result" class="hidden">
+
+    <section class="panel">
+      <div class="profileTop">
+
+        <img id="avatar" class="avatar" alt="Roblox avatar">
+
+        <div>
+          <div id="displayName" class="profileName">—</div>
+          <div id="usernameResult" class="profileUser">@—</div>
+          <div id="userId" class="profileId">ID: —</div>
         </div>
-    </header>
 
-    <main class="relative z-20 flex-grow max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 flex flex-col justify-center">
+        <a
+          id="profileLink"
+          class="robloxBtn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          OPEN ROBLOX PROFILE ↗
+        </a>
 
-        <!-- 1. HERO SECTION -->
-        <section id="heroSection" class="transition-all duration-500 max-w-3xl mx-auto w-full text-center my-auto py-12">
-            <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-electric-500/10 border border-electric-500/30 text-electric-300 text-xs font-mono mb-6">
-                <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
-                <span>ROBLOX INTELLIGENCE ENGINE V2.4</span>
-            </div>
+      </div>
 
-            <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-4 text-white">
-                Discover Any <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-electric-400 to-cyanGlow">Roblox Profile</span>
-            </h2>
-            <p class="text-gray-400 text-base sm:text-lg mb-10 max-w-xl mx-auto font-light">
-                Enter a Roblox username and let Shadowz analyze publicly available profile metadata, join dates, RAP values, and inventory items.
-            </p>
+      <div class="stats">
 
-            <form id="searchForm" class="relative max-w-2xl mx-auto group" onsubmit="handleSearch(event)">
-                <div class="absolute -inset-1 bg-gradient-to-r from-electric-500 to-cyanGlow rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                <div class="relative flex items-center bg-navy-950 border border-blue-600/40 rounded-2xl p-2 shadow-2xl">
-                    <i data-lucide="user" class="w-6 h-6 text-blue-400 ml-4 mr-3 flex-shrink-0"></i>
-                    <input 
-                        type="text" 
-                        id="usernameInput" 
-                        placeholder="Enter Roblox username (e.g. Builderman)..." 
-                        required
-                        autocomplete="off"
-                        class="w-full bg-transparent text-white placeholder-gray-500 focus:outline-none font-mono text-sm sm:text-base py-2"
-                    />
-                    <button 
-                        type="submit" 
-                        class="relative group/btn flex items-center space-x-2 bg-gradient-to-r from-electric-500 to-blue-600 hover:from-cyanGlow hover:to-electric-500 text-white font-semibold px-6 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-electric-500/20 active:scale-95 flex-shrink-0"
-                    >
-                        <span>SCAN PROFILE</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover/btn:translate-x-1"></i>
-                    </button>
-                </div>
-            </form>
-        </section>
+        <div class="stat">
+          <div class="statLabel">Joined Roblox</div>
+          <div id="joined" class="statValue">—</div>
+          <div id="joinedExact" class="statSub">—</div>
+        </div>
 
-        <!-- 2. FUTURISTIC SCANNING OVERLAY -->
-        <section id="scannerOverlay" class="hidden transition-all duration-500 max-w-2xl mx-auto w-full my-auto text-center py-12">
-            <div class="relative w-64 h-64 mx-auto mb-8 flex items-center justify-center">
-                <div class="absolute inset-0 rounded-full border-2 border-dashed border-electric-500/40 rotate-scanner"></div>
-                <div class="absolute inset-3 rounded-full border border-cyanGlow/30 rotate-scanner-reverse"></div>
-                <div class="absolute inset-8 rounded-full border-2 border-blue-600/20"></div>
+        <div class="stat">
+          <div class="statLabel">Account Age</div>
+          <div id="accountAge" class="statValue">—</div>
+          <div class="statSub">Calculated from creation date</div>
+        </div>
 
-                <div class="relative z-10 flex flex-col items-center justify-center">
-                    <i data-lucide="radar" class="w-12 h-12 text-cyanGlow animate-pulse mb-2"></i>
-                    <span id="scanPercent" class="font-mono text-3xl font-extrabold text-white">0%</span>
-                    <span class="text-[10px] font-mono text-blue-400 tracking-widest uppercase">SCANNING</span>
-                </div>
-            </div>
+        <div class="stat">
+          <div class="statLabel">Limited Items</div>
+          <div id="limitedCount" class="statValue">—</div>
+          <div class="statSub">Publicly returned items</div>
+        </div>
 
-            <div class="glass-card rounded-xl p-4 font-mono text-xs text-left max-w-md mx-auto h-36 overflow-y-auto border border-blue-900/50" id="terminalLogs">
-                <div class="text-blue-400 tracking-wide">&gt; Initializing Shadowz core engine...</div>
-            </div>
-        </section>
+        <div class="stat">
+          <div class="statLabel">Estimated RAP</div>
+          <div id="rap" class="statValue">—</div>
+          <div class="statSub">From returned Limited data</div>
+        </div>
 
-        <!-- 3. ERROR SCREEN -->
-        <section id="errorSection" class="hidden transition-all duration-500 max-w-md mx-auto w-full text-center my-auto py-12">
-            <div class="glass-card rounded-2xl p-8 border border-red-500/30 relative overflow-hidden">
-                <div class="w-16 h-16 bg-red-500/10 border border-red-500/40 rounded-2xl flex items-center justify-center mx-auto mb-4 text-red-400">
-                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
-                </div>
-                <h3 id="errorTitle" class="text-2xl font-bold text-white mb-2">SCAN FAILED</h3>
-                <p id="errorMessage" class="text-gray-400 text-sm mb-6">No Roblox account could be found with that username.</p>
-                <button onclick="resetToHome()" class="w-full bg-blue-900/40 hover:bg-blue-800/60 border border-blue-500/40 text-white font-medium py-3 rounded-xl transition">
-                    TRY AGAIN
-                </button>
-            </div>
-        </section>
+      </div>
+    </section>
 
-        <!-- 4. PROFILE RESULT DASHBOARD -->
-        <section id="resultSection" class="hidden transition-all duration-500 space-y-8">
-            <div class="glass-card rounded-2xl p-6 lg:p-8 relative overflow-hidden">
-                <div class="absolute top-0 right-0 px-4 py-1.5 bg-electric-500/20 border-b border-l border-electric-500/40 text-cyanGlow font-mono text-xs font-semibold rounded-bl-xl flex items-center space-x-1.5">
-                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-                    <span>PROFILE VERIFIED</span>
-                </div>
+    <section class="panel section">
+      <div class="sectionHead">
+        <div class="sectionTitle">LIMITED INVENTORY</div>
+        <div id="inventoryMeta" class="sectionMeta">Scanning...</div>
+      </div>
 
-                <div class="flex flex-col md:flex-row items-center md:items-start gap-6 lg:gap-8">
-                    <div class="relative group flex-shrink-0">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-electric-500 to-cyanGlow rounded-2xl blur opacity-40 group-hover:opacity-75 transition"></div>
-                        <img id="userHeadshot" src="" alt="Avatar" class="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-navy-950 border border-blue-500/30 object-cover" />
-                    </div>
+      <div id="items" class="sectionBody items"></div>
+    </section>
 
-                    <div class="flex-grow text-center md:text-left space-y-3">
-                        <div>
-                            <h2 id="userDisplayName" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">--</h2>
-                            <p id="userUsername" class="text-electric-400 font-mono text-lg font-medium">@--</p>
-                        </div>
+    <section class="panel section">
+      <div class="sectionHead">
+        <div class="sectionTitle">PROFILE ANALYTICS</div>
+        <div class="sectionMeta">Public data</div>
+      </div>
 
-                        <div class="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
-                            <div class="px-3 py-1.5 rounded-lg bg-navy-900/80 border border-blue-800/40 text-xs font-mono text-gray-300">
-                                USER ID: <span id="userIdText" class="text-white font-bold">--</span>
-                            </div>
-                            <div class="px-3 py-1.5 rounded-lg bg-navy-900/80 border border-blue-800/40 text-xs font-mono text-gray-300">
-                                JOINED: <span id="userCreatedText" class="text-white font-bold">--</span>
-                            </div>
-                        </div>
+      <div class="sectionBody analytics">
 
-                        <div class="flex flex-wrap justify-center md:justify-start gap-3 pt-4">
-                            <a id="robloxProfileLink" href="#" target="_blank" class="flex items-center space-x-2 bg-electric-500 hover:bg-electric-400 text-white font-medium text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-electric-500/20">
-                                <i data-lucide="external-link" class="w-4 h-4"></i>
-                                <span>OPEN ROBLOX PROFILE</span>
-                            </a>
-                            <button onclick="copyUserId()" class="flex items-center space-x-2 bg-navy-900 hover:bg-navy-800 border border-blue-700/40 text-blue-200 font-medium text-xs px-4 py-2.5 rounded-xl transition">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                                <span id="copyBtnText">COPY USER ID</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="metric">
+          <div class="metricTop">
+            <span>ACCOUNT MATURITY</span>
+            <span id="maturityPercent">—</span>
+          </div>
 
-            <!-- STATS GRID -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="glass-card rounded-xl p-5 border border-blue-900/40 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-mono uppercase tracking-wider">Account Age</span>
-                        <i data-lucide="clock" class="w-4 h-4 text-electric-400"></i>
-                    </div>
-                    <div>
-                        <div id="statAccountAgeYears" class="text-2xl font-extrabold text-white">-- YEARS</div>
-                        <div id="statAccountAgeFull" class="text-xs text-blue-300/80 font-mono mt-1">--</div>
-                    </div>
-                </div>
+          <div id="maturity" class="metricNumber">—</div>
 
-                <div class="glass-card rounded-xl p-5 border border-blue-900/40 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-mono uppercase tracking-wider">Limited Items</span>
-                        <i data-lucide="package" class="w-4 h-4 text-cyanGlow"></i>
-                    </div>
-                    <div>
-                        <div id="statLimitedCount" class="text-2xl font-extrabold text-white">--</div>
-                        <div id="statLimitedTypes" class="text-xs text-blue-300/80 font-mono mt-1">-- Limited / -- Limited U</div>
-                    </div>
-                </div>
+          <div class="bar">
+            <div id="maturityBar"></div>
+          </div>
+        </div>
 
-                <div class="glass-card rounded-xl p-5 border border-blue-900/40 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-mono uppercase tracking-wider">Total RAP Value</span>
-                        <i data-lucide="coins" class="w-4 h-4 text-yellow-400"></i>
-                    </div>
-                    <div>
-                        <div id="statTotalRAP" class="text-2xl font-extrabold text-white">R$ 0</div>
-                        <div class="text-xs text-blue-300/80 font-mono mt-1">Recent Average Price</div>
-                    </div>
-                </div>
+        <div class="metric">
+          <div class="metricTop">
+            <span>LIMITED COLLECTION</span>
+            <span id="collectionPercent">—</span>
+          </div>
 
-                <div class="glass-card rounded-xl p-5 border border-blue-900/40 flex flex-col justify-between">
-                    <div class="flex items-center justify-between text-gray-400 mb-2">
-                        <span class="text-xs font-mono uppercase tracking-wider">Highest Value Item</span>
-                        <i data-lucide="award" class="w-4 h-4 text-electric-400"></i>
-                    </div>
-                    <div>
-                        <div id="statHighestRAP" class="text-2xl font-extrabold text-white">R$ 0</div>
-                        <div id="statHighestItemName" class="text-xs text-blue-300/80 font-mono truncate mt-1">None</div>
-                    </div>
-                </div>
-            </div>
+          <div id="collection" class="metricNumber">—</div>
 
-            <!-- INVENTORY GRID -->
-            <div class="space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h3 class="text-2xl font-bold text-white tracking-tight">LIMITED INVENTORY</h3>
-                        <p class="text-xs text-gray-400 font-mono">Displaying verified Limited & Limited U collectibles</p>
-                    </div>
+          <div class="bar">
+            <div id="collectionBar"></div>
+          </div>
+        </div>
 
-                    <div class="flex flex-wrap items-center gap-2" id="inventoryControls">
-                        <input 
-                            type="text" 
-                            id="itemSearch" 
-                            placeholder="Search Limiteds..." 
-                            oninput="filterAndSortInventory()"
-                            class="bg-navy-950 border border-blue-800/40 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyanGlow font-mono"
-                        />
-                        <select id="itemSort" onchange="filterAndSortInventory()" class="bg-navy-950 border border-blue-800/40 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none">
-                            <option value="highest">Highest RAP</option>
-                            <option value="lowest">Lowest RAP</option>
-                            <option value="name">Alphabetical</option>
-                        </select>
-                    </div>
-                </div>
+      </div>
+    </section>
 
-                <div id="inventoryPrivateBanner" class="hidden glass-card rounded-2xl p-8 text-center border border-yellow-500/30">
-                    <i data-lucide="lock" class="w-10 h-10 text-yellow-400 mx-auto mb-3"></i>
-                    <h4 class="text-lg font-bold text-white">INVENTORY PRIVATE / UNAVAILABLE</h4>
-                    <p class="text-xs text-gray-400 mt-1 max-w-md mx-auto">This Roblox account has configured their inventory privacy settings to hidden or has no public collectibles available.</p>
-                </div>
+    <section class="panel section">
+      <div class="sectionHead">
+        <div class="sectionTitle">BADGES</div>
+        <div id="badgeMeta" class="sectionMeta">—</div>
+      </div>
 
-                <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-            </div>
+      <div id="badges" class="sectionBody badges"></div>
+    </section>
 
-            <!-- BADGES SECTION -->
-            <div class="space-y-4 pt-4">
-                <h3 class="text-2xl font-bold text-white tracking-tight">RECENT BADGES</h3>
-                <div id="badgesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
-            </div>
+  </div>
+</main>
 
-            <!-- REPORT SUMMARY -->
-            <div class="glass-card rounded-2xl p-6 border border-blue-900/60 font-mono text-xs text-gray-300 space-y-2">
-                <div class="text-electric-400 font-bold tracking-wider uppercase border-b border-blue-900/60 pb-2 mb-3 flex items-center justify-between">
-                    <span>SHADOWZ PROFILE INTELLIGENCE REPORT</span>
-                    <span id="reportTimestamp" class="text-[10px] text-gray-500">TIMESTAMP: --</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div>TARGET USER: <span id="reportUsername" class="text-white">--</span></div>
-                    <div>USER ID: <span id="reportUserId" class="text-white">--</span></div>
-                    <div>CREATION DATE: <span id="reportCreated" class="text-white">--</span></div>
-                    <div>ESTIMATED RAP: <span id="reportRAP" class="text-white">--</span></div>
-                </div>
-            </div>
-        </section>
-    </main>
+<footer>
+  SHADOWZ • PUBLIC ROBLOX DATA ONLY • NEVER ENTER YOUR ROBLOX PASSWORD
+</footer>
 
-    <footer class="relative z-20 border-t border-blue-900/30 bg-navy-950/90 py-6 text-center font-mono text-xs text-gray-500">
-        <p>SHADOWZ &copy; 2026 // ROBLOX PROFILE INTELLIGENCE ENGINE</p>
-        <p class="text-[10px] text-gray-600 mt-1">Not affiliated with Roblox Corporation. Uses public API data endpoints.</p>
-    </footer>
+<script>
+"use strict";
 
-    <script>
-        let rawScanData = null;
-        let currentUserId = null;
+/*
+  SHADOWZ
+  Single-file Roblox profile scanner.
 
-        lucide.createIcons();
+  IMPORTANT:
+  This is a frontend-only GitHub Pages application.
+  Roblox may block browser requests with CORS or rate limits.
+  This app NEVER uses passwords, cookies or .ROBLOSECURITY.
+*/
 
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+const $ = id => document.getElementById(id);
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+const API = {
+  usersByUsername:
+    "https://users.roblox.com/v1/usernames/users",
 
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.8 + 0.2;
-                this.vx = (Math.random() - 0.5) * 0.3;
-                this.vy = (Math.random() - 0.5) * 0.3;
-                this.alpha = Math.random() * 0.5 + 0.1;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            draw() {
-                ctx.fillStyle = \`rgba(0, 102, 255, \${this.alpha})\`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+  user:
+    id => `https://users.roblox.com/v1/users/${id}`,
 
-        for (let i = 0; i < 65; i++) {
-            particles.push(new Particle());
-        }
+  avatar:
+    id => `https://thumbnails.roblox.com/v1/users/avatar?userIds=${id}&size=420x420&format=Png&isCircular=false`,
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+  inventory:
+    id => `https://inventory.roblox.com/v1/users/${id}/items/Asset?sortOrder=Desc&limit=100`,
 
-        function addTerminalLog(msg) {
-            const logsDiv = document.getElementById('terminalLogs');
-            const entry = document.createElement('div');
-            entry.className = 'text-blue-300/90 tracking-wide mt-1';
-            entry.innerHTML = \`&gt; \${msg}\`;
-            logsDiv.appendChild(entry);
-            logsDiv.scrollTop = logsDiv.scrollHeight;
-        }
+  catalog:
+    id => `https://catalog.roblox.com/v1/catalog/items/${id}/details?itemType=Asset`,
 
-        async function handleSearch(event) {
-            event.preventDefault();
-            const username = document.getElementById('usernameInput').value.trim();
-            if (!username) return;
+  badges:
+    id => `https://badges.roblox.com/v1/users/${id}/badges?sortOrder=Desc&limit=50`
+};
 
-            document.getElementById('heroSection').classList.add('hidden');
-            document.getElementById('errorSection').classList.add('hidden');
-            document.getElementById('resultSection').classList.add('hidden');
-            document.getElementById('scannerOverlay').classList.remove('hidden');
+let currentUser = null;
+let currentItems = [];
 
-            const percentEl = document.getElementById('scanPercent');
-            const terminalLogs = document.getElementById('terminalLogs');
-            terminalLogs.innerHTML = '<div class="text-blue-400 tracking-wide">&gt; Initializing Shadowz scanner...</div>';
+function setStatus(text, state=""){
+  $("statusText").textContent = text;
+  $("statusDot").className = "statusDot " + state;
+}
 
-            const stages = [
-                { percent: 17, log: 'Connecting to Roblox network proxy...' },
-                { percent: 34, log: \`Resolving user ID for "\${username}"...\` },
-                { percent: 51, log: 'User ID located. Fetching public profile...' },
-                { percent: 73, log: 'Calculating exact account age...' },
-                { percent: 89, log: 'Scanning public inventory for Limiteds...' },
-                { percent: 100, log: 'SCAN COMPLETE. Rendering profile report...' }
-            ];
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve,ms));
+}
 
-            let stageIdx = 0;
-            const progressInterval = setInterval(() => {
-                if (stageIdx < stages.length) {
-                    percentEl.textContent = \`\${stages[stageIdx].percent}%\`;
-                    addTerminalLog(stages[stageIdx].log);
-                    stageIdx++;
-                }
-            }, 350);
+function escapeHTML(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-            try {
-                const response = await fetch(\`/api/profile?username=\${encodeURIComponent(username)}\`);
-                const data = await response.json();
+/*
+  Safe JSON fetch.
 
-                clearInterval(progressInterval);
-                percentEl.textContent = '100%';
+  A CORS failure is caught and turned into a useful error
+  instead of fake profile information.
+*/
+async function fetchJSON(url, options = {}){
+  const response = await fetch(url, {
+    ...options,
+    mode:"cors",
+    headers:{
+      "Accept":"application/json",
+      ...(options.headers || {})
+    }
+  });
 
-                if (!response.ok) {
-                    setTimeout(() => {
-                        showError(data.message || 'Failed to scan requested user.');
-                    }, 600);
-                    return;
-                }
+  if(!response.ok){
+    throw new Error(`HTTP ${response.status}`);
+  }
 
-                rawScanData = data;
-                setTimeout(() => {
-                    renderProfileResults(data);
-                }, 800);
+  return await response.json();
+}
 
-            } catch (err) {
-                clearInterval(progressInterval);
-                showError('Network error occurred while connecting to scanner backend.');
-            }
-        }
+/* ACCOUNT AGE */
+function dateParts(fromDate){
+  const from = new Date(fromDate);
+  const now = new Date();
 
-        function showError(msg) {
-            document.getElementById('scannerOverlay').classList.add('hidden');
-            document.getElementById('errorMessage').textContent = msg;
-            document.getElementById('errorSection').classList.remove('hidden');
-        }
+  if(Number.isNaN(from.getTime())){
+    return {
+      text:"Unknown",
+      years:0,
+      months:0,
+      days:0
+    };
+  }
 
-        function resetToHome() {
-            document.getElementById('errorSection').classList.add('hidden');
-            document.getElementById('scannerOverlay').classList.add('hidden');
-            document.getElementById('resultSection').classList.add('hidden');
-            document.getElementById('heroSection').classList.remove('hidden');
-            document.getElementById('usernameInput').value = '';
-        }
+  let years = now.getFullYear() - from.getFullYear();
+  let months = now.getMonth() - from.getMonth();
+  let days = now.getDate() - from.getDate();
 
-        function calculateAgeDetails(createdIso) {
-            const created = new Date(createdIso);
-            const now = new Date();
+  if(days < 0){
+    months--;
 
-            let years = now.getFullYear() - created.getFullYear();
-            let months = now.getMonth() - created.getMonth();
-            let days = now.getDate() - created.getDate();
+    const previousMonth =
+      new Date(now.getFullYear(), now.getMonth(), 0);
 
-            if (days < 0) {
-                months -= 1;
-                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-                days += prevMonth.getDate();
-            }
-            if (months < 0) {
-                years -= 1;
-                months += 12;
-            }
+    days += previousMonth.getDate();
+  }
 
-            return { years, months, days, formattedDate: created.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) };
+  if(months < 0){
+    years--;
+    months += 12;
+  }
+
+  return {
+    text:`${years}y ${months}m ${days}d`,
+    years,
+    months,
+    days
+  };
+}
+
+function formatDate(date){
+  const d = new Date(date);
+
+  if(Number.isNaN(d.getTime())){
+    return "Unknown";
+  }
+
+  return d.toLocaleDateString(undefined,{
+    year:"numeric",
+    month:"long",
+    day:"numeric"
+  });
+}
+
+function formatNumber(number){
+  return Number(number || 0).toLocaleString();
+}
+
+function formatRobux(number){
+  return `${formatNumber(number)} R$`;
+}
+
+/*
+  Username lookup.
+
+  Roblox's endpoint expects POST JSON.
+*/
+async function findUser(username){
+
+  const data = await fetchJSON(API.usersByUsername,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      usernames:[username],
+      excludeBannedUsers:false
+    })
+  });
+
+  if(!data || !Array.isArray(data.data) || !data.data.length){
+    throw new Error("Roblox user not found.");
+  }
+
+  return data.data[0];
+}
+
+/* USER PROFILE */
+async function getUser(id){
+  return await fetchJSON(API.user(id));
+}
+
+/* AVATAR */
+async function getAvatar(id){
+
+  const data = await fetchJSON(API.avatar(id));
+
+  if(
+    data &&
+    Array.isArray(data.data) &&
+    data.data[0] &&
+    data.data[0].imageUrl
+  ){
+    return data.data[0].imageUrl;
+  }
+
+  return "";
+}
+
+/*
+  Inventory retrieval.
+
+  The endpoint returns owned Asset inventory.
+  We inspect each returned asset with Catalog details
+  and keep only Limited/Limited Unique style assets.
+*/
+async function getInventory(id){
+
+  const data = await fetchJSON(API.inventory(id));
+
+  if(!data || !Array.isArray(data.data)){
+    return [];
+  }
+
+  const raw = data.data;
+
+  const results = [];
+
+  /*
+    Do not hammer the catalog service with hundreds
+    of simultaneous requests.
+  */
+  const batchSize = 6;
+
+  for(let i = 0; i < raw.length; i += batchSize){
+
+    const batch = raw.slice(i,i + batchSize);
+
+    const details = await Promise.all(
+      batch.map(async asset => {
+
+        try{
+
+          const catalog = await fetchJSON(
+            API.catalog(asset.id)
+          );
+
+          const collectible =
+            catalog.isLimited === true ||
+            catalog.isLimitedUnique === true ||
+            catalog.collectibleItemId ||
+            catalog.collectibleProductId ||
+            catalog.itemRestrictions?.includes("Limited") ||
+            catalog.itemRestrictions?.includes("LimitedUnique");
+
+          if(!collectible){
+            return null;
+          }
+
+          return {
+            id:asset.id,
+            name:
+              catalog.name ||
+              asset.name ||
+              `Asset ${asset.id}`,
+
+            price:
+              Number(
+                catalog.recentAveragePrice ||
+                catalog.price ||
+                catalog.lowestPrice ||
+                0
+              ),
+
+            image:
+              catalog.thumbnail?.url ||
+              `https://tr.rbxcdn.com/${asset.id}/420/420/Image/Png`,
+
+            limited:
+              catalog.isLimited === true,
+
+            limitedUnique:
+              catalog.isLimitedUnique === true
+          };
+
+        }catch{
+          return null;
         }
 
-        function renderProfileResults(data) {
-            const user = data.user;
-            const inv = data.inventory;
-            currentUserId = user.id;
+      })
+    );
 
-            document.getElementById('userDisplayName').textContent = user.displayName;
-            document.getElementById('userUsername').textContent = \`@\${user.username}\`;
-            document.getElementById('userIdText').textContent = user.id;
-            document.getElementById('userHeadshot').src = user.headshotUrl || user.avatarUrl || 'https://via.placeholder.com/150';
-            document.getElementById('robloxProfileLink').href = user.externalUrl;
+    for(const item of details){
+      if(item){
+        results.push(item);
+      }
+    }
 
-            const ageInfo = calculateAgeDetails(user.created);
-            document.getElementById('userCreatedText').textContent = ageInfo.formattedDate;
-            document.getElementById('statAccountAgeYears').textContent = \`\${ageInfo.years} YEARS\`;
-            document.getElementById('statAccountAgeFull').textContent = \`\${ageInfo.years}y \${ageInfo.months}m \${ageInfo.days}d ago\`;
+    /*
+      Avoid unnecessarily huge scans on a browser-only
+      application.
+    */
+    if(results.length >= 100){
+      break;
+    }
+  }
 
-            document.getElementById('statLimitedCount').textContent = inv.totalCount;
-            document.getElementById('statLimitedTypes').textContent = \`\${inv.limitedCount} Limited / \${inv.limitedUCount} Limited U\`;
-            document.getElementById('statTotalRAP').textContent = \`R$ \${inv.totalRAP.toLocaleString()}\`;
-            document.getElementById('statHighestRAP').textContent = \`R$ \${inv.highestRAP.toLocaleString()}\`;
+  return results;
+}
 
-            const topItem = inv.items.find(i => i.rap === inv.highestRAP);
-            document.getElementById('statHighestItemName').textContent = topItem ? topItem.name : 'None';
+/* BADGES */
+async function getBadges(id){
 
-            if (inv.status !== 'AVAILABLE' || inv.items.length === 0) {
-                document.getElementById('inventoryGrid').innerHTML = '';
-                document.getElementById('inventoryPrivateBanner').classList.remove('hidden');
-                document.getElementById('inventoryControls').classList.add('hidden');
-            } else {
-                document.getElementById('inventoryPrivateBanner').classList.add('hidden');
-                document.getElementById('inventoryControls').classList.remove('hidden');
-                filterAndSortInventory();
-            }
+  const data = await fetchJSON(API.badges(id));
 
-            const badgesGrid = document.getElementById('badgesGrid');
-            badgesGrid.innerHTML = '';
-            if (data.badges && data.badges.length > 0) {
-                data.badges.slice(0, 6).forEach(badge => {
-                    const card = document.createElement('div');
-                    card.className = 'glass-card rounded-xl p-3 border border-blue-900/40 flex items-center space-x-3';
-                    card.innerHTML = \`
-                        <img src="\${badge.iconUrl || 'https://via.placeholder.com/48'}" class="w-10 h-10 rounded-lg bg-navy-950 object-cover" />
-                        <div class="overflow-hidden">
-                            <div class="text-xs font-bold text-white truncate">\${badge.name}</div>
-                            <div class="text-[10px] text-gray-400 font-mono truncate">\${badge.description}</div>
-                        </div>
-                    \`;
-                    badgesGrid.appendChild(card);
-                });
-            } else {
-                badgesGrid.innerHTML = '<div class="text-xs text-gray-500 font-mono">No public badges detected.</div>';
-            }
+  if(!data || !Array.isArray(data.data)){
+    return [];
+  }
 
-            document.getElementById('reportTimestamp').textContent = \`TIMESTAMP: \${new Date().toISOString()}\`;
-            document.getElementById('reportUsername').textContent = \`\${user.displayName} (@\${user.username})\`;
-            document.getElementById('reportUserId').textContent = user.id;
-            document.getElementById('reportCreated').textContent = ageInfo.formattedDate;
-            document.getElementById('reportRAP').textContent = \`R$ \${inv.totalRAP.toLocaleString()}\`;
+  return data.data;
+}
 
-            document.getElementById('scannerOverlay').classList.add('hidden');
-            document.getElementById('resultSection').classList.remove('hidden');
-            lucide.createIcons();
-        }
+/* SCAN ANIMATION */
+async function scanAnimation(){
 
-        function filterAndSortInventory() {
-            if (!rawScanData || !rawScanData.inventory || !rawScanData.inventory.items) return;
+  const steps = [
+    ["Resolving Roblox username...",15],
+    ["Fetching profile identity...",32],
+    ["Loading account information...",48],
+    ["Analyzing Limited inventory...",70],
+    ["Checking badges...",87],
+    ["Building intelligence report...",100]
+  ];
 
-            const query = document.getElementById('itemSearch').value.toLowerCase();
-            const sortBy = document.getElementById('itemSort').value;
-            let items = [...rawScanData.inventory.items];
+  $("scanner").classList.remove("hidden");
 
-            if (query) {
-                items = items.filter(i => i.name.toLowerCase().includes(query));
-            }
+  for(const [text,percent] of steps){
 
-            if (sortBy === 'highest') {
-                items.sort((a, b) => b.rap - a.rap);
-            } else if (sortBy === 'lowest') {
-                items.sort((a, b) => a.rap - b.rap);
-            } else if (sortBy === 'name') {
-                items.sort((a, b) => a.name.localeCompare(b.name));
-            }
+    $("scanStep").textContent = text;
+    $("progressBar").style.width = percent + "%";
 
-            const grid = document.getElementById('inventoryGrid');
-            grid.innerHTML = '';
+    await sleep(480);
+  }
+}
 
-            items.forEach(item => {
-                const itemCard = document.createElement('div');
-                itemCard.className = 'glass-card rounded-xl p-3 border border-blue-800/30 flex flex-col justify-between hover:scale-[1.02] transition duration-200 group';
-                itemCard.innerHTML = \`
-                    <div>
-                        <div class="relative bg-navy-950 rounded-lg p-2 mb-2 border border-blue-900/40 flex items-center justify-center">
-                            <span class="absolute top-1 right-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded \${item.isLimitedU ? 'bg-cyanGlow/20 text-cyanGlow border border-cyanGlow/40' : 'bg-electric-500/20 text-electric-300 border border-electric-500/40'}">
-                                \${item.isLimitedU ? 'LIMITED U' : 'LIMITED'}
-                            </span>
-                            <img src="\${item.thumbnailUrl}" alt="\${item.name}" class="w-20 h-20 object-contain group-hover:scale-105 transition" />
-                        </div>
-                        <div class="text-xs font-bold text-white truncate" title="\${item.name}">\${item.name}</div>
-                        <div class="text-[10px] text-gray-400 font-mono">ID: \${item.assetId}</div>
-                    </div>
-                    <div class="mt-3 pt-2 border-t border-blue-900/40 flex items-center justify-between font-mono">
-                        <span class="text-[10px] text-gray-400">RAP</span>
-                        <span class="text-xs font-extrabold text-cyanGlow">R$ \${item.rap.toLocaleString()}</span>
-                    </div>
-                \`;
-                grid.appendChild(itemCard);
-            });
-        }
+/* PROFILE RENDER */
+function renderProfile(user, avatar){
 
-        function copyUserId() {
-            if (!currentUserId) return;
-            navigator.clipboard.writeText(currentUserId.toString());
-            const copyBtnText = document.getElementById('copyBtnText');
-            copyBtnText.textContent = '✓ COPIED';
-            setTimeout(() => {
-                copyBtnText.textContent = 'COPY USER ID';
-            }, 2000);
-        }
+  currentUser = user;
 
-        async function checkStatus() {
-            try {
-                const res = await fetch('/api/status');
-                const data = await res.json();
-                const badge = document.getElementById('statusBadge');
-                if (res.ok && data.status === 'ONLINE') {
-                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-blue-200">SERVICES ONLINE</span>';
-                } else {
-                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-red-300">SERVICE DEGRADED</span>';
-                }
-            } catch (e) {
-                const badge = document.getElementById('statusBadge');
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-red-400">SERVICE OFFLINE</span>';
-            }
-        }
-        checkStatus();
-        setInterval(checkStatus, 30000);
-    </script>
+  $("avatar").src = avatar || "";
+  $("avatar").alt = `${user.name} avatar`;
+
+  $("displayName").textContent =
+    user.displayName || user.name;
+
+  $("usernameResult").textContent =
+    "@" + user.name;
+
+  $("userId").textContent =
+    "ID: " + user.id;
+
+  $("profileLink").href =
+    `https://www.roblox.com/users/${user.id}/profile`;
+
+  const created = new Date(user.created);
+  const age = dateParts(user.created);
+
+  $("joined").textContent =
+    formatDate(user.created);
+
+  $("joinedExact").textContent =
+    created.toISOString();
+
+  $("accountAge").textContent =
+    age.text;
+
+  /*
+    Simple maturity visualization.
+    It is not an official Roblox score.
+  */
+  const ageDays =
+    Math.max(
+      0,
+      (Date.now() - created.getTime()) / 86400000
+    );
+
+  const maturity =
+    Math.min(100,Math.round((ageDays / 3650) * 100));
+
+  $("maturity").textContent =
+    maturity + "%";
+
+  $("maturityPercent").textContent =
+    maturity + "%";
+
+  $("maturityBar").style.width =
+    maturity + "%";
+}
+
+/* LIMITED RENDER */
+function renderItems(items){
+
+  currentItems = items;
+
+  $("limitedCount").textContent =
+    formatNumber(items.length);
+
+  const rap =
+    items.reduce(
+      (total,item) =>
+        total + Number(item.price || 0),
+      0
+    );
+
+  $("rap").textContent =
+    formatRobux(rap);
+
+  $("inventoryMeta").textContent =
+    `${items.length} Limited item${items.length === 1 ? "" : "s"}`;
+
+  const collectionScore =
+    Math.min(100,Math.round(items.length / 2));
+
+  $("collection").textContent =
+    collectionScore + "%";
+
+  $("collectionPercent").textContent =
+    collectionScore + "%";
+
+  $("collectionBar").style.width =
+    collectionScore + "%";
+
+  const container = $("items");
+
+  container.innerHTML = "";
+
+  if(!items.length){
+
+    container.innerHTML = `
+      <div class="message" style="grid-column:1/-1">
+        <strong>No Limited items returned</strong>
+        Roblox did not return any detectable Limited/Limited Unique
+        assets for this scan.
+      </div>
+    `;
+
+    return;
+  }
+
+  for(const item of items){
+
+    const div = document.createElement("div");
+
+    div.className = "item";
+
+    div.innerHTML = `
+      <img
+        class="itemImg"
+        loading="lazy"
+        src="${escapeHTML(item.image)}"
+        alt=""
+        onerror="this.style.opacity='.2'"
+      >
+
+      <div class="itemInfo">
+
+        <div class="itemName"
+             title="${escapeHTML(item.name)}">
+          ${escapeHTML(item.name)}
+        </div>
+
+        <div class="itemPrice">
+          ${formatRobux(item.price)}
+        </div>
+
+        <div class="itemId">
+          Asset ID ${escapeHTML(item.id)}
+        </div>
+
+      </div>
+    `;
+
+    container.appendChild(div);
+  }
+}
+
+/* BADGES RENDER */
+function renderBadges(badges){
+
+  $("badgeMeta").textContent =
+    `${badges.length} returned`;
+
+  const container = $("badges");
+
+  container.innerHTML = "";
+
+  if(!badges.length){
+
+    container.innerHTML = `
+      <div class="message" style="width:100%">
+        <strong>No badges returned</strong>
+        Roblox did not return badge information.
+      </div>
+    `;
+
+    return;
+  }
+
+  for(const badge of badges){
+
+    const div = document.createElement("div");
+
+    div.className = "badgeItem";
+
+    div.innerHTML = `
+      <img
+        class="badgeImg"
+        src="${escapeHTML(
+          badge.iconImageId
+            ? `https://tr.rbxcdn.com/${badge.iconImageId}/150/150/Image/Png`
+            : ""
+        )}"
+        alt=""
+        onerror="this.style.opacity='.2'"
+      >
+
+      <div class="badgeName">
+        ${escapeHTML(
+          badge.name || "Unnamed Badge"
+        )}
+      </div>
+    `;
+
+    container.appendChild(div);
+  }
+}
+
+/* MAIN SCAN */
+async function scan(){
+
+  const username =
+    $("username").value.trim();
+
+  if(!username){
+    showError(
+      "Username required",
+      "Enter a Roblox username before scanning."
+    );
+    return;
+  }
+
+  $("result").classList.add("hidden");
+  $("errorPanel").classList.add("hidden");
+  $("scanner").classList.remove("hidden");
+
+  $("scanBtn").disabled = true;
+
+  setStatus(
+    "CONNECTING TO ROBLOX",
+    "busy"
+  );
+
+  $("progressBar").style.width = "0%";
+
+  try{
+
+    /*
+      Run animation and first lookup together.
+      The real API request determines whether the
+      browser can actually communicate with Roblox.
+    */
+    const lookupPromise =
+      findUser(username);
+
+    const animationPromise =
+      scanAnimation();
+
+    const userSearch =
+      await lookupPromise;
+
+    await animationPromise;
+
+    const user =
+      await getUser(userSearch.id);
+
+    $("scanStep").textContent =
+      "Loading avatar...";
+
+    const avatar =
+      await getAvatar(user.id);
+
+    renderProfile(user,avatar);
+
+    $("scanStep").textContent =
+      "Scanning Limited inventory...";
+
+    let items = [];
+
+    try{
+      items = await getInventory(user.id);
+    }catch(error){
+      console.warn(
+        "Inventory unavailable:",
+        error
+      );
+    }
+
+    renderItems(items);
+
+    $("scanStep").textContent =
+      "Loading badges...";
+
+    let badges = [];
+
+    try{
+      badges = await getBadges(user.id);
+    }catch(error){
+      console.warn(
+        "Badges unavailable:",
+        error
+      );
+    }
+
+    renderBadges(badges);
+
+    $("scanner").classList.add("hidden");
+    $("result").classList.remove("hidden");
+
+    setStatus(
+      "ROBLOX SERVICES RESPONDED",
+      "online"
+    );
+
+    $("result").scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }catch(error){
+
+    console.error(error);
+
+    $("scanner").classList.add("hidden");
+
+    setStatus(
+      "API REQUEST FAILED",
+      "error"
+    );
+
+    let message =
+      error?.message ||
+      "Unknown error.";
+
+    if(
+      message.includes("Failed to fetch") ||
+      message.includes("NetworkError") ||
+      message.includes("CORS")
+    ){
+      message =
+        "Your browser blocked the Roblox API request. " +
+        "This is a GitHub Pages/browser CORS restriction. " +
+        "A frontend-only website cannot bypass Roblox CORS.";
+    }
+
+    showError(
+      "Scan failed",
+      message
+    );
+
+  }finally{
+
+    $("scanBtn").disabled = false;
+  }
+}
+
+/* ERROR */
+function showError(title,text){
+
+  $("result").classList.add("hidden");
+  $("scanner").classList.add("hidden");
+
+  $("errorTitle").textContent =
+    title;
+
+  $("errorText").textContent =
+    text;
+
+  $("errorPanel").classList.remove("hidden");
+}
+
+/* ENTER KEY */
+$("username").addEventListener(
+  "keydown",
+  event => {
+    if(event.key === "Enter"){
+      scan();
+    }
+  }
+);
+
+/* BUTTON */
+$("scanBtn").addEventListener(
+  "click",
+  scan
+);
+
+/* INITIAL STATUS */
+setStatus(
+  "READY TO SCAN",
+  ""
+);
+</script>
+
 </body>
 </html>
-    `);
-});
-
-app.listen(PORT, () => {
-    console.log(`[SHADOWZ ALL-IN-ONE ENGINE] Online at http://localhost:${PORT}`);
-});
