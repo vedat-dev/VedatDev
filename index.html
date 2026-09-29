@@ -1,1281 +1,811 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NUBRIC — ODYSSEY</title>
-    <!-- Sci-Fi Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-black: #020408;
-            --electric-blue: #0066ff;
-            --cyan-bright: #00f0ff;
-            --cyan-glow: rgba(0, 240, 255, 0.5);
-            --text-white: #f0f6ff;
-            --glass-bg: rgba(6, 16, 38, 0.82);
-            --glass-border: rgba(0, 240, 255, 0.45);
-            --font-head: 'Orbitron', sans-serif;
-            --font-ui: 'Rajdhani', sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg-black);
-            font-family: var(--font-ui);
-            color: var(--text-white);
-        }
-
-        #webgl-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* Glassmorphism Panels */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85), inset 0 0 20px rgba(0, 240, 255, 0.15);
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            transform: scale(0.96);
-            padding: 20px;
-        }
-
-        .screen.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-        }
-
-        .logo-title {
-            font-family: var(--font-head);
-            font-size: 3.4rem;
-            font-weight: 900;
-            letter-spacing: 0.22em;
-            color: #fff;
-            text-shadow: 0 0 25px var(--cyan-bright), 0 0 50px var(--electric-blue);
-            margin-bottom: 5px;
-            text-align: center;
-        }
-
-        .logo-subtitle {
-            font-family: var(--font-ui);
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.35em;
-            color: var(--cyan-bright);
-            margin-bottom: 25px;
-            text-shadow: 0 0 12px var(--cyan-glow);
-            text-align: center;
-        }
-
-        /* Redesigned Premium Buttons */
-        .btn {
-            position: relative;
-            font-family: var(--font-head);
-            font-size: 0.9rem;
-            font-weight: 800;
-            letter-spacing: 0.18em;
-            background: linear-gradient(135deg, rgba(0, 102, 255, 0.35), rgba(0, 240, 255, 0.12));
-            border: 1px solid var(--glass-border);
-            color: var(--text-white);
-            padding: 16px 32px;
-            margin: 8px 0;
-            border-radius: 12px;
-            cursor: pointer;
-            outline: none;
-            text-transform: uppercase;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            min-width: 250px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0,240,255,0.25) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .btn:hover::before { opacity: 1; }
-
-        .btn:hover {
-            border-color: var(--cyan-bright);
-            box-shadow: 0 0 25px var(--cyan-glow), 0 0 10px rgba(0,240,255,0.8);
-            transform: translateY(-3px) scale(1.02);
-            color: #fff;
-        }
-
-        .btn:active { transform: translateY(1px) scale(0.98); }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--electric-blue), rgba(0, 240, 255, 0.75));
-            border-color: var(--cyan-bright);
-            box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
-        }
-
-        .btn-auth {
-            background: rgba(255, 255, 255, 0.95);
-            color: #111;
-            font-family: var(--font-ui);
-            font-weight: 700;
-            font-size: 0.95rem;
-            border: none;
-            width: 100%;
-        }
-        .btn-auth:hover { background: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.7); }
-
-        /* HUD OVERLAY */
-        #hud {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none;
-            display: none;
-            padding: 20px;
-        }
-
-        .hud-card { padding: 12px 20px; position: absolute; }
-        .hud-top-left { top: 20px; left: 20px; }
-        .hud-top-right { top: 20px; right: 20px; text-align: right; }
-
-        .hud-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.18em;
-            color: var(--cyan-bright);
-            margin-bottom: 2px;
-        }
-
-        .hud-value {
-            font-family: var(--font-head);
-            font-size: 1.3rem;
-            color: #fff;
-            text-shadow: 0 0 10px var(--cyan-glow);
-        }
-
-        .speed-bar-hud {
-            width: 130px;
-            height: 8px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        .speed-bar-hud-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright));
-            box-shadow: 0 0 10px var(--cyan-bright);
-            transition: width 0.2s ease;
-        }
-
-        /* TOUCH CONTROLS */
-        #touch-controls {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 20;
-            pointer-events: none;
-            display: block;
-        }
-
-        #joystick-zone {
-            position: absolute;
-            bottom: 35px;
-            left: 35px;
-            width: 135px;
-            height: 135px;
-            background: rgba(6, 16, 38, 0.7);
-            border: 2px solid var(--cyan-bright);
-            box-shadow: 0 0 20px var(--cyan-glow);
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        #joystick-zone.shape-round { border-radius: 50%; }
-        #joystick-zone.shape-square { border-radius: 12px; }
-
-        #joystick-knob {
-            width: 50px;
-            height: 50px;
-            background: radial-gradient(circle, var(--cyan-bright), var(--electric-blue));
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 18px var(--cyan-bright);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -25px;
-            margin-left: -25px;
-            pointer-events: none;
-        }
-
-        #joystick-knob.shape-round { border-radius: 50%; }
-        #joystick-knob.shape-square { border-radius: 8px; }
-
-        #dpad-overlay {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        .dpad-btn {
-            position: absolute;
-            background: rgba(0, 240, 255, 0.25);
-            border: 1px solid var(--cyan-bright);
-            color: #fff;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-        }
-        .dpad-up { top: 5px; left: 47px; width: 40px; height: 38px; }
-        .dpad-down { bottom: 5px; left: 47px; width: 40px; height: 38px; }
-        .dpad-left { top: 47px; left: 5px; width: 38px; height: 40px; }
-        .dpad-right { top: 47px; right: 5px; width: 38px; height: 40px; }
-
-        #boost-btn {
-            position: absolute;
-            bottom: 40px;
-            right: 35px;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: rgba(0, 102, 255, 0.35);
-            border: 2px solid var(--cyan-bright);
-            box-shadow: 0 0 25px var(--cyan-glow);
-            color: #fff;
-            font-family: var(--font-head);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
-        }
-
-        #boost-btn:active {
-            background: rgba(0, 240, 255, 0.7);
-            box-shadow: 0 0 35px var(--cyan-bright);
-        }
-
-        /* NOTIFICATIONS */
-        #speed-notify {
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            text-align: center;
-            pointer-events: none;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 6;
-        }
-        #speed-notify.active {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-
-        .modal-body {
-            width: 480px;
-            max-width: 92vw;
-            padding: 35px;
-        }
-
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,240,255,0.18);
-            font-size: 1.05rem;
-        }
-
-        select, input[type="range"] {
-            background: rgba(0,0,0,0.65);
-            border: 1px solid var(--cyan-bright);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 6px;
-            outline: none;
-            font-family: var(--font-ui);
-        }
-
-        /* AUTH MODAL */
-        .auth-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .auth-modal-card {
-            background: #ffffff;
-            color: #202124;
-            width: 380px;
-            max-width: 90vw;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        .account-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 1px solid #dadce0;
-            margin-top: 10px;
-            transition: background 0.2s;
-        }
-        .account-item:hover { background: #f1f3f4; }
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #0066ff;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        #sound-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>COLOR//DICE — Prediction Lab</title>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+:root{
+  --bg:#05060a;
+  --panel:rgba(14,17,27,.78);
+  --line:rgba(255,255,255,.09);
+  --text:#f5f7ff;
+  --muted:#858ba0;
+  --blue:#4da3ff;
+  --cyan:#00e5ff;
+  --green:#21e58b;
+  --red:#ff477e;
+  --purple:#9b6cff;
+}
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 20% 10%,rgba(77,163,255,.14),transparent 28%),
+    radial-gradient(circle at 80% 80%,rgba(155,108,255,.10),transparent 30%),
+    var(--bg);
+}
+/* BACKGROUND */
+.grid{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent);
+}
+.orb{
+  position:fixed;
+  width:320px;
+  height:320px;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:.16;
+  pointer-events:none;
+  animation:float 8s ease-in-out infinite alternate;
+}
+.orb.one{
+  background:#008cff;
+  top:-120px;
+  left:-100px;
+}
+.orb.two{
+  background:#8b4dff;
+  right:-120px;
+  bottom:-120px;
+  animation-delay:2s;
+}
+@keyframes float{
+  to{transform:translate(50px,35px) scale(1.12)}
+}
+/* APP */
+.app{
+  position:relative;
+  width:min(1180px,94%);
+  margin:auto;
+  padding:28px 0 50px;
+}
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,#197cff,#00d9ff);
+  box-shadow:0 0 35px rgba(0,180,255,.35);
+  font-size:20px;
+}
+.logo h1{
+  font-size:18px;
+  letter-spacing:3px;
+}
+.logo span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:2px;
+  margin-top:3px;
+}
+.status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 13px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.035);
+  border-radius:30px;
+  font-size:11px;
+  color:#aab0c3;
+}
+.status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green);
+}
+/* HERO */
+.hero{
+  position:relative;
+  padding:30px;
+  border:1px solid var(--line);
+  border-radius:25px;
+  background:linear-gradient(145deg,rgba(17,21,34,.88),rgba(8,10,17,.72));
+  box-shadow:0 30px 80px rgba(0,0,0,.3);
+  overflow:hidden;
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,transparent,rgba(0,190,255,.035),transparent);
+  animation:scan 5s linear infinite;
+}
+@keyframes scan{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(100%)}
+}
+.hero-content{
+  position:relative;
+  z-index:2;
+}
+.eyebrow{
+  color:var(--cyan);
+  font-size:10px;
+  letter-spacing:3px;
+  margin-bottom:10px;
+}
+.hero h2{
+  font-size:clamp(28px,5vw,54px);
+  line-height:1;
+  letter-spacing:-2px;
+  max-width:700px;
+}
+.hero p{
+  margin-top:14px;
+  max-width:650px;
+  color:var(--muted);
+  line-height:1.6;
+}
+/* MAIN GRID */
+.dashboard{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:18px;
+  margin-top:18px;
+}
+.panel{
+  border:1px solid var(--line);
+  background:var(--panel);
+  backdrop-filter:blur(18px);
+  border-radius:22px;
+  padding:22px;
+}
+/* ROLLER */
+.roller{
+  min-height:480px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.roller-title{
+  position:absolute;
+  top:22px;
+  left:22px;
+  font-size:11px;
+  letter-spacing:2px;
+  color:var(--muted);
+}
+.dice-stage{
+  position:relative;
+  width:180px;
+  height:180px;
+  display:grid;
+  place-items:center;
+}
+.ring{
+  position:absolute;
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.2);
+  box-shadow:0 0 60px rgba(0,180,255,.12);
+  animation:spin 12s linear infinite;
+}
+.ring:after{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:50%;
+  border:1px dashed rgba(255,255,255,.08);
+}
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+.dice{
+  width:110px;
+  height:110px;
+  border-radius:25px;
+  display:grid;
+  place-items:center;
+  font-size:42px;
+  font-weight:900;
+  background:
+    linear-gradient(145deg,#20283b,#090c14);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:
+    inset 0 0 25px rgba(255,255,255,.04),
+    0 0 45px rgba(0,180,255,.18);
+  transition:.35s;
+}
+.dice.rolling{
+  animation:diceRoll .55s infinite linear;
+}
+@keyframes diceRoll{
+  0%{transform:rotateX(0) rotateY(0) scale(1)}
+  50%{transform:rotateX(180deg) rotateY(90deg) scale(1.08)}
+  100%{transform:rotateX(360deg) rotateY(180deg) scale(1)}
+}
+.result{
+  margin-top:20px;
+  text-align:center;
+}
+.result-label{
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:2px;
+}
+.result-color{
+  font-size:27px;
+  font-weight:900;
+  margin-top:6px;
+}
+.result-number{
+  color:#fff;
+  font-size:12px;
+  margin-top:4px;
+}
+.roll-btn{
+  margin-top:28px;
+  border:0;
+  cursor:pointer;
+  color:white;
+  font-weight:800;
+  letter-spacing:1px;
+  padding:15px 35px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#167cff,#00cfff);
+  box-shadow:0 10px 35px rgba(0,170,255,.25);
+  transition:.2s;
+}
+.roll-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 15px 45px rgba(0,170,255,.38);
+}
+.roll-btn:active{
+  transform:scale(.96);
+}
+/* PREDICTION */
+.prediction{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.panel-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.panel-heading h3{
+  font-size:14px;
+}
+.panel-heading span{
+  color:var(--muted);
+  font-size:10px;
+}
+.prediction-card{
+  padding:20px;
+  border-radius:17px;
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--line);
+  text-align:center;
+}
+.prediction-label{
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:2px;
+}
+.predicted-color{
+  font-size:30px;
+  font-weight:900;
+  margin:10px 0;
+}
+.confidence{
+  font-size:12px;
+  color:#aeb5c8;
+}
+.bar{
+  height:7px;
+  background:#191d29;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:12px;
+}
+.bar-fill{
+  width:0;
+  height:100%;
+  border-radius:20px;
+  transition:1s;
+}
+/* PROBABILITIES */
+.probs{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.prob{
+  display:grid;
+  grid-template-columns:80px 1fr 45px;
+  align-items:center;
+  gap:10px;
+  font-size:11px;
+}
+.prob-name{
+  color:#c3c7d5;
+}
+.prob-track{
+  height:6px;
+  border-radius:20px;
+  background:#191d29;
+  overflow:hidden;
+}
+.prob-fill{
+  height:100%;
+  width:0;
+  transition:1s;
+}
+.red{background:linear-gradient(90deg,#ff315e,#ff6b91)}
+.green{background:linear-gradient(90deg,#18d980,#69ffba)}
+.blue{background:linear-gradient(90deg,#328cff,#65d8ff)}
+.prob-value{
+  text-align:right;
+  color:#aeb5c8;
+}
+/* HISTORY */
+.history-panel{
+  margin-top:18px;
+}
+.history{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding-top:16px;
+  scrollbar-width:none;
+}
+.history::-webkit-scrollbar{
+  display:none;
+}
+.history-item{
+  min-width:64px;
+  height:70px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.025);
+}
+.history-dot{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  margin-bottom:6px;
+  box-shadow:0 0 14px currentColor;
+}
+.history-number{
+  color:#8e95aa;
+  font-size:9px;
+}
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:18px;
+}
+.stat{
+  padding:18px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.025);
+}
+.stat-label{
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:1.5px;
+}
+.stat-value{
+  font-size:23px;
+  font-weight:900;
+  margin-top:7px;
+}
+/* FOOTER */
+.notice{
+  margin-top:18px;
+  text-align:center;
+  color:#656b7d;
+  font-size:10px;
+  line-height:1.6;
+}
+/* MOBILE */
+@media(max-width:800px){
+  .dashboard{
+    grid-template-columns:1fr;
+  }
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .hero{
+    padding:23px;
+  }
+  .roller{
+    min-height:420px;
+  }
+}
+@media(max-width:480px){
+  .app{
+    width:92%;
+    padding-top:18px;
+  }
+  header{
+    margin-bottom:16px;
+  }
+  .logo h1{
+    font-size:15px;
+  }
+  .status{
+    font-size:9px;
+  }
+  .hero h2{
+    font-size:31px;
+  }
+  .panel{
+    padding:17px;
+  }
+  .prob{
+    grid-template-columns:65px 1fr 40px;
+  }
+}
+</style>
 </head>
 <body>
-
-    <div id="webgl-container"></div>
-    <div id="sound-toggle" class="glass-panel">🔊</div>
-
-    <!-- 1. LOADING SCREEN -->
-    <div id="loader-screen" class="screen active">
-        <div class="glass-panel" style="width: 400px; max-width: 90vw; padding: 40px; text-align: center;">
-            <div class="logo-title" style="font-size: 2.4rem;">NUBRIC</div>
-            <div class="logo-subtitle">INITIALIZING SOLAR ENGINE</div>
-            <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 5px; margin: 22px 0 14px 0; overflow: hidden;">
-                <div id="loader-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--electric-blue), var(--cyan-bright)); box-shadow: 0 0 15px var(--cyan-bright);"></div>
-            </div>
-            <div id="loader-percent" class="hud-label" style="text-align:center;">LOADING 0%</div>
-            <div id="loader-log" style="font-size:0.85rem; color:var(--cyan-bright); height:20px; margin-top:6px; font-family:monospace;">Generating Planets...</div>
-        </div>
+<div class="grid"></div>
+<div class="orb one"></div>
+<div class="orb two"></div>
+<main class="app">
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎲</div>
+    <div>
+      <h1>COLOR//DICE</h1>
+      <span>PREDICTION LAB</span>
     </div>
-
-    <!-- 2. AUTHENTICATION SCREEN -->
-    <div id="auth-screen" class="screen">
-        <div class="glass-panel" style="width: 400px; max-width:90vw; padding:40px; text-align:center;">
-            <div class="logo-title" style="font-size: 2.5rem;">NUBRIC</div>
-            <div class="logo-subtitle">ENTER THE VOID</div>
-            
-            <div id="active-user-badge" style="margin-bottom: 18px; font-size:0.95rem; color:var(--cyan-bright); display:none;">
-                Logged in as: <strong id="logged-user-name">None</strong>
-            </div>
-
-            <button class="btn btn-auth" style="margin-bottom: 12px;" onclick="openAuthModal('google')">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.29 21.39 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.61 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                SIGN IN WITH GOOGLE
-            </button>
-
-            <button class="btn btn-auth" style="background:#000; color:#fff; border: 1px solid #444;" onclick="openAuthModal('apple')">
-                <svg width="18" height="18" viewBox="0 0 170 170" fill="#fff"><path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.9-14.36-6.08-3.32-2.73-7.23-7.4-11.73-14.02-7.53-11.02-13.23-22.75-17.1-35.17-3.87-12.43-5.81-24.18-5.81-35.27 0-14.76 3.67-26.85 11.01-36.27 7.34-9.41 16.7-14.22 28.09-14.43 4.23 0 9.24 1.14 15.02 3.42 5.78 2.28 9.53 3.42 11.25 3.42 1.4 0 5.25-1.2 11.55-3.6 6.31-2.4 11.33-3.5 15.07-3.3 12.33.56 22.18 5.15 29.56 13.78-10.97 6.64-16.32 15.75-16.07 27.34.25 9.17 3.73 16.8 10.45 22.88 6.72 6.08 14.8 9.5 24.24 10.25-2.58 7.6-5.81 15.11-9.68 22.52zM119.22 31.07c0-7.34 2.65-14.34 7.96-21 5.31-6.66 12.02-10.63 20.13-11.91.25 1.02.38 1.93.38 2.73 0 7.35-2.71 14.34-8.13 20.98-5.42 6.64-12.23 10.51-20.44 11.61-.13-.88-.2-1.68-.2-2.41z"/></svg>
-                SIGN IN WITH APPLE
-            </button>
-
-            <div style="margin-top: 18px; display:flex; gap:12px;">
-                <button class="btn btn-primary" style="flex:1; min-width:0;" onclick="enterGameAsCurrent()">PLAY NOW</button>
-                <button class="btn" style="flex:1; min-width:0;" onclick="enterGameAsGuest()">GUEST</button>
-            </div>
-        </div>
+  </div>
+  <div class="status">
+    <div class="status-dot"></div>
+    DEMO ENGINE ONLINE
+  </div>
+</header>
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">ANALYTICAL SIMULATION</div>
+    <h2>Read the pattern.<br>Roll the future.</h2>
+    <p>
+      A futuristic color-and-dice simulation dashboard.
+      Results are generated locally for demonstration purposes.
+    </p>
+  </div>
+</section>
+<section class="dashboard">
+  <div class="panel roller">
+    <div class="roller-title">LIVE SIMULATOR / ROUND <span id="round">001</span></div>
+    <div class="dice-stage">
+      <div class="ring"></div>
+      <div class="dice" id="dice">?</div>
     </div>
-
-    <!-- 3. MAIN MENU -->
-    <div id="menu-screen" class="screen">
-        <div class="logo-title">NUBRIC</div>
-        <div class="logo-subtitle">SOLAR ODYSSEY</div>
-        
-        <div style="display:flex; flex-direction:column; gap:12px; width:270px;">
-            <button class="btn btn-primary" onclick="startGame()">PLAY RUN</button>
-            <button class="btn" onclick="showScreen('progress-screen')">TELEMETRY</button>
-            <button class="btn" onclick="showScreen('settings-screen')">SETTINGS</button>
-            <button class="btn" style="opacity:0.75;" onclick="showScreen('auth-screen')">SWITCH PILOT</button>
-        </div>
+    <div class="result">
+      <div class="result-label">LATEST RESULT</div>
+      <div class="result-color" id="resultColor">WAITING</div>
+      <div class="result-number" id="resultNumber">Press ROLL to begin</div>
     </div>
-
-    <!-- 4. PROGRESS SCREEN -->
-    <div id="progress-screen" class="screen">
-        <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 22px;">PILOT TELEMETRY</div>
-            <div class="setting-row"><span class="stat-label">Active Pilot</span><span id="st-pilot" style="color:var(--cyan-bright); font-weight:bold;">Guest</span></div>
-            <div class="setting-row"><span class="stat-label">Best Distance</span><span id="st-dist" style="color:var(--cyan-bright);">0 m</span></div>
-            <div class="setting-row"><span class="stat-label">High Score</span><span id="st-score" style="color:var(--cyan-bright);">0</span></div>
-            <div class="setting-row"><span class="stat-label">Max Rocks Dodged</span><span id="st-rocks" style="color:var(--cyan-bright);">0 Rocks</span></div>
-            <div class="setting-row"><span class="stat-label">Substance Boosts Collected</span><span id="st-substance" style="color:var(--cyan-bright);">0</span></div>
-            
-            <div style="margin-top: 28px; text-align: center;">
-                <button class="btn" onclick="showScreen('menu-screen')">BACK TO MENU</button>
-            </div>
-        </div>
+    <button class="roll-btn" id="rollBtn">ROLL DICE</button>
+  </div>
+  <div class="panel prediction">
+    <div class="panel-heading">
+      <h3>Pattern Engine</h3>
+      <span>SIMULATION</span>
     </div>
-
-    <!-- 5. ADVANCED SETTINGS -->
-    <div id="settings-screen" class="screen">
-        <div class="modal-body glass-panel">
-            <div class="logo-subtitle" style="font-size: 1.2rem; margin-bottom: 22px;">SYSTEM CONFIGURATION</div>
-            
-            <div class="setting-row">
-                <span>Space Environment</span>
-                <select id="cfg-time" onchange="toggleDayNight(this.value)">
-                    <option value="night">Deep Space Void (Night)</option>
-                    <option value="day">Solar Nebula Atmosphere (Day)</option>
-                </select>
-            </div>
-
-            <div class="setting-row">
-                <span>Joystick Style</span>
-                <select id="cfg-joystick" onchange="applyJoystickStyle(this.value)">
-                    <option value="round">Round Glow Halo</option>
-                    <option value="square">Square Metallic Frame</option>
-                    <option value="dpad">D-Pad Directional Arrows</option>
-                </select>
-            </div>
-
-            <div class="setting-row">
-                <span>Engine Audio Volume</span>
-                <input type="range" id="cfg-vol" min="0" max="100" value="80">
-            </div>
-
-            <div style="margin-top: 28px; text-align: center;">
-                <button class="btn btn-primary" onclick="showScreen('menu-screen')">SAVE & RETURN</button>
-            </div>
-        </div>
+    <div class="prediction-card">
+      <div class="prediction-label">NEXT SIMULATED COLOR</div>
+      <div class="predicted-color" id="prediction">
+        ANALYZING...
+      </div>
+      <div class="confidence">
+        Pattern confidence: <b id="confidence">0%</b>
+      </div>
+      <div class="bar">
+        <div class="bar-fill" id="confidenceBar"></div>
+      </div>
     </div>
-
-    <!-- 6. GAME OVER SCREEN -->
-    <div id="gameover-screen" class="screen">
-        <div class="modal-body glass-panel" style="text-align: center;">
-            <div class="logo-title" style="font-size: 2.1rem;">CRITICAL COLLISION</div>
-            <div class="logo-subtitle" style="margin-bottom: 22px;">HULL DESTROYED</div>
-            
-            <div class="setting-row"><span>Distance Traveled</span><span id="go-dist" style="color:var(--cyan-bright); font-weight:bold;">0 m</span></div>
-            <div class="setting-row"><span>Final Score</span><span id="go-score" style="color:var(--cyan-bright); font-weight:bold;">0</span></div>
-            <div class="setting-row"><span>Rocks Passed</span><span id="go-rocks" style="color:var(--cyan-bright); font-weight:bold;">0 Rocks</span></div>
-            <div class="setting-row"><span>Final Speed Level</span><span id="go-speed" style="color:var(--cyan-bright); font-weight:bold;">Speed 1</span></div>
-            
-            <div style="margin-top: 28px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="startGame()">RETRY RUN</button>
-                <button class="btn" onclick="showScreen('menu-screen')">MAIN MENU</button>
-            </div>
-        </div>
+    <div class="panel-heading">
+      <h3>Probability Model</h3>
+      <span>DEMO DATA</span>
     </div>
-
-    <!-- HUD OVERLAY -->
-    <div id="hud">
-        <div class="hud-card glass-panel hud-top-left">
-            <div class="hud-label">DISTANCE</div>
-            <div class="hud-value" id="hud-dist">0 m</div>
-            <div class="hud-label" style="margin-top:4px;" id="hud-rocks-count">ROCKS PASSED: 0</div>
+    <div class="probs">
+      <div class="prob">
+        <div class="prob-name">RED</div>
+        <div class="prob-track">
+          <div class="prob-fill red" id="redBar"></div>
         </div>
-        <div class="hud-card glass-panel hud-top-right">
-            <div class="hud-label">SCORE</div>
-            <div class="hud-value" id="hud-score">0</div>
-            <div style="margin-top: 6px;">
-                <div class="hud-label" id="hud-speed-lvl">SPEED 1 (SLOW)</div>
-                <div class="speed-bar-hud"><div id="hud-speed-progress" class="speed-bar-hud-fill"></div></div>
-            </div>
+        <div class="prob-value" id="redValue">33%</div>
+      </div>
+      <div class="prob">
+        <div class="prob-name">GREEN</div>
+        <div class="prob-track">
+          <div class="prob-fill green" id="greenBar"></div>
         </div>
-    </div>
-
-    <!-- SPEED UP NOTIFICATION -->
-    <div id="speed-notify">
-        <div class="logo-title" id="notify-title" style="font-size: 2rem;">SPEED INCREASED!</div>
-        <div class="logo-subtitle" id="speed-notify-val" style="font-size: 1rem;">SPEED +1 (50 ROCKS PASSED)</div>
-    </div>
-
-    <!-- TOUCH CONTROLS OVERLAY -->
-    <div id="touch-controls">
-        <div id="joystick-zone" class="shape-round">
-            <div id="joystick-knob" class="shape-round"></div>
-            <div id="dpad-overlay">
-                <div class="dpad-btn dpad-up">▲</div>
-                <div class="dpad-btn dpad-down">▼</div>
-                <div class="dpad-btn dpad-left">◀</div>
-                <div class="dpad-btn dpad-right">▶</div>
-            </div>
+        <div class="prob-value" id="greenValue">33%</div>
+      </div>
+      <div class="prob">
+        <div class="prob-name">BLUE</div>
+        <div class="prob-track">
+          <div class="prob-fill blue" id="blueBar"></div>
         </div>
-        <div id="boost-btn">BOOST</div>
+        <div class="prob-value" id="blueValue">34%</div>
+      </div>
     </div>
-
-    <!-- ACCOUNT AUTH MODAL -->
-    <div id="auth-modal" class="auth-modal-overlay">
-        <div class="auth-modal-card">
-            <h3 id="auth-provider-title" style="margin-bottom:8px; font-size:1.25rem;">Select Pilot Account</h3>
-            <p style="font-size:0.88rem; color:#5f6368; margin-bottom:16px;">Choose your pilot profile to sync progress:</p>
-            <div id="account-list"></div>
-            <button onclick="closeAuthModal()" style="margin-top:22px; border:none; background:none; color:#1a73e8; cursor:pointer; font-weight:bold; font-size:0.9rem;">Cancel</button>
-        </div>
-    </div>
-
+  </div>
+</section>
+<section class="panel history-panel">
+  <div class="panel-heading">
+    <h3>Round History</h3>
+    <span id="historyCount">0 RESULTS</span>
+  </div>
+  <div class="history" id="history"></div>
+</section>
+<section class="stats">
+  <div class="stat">
+    <div class="stat-label">TOTAL ROLLS</div>
+    <div class="stat-value" id="totalRolls">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">CURRENT STREAK</div>
+    <div class="stat-value" id="streak">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">LAST NUMBER</div>
+    <div class="stat-value" id="lastNumber">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">ENGINE STATE</div>
+    <div class="stat-value" id="engineState">READY</div>
+  </div>
+</section>
+<div class="notice">
+  DEMO / SIMULATION ONLY — This engine generates local random outcomes.
+  It does not access, predict, manipulate, or guarantee results from real-money games.
+</div>
+</main>
 <script>
-/* --- AUDIO SYNTHESIZER --- */
-class SoundController {
-    constructor() { this.ctx = null; this.muted = false; }
-    init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
-    playTone(freq, type, duration, vol=0.1) {
-        if(this.muted || !this.ctx) return;
-        try {
-            let userVol = document.getElementById('cfg-vol').value / 100;
-            let osc = this.ctx.createOscillator();
-            let gain = this.ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-            gain.gain.setValueAtTime(vol * userVol, this.ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start();
-            osc.stop(this.ctx.currentTime + duration);
-        } catch(e){}
-    }
-    playHover() { this.playTone(350, 'sine', 0.04, 0.02); }
-    playClick() { this.playTone(650, 'triangle', 0.06, 0.05); }
-    playBoost() { this.playTone(850, 'sawtooth', 0.25, 0.08); }
-    playSpeedUp() {
-        this.playTone(400, 'sawtooth', 0.1, 0.08);
-        setTimeout(() => this.playTone(800, 'sawtooth', 0.15, 0.08), 80);
-    }
-    playExplosion() {
-        if(this.muted || !this.ctx) return;
-        let bufSize = this.ctx.sampleRate * 0.5;
-        let buffer = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-        let data = buffer.getChannelData(0);
-        for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-        let noise = this.ctx.createBufferSource();
-        noise.buffer = buffer;
-        let gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
-        noise.connect(gain);
-        gain.connect(this.ctx.destination);
-        noise.start();
-    }
+const colors = [
+  {
+    name:"RED",
+    css:"#ff477e",
+    class:"red"
+  },
+  {
+    name:"GREEN",
+    css:"#21e58b",
+    class:"green"
+  },
+  {
+    name:"BLUE",
+    css:"#4da3ff",
+    class:"blue"
+  }
+];
+let history = [];
+let round = 0;
+let streak = 0;
+let lastColor = null;
+let rolling = false;
+/* ELEMENTS */
+const dice = document.getElementById("dice");
+const rollBtn = document.getElementById("rollBtn");
+const resultColor = document.getElementById("resultColor");
+const resultNumber = document.getElementById("resultNumber");
+const prediction = document.getElementById("prediction");
+const confidence = document.getElementById("confidence");
+const confidenceBar = document.getElementById("confidenceBar");
+const redBar = document.getElementById("redBar");
+const greenBar = document.getElementById("greenBar");
+const blueBar = document.getElementById("blueBar");
+const redValue = document.getElementById("redValue");
+const greenValue = document.getElementById("greenValue");
+const blueValue = document.getElementById("blueValue");
+const historyBox = document.getElementById("history");
+/* INITIAL DEMO HISTORY */
+for(let i=0;i<8;i++){
+  addHistory(
+    colors[Math.floor(Math.random()*colors.length)],
+    Math.floor(Math.random()*6)+1
+  );
 }
-const sound = new SoundController();
-document.getElementById('sound-toggle').addEventListener('click', () => {
-    sound.init();
-    sound.muted = !sound.muted;
-    document.getElementById('sound-toggle').innerText = sound.muted ? '🔇' : '🔊';
-});
-
-/* --- MULTI-ACCOUNT AUTH & DATA --- */
-let activeUser = 'Guest Pilot';
-let userData = { distance: 0, score: 0, maxRocks: 0, substances: 0 };
-
-function loadUserData() {
-    let saved = localStorage.getItem('NUBRIC_SAVE_' + activeUser);
-    if(saved) {
-        try { userData = JSON.parse(saved); } catch(e){}
-    } else {
-        userData = { distance: 0, score: 0, maxRocks: 0, substances: 0 };
+updatePrediction();
+/* ROLL */
+rollBtn.addEventListener("click",rollDice);
+function rollDice(){
+  if(rolling) return;
+  rolling = true;
+  rollBtn.disabled = true;
+  rollBtn.textContent = "ROLLING...";
+  dice.classList.add("rolling");
+  document.getElementById("engineState").textContent="PROCESSING";
+  let animationTime = 900;
+  setTimeout(()=>{
+    dice.classList.remove("rolling");
+    const number = Math.floor(Math.random()*6)+1;
+    /*
+      Demo mapping:
+      1-2 = RED
+      3-4 = GREEN
+      5-6 = BLUE
+    */
+    let color;
+    if(number <= 2){
+      color = colors[0];
+    }else if(number <= 4){
+      color = colors[1];
+    }else{
+      color = colors[2];
     }
-    updateProgressUI();
-}
-
-function saveUserData() {
-    localStorage.setItem('NUBRIC_SAVE_' + activeUser, JSON.stringify(userData));
-    updateProgressUI();
-}
-
-function updateProgressUI() {
-    document.getElementById('st-pilot').innerText = activeUser;
-    document.getElementById('st-dist').innerText = Math.floor(userData.distance) + ' m';
-    document.getElementById('st-score').innerText = Math.floor(userData.score);
-    document.getElementById('st-rocks').innerText = (userData.maxRocks || 0) + ' Rocks';
-    document.getElementById('st-substance').innerText = userData.substances;
-}
-
-function openAuthModal(provider) {
-    sound.playClick();
-    let modal = document.getElementById('auth-modal');
-    let title = document.getElementById('auth-provider-title');
-    let list = document.getElementById('account-list');
-
-    title.innerText = provider === 'google' ? 'Sign in with Google' : 'Sign in with Apple ID';
-    
-    let accounts = provider === 'google' ? [
-        { name: 'Commander Nova', email: 'nova.pilot@gmail.com', letter: 'N' },
-        { name: 'Alex Void', email: 'alex.nubric@gmail.com', letter: 'A' }
-    ] : [
-        { name: 'Star Runner (Apple ID)', email: 'runner@icloud.com', letter: 'S' }
-    ];
-
-    list.innerHTML = '';
-    accounts.forEach(acc => {
-        let div = document.createElement('div');
-        div.className = 'account-item';
-        div.innerHTML = `<div class="avatar-circle">${acc.letter}</div><div><div style="font-weight:bold; font-size:0.9rem;">${acc.name}</div><div style="font-size:0.75rem; color:#5f6368;">${acc.email}</div></div>`;
-        div.onclick = () => selectAccount(acc.name);
-        list.appendChild(div);
+    dice.textContent = number;
+    resultColor.textContent = color.name;
+    resultColor.style.color = color.css;
+    resultNumber.textContent =
+      "Generated number: " + number;
+    round++;
+    document.getElementById("round").textContent =
+      String(round).padStart(3,"0");
+    if(lastColor === color.name){
+      streak++;
+    }else{
+      streak = 1;
+    }
+    lastColor = color.name;
+    history.unshift({
+      color,
+      number
     });
-
-    modal.style.display = 'flex';
-}
-
-function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
-
-function selectAccount(name) {
-    activeUser = name;
-    loadUserData();
-    closeAuthModal();
-    document.getElementById('logged-user-name').innerText = activeUser;
-    document.getElementById('active-user-badge').style.display = 'block';
-    showScreen('menu-screen');
-}
-
-function enterGameAsCurrent() { loadUserData(); showScreen('menu-screen'); }
-function enterGameAsGuest() { activeUser = 'Guest Pilot'; loadUserData(); showScreen('menu-screen'); }
-
-/* --- THREE.JS ENGINE, PLANETS & SHADOWS --- */
-let scene, camera, renderer, ambientLight, mainLight, dayLight;
-let playerCraft, shieldAura, starField, planetGroup;
-let asteroids = [], substances = [];
-let gameActive = false;
-
-// Telemetry
-let distanceTraveled = 0;
-let currentScore = 0;
-let speedLevel = 1;
-let dodgedCount = 0;
-let totalRocksPassed = 0;
-
-// Physics Vector
-let inputVector = { x: 0, y: 0 };
-let isBoosting = false;
-let craftVelocity = { x: 0, y: 0 };
-
-const BOUNDS_X = 22;
-const BOUNDS_Y = 13;
-
-function initEngine() {
-    let container = document.getElementById('webgl-container');
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020408, 0.005);
-
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1200);
-    camera.position.set(0, 2.5, 9);
-
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    container.appendChild(renderer.domElement);
-
-    ambientLight = new THREE.AmbientLight(0x0c1a38, 2.0);
-    scene.add(ambientLight);
-
-    mainLight = new THREE.DirectionalLight(0x00f0ff, 3.2);
-    mainLight.position.set(20, 40, 20);
-    mainLight.castShadow = true;
-    mainLight.shadow.mapSize.width = 1024;
-    mainLight.shadow.mapSize.height = 1024;
-    scene.add(mainLight);
-
-    buildStarfield();
-    buildSolarSystemPlanets();
-    buildPlayerCraft();
-
-    window.addEventListener('resize', onWindowResize);
-    setupControls();
-    
-    requestAnimationFrame(renderLoop);
-    runLoadingSequence();
-}
-
-function toggleDayNight(mode) {
-    if(mode === 'day') {
-        scene.background = new THREE.Color(0x1a3366);
-        scene.fog.color.setHex(0x1a3366);
-        ambientLight.color.setHex(0xffffff);
-        ambientLight.intensity = 2.8;
-    } else {
-        scene.background = null;
-        scene.fog.color.setHex(0x020408);
-        ambientLight.color.setHex(0x0c1a38);
-        ambientLight.intensity = 2.0;
+    if(history.length > 18){
+      history.pop();
     }
+    renderHistory();
+    document.getElementById("totalRolls").textContent =
+      history.length;
+    document.getElementById("streak").textContent =
+      streak;
+    document.getElementById("lastNumber").textContent =
+      number;
+    updatePrediction();
+    document.getElementById("engineState").textContent="READY";
+    rollBtn.disabled=false;
+    rollBtn.textContent="ROLL DICE";
+    rolling=false;
+  },animationTime);
 }
-
-/* SOLAR SYSTEM PLANETS (EARTH, JUPITER, SATURN, URANUS, NEPTUNE) */
-function buildSolarSystemPlanets() {
-    planetGroup = new THREE.Group();
-
-    // 1. EARTH
-    let earthGeo = new THREE.SphereGeometry(14, 32, 32);
-    let earthMat = new THREE.MeshStandardMaterial({ color: 0x1b55aa, roughness: 0.5, metalness: 0.1 });
-    let earth = new THREE.Mesh(earthGeo, earthMat);
-    earth.position.set(-110, 35, -280);
-    planetGroup.add(earth);
-
-    // Earth Atmosphere Glow
-    let eGlowGeo = new THREE.SphereGeometry(15, 32, 32);
-    let eGlowMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.25, side: THREE.BackSide });
-    earth.add(new THREE.Mesh(eGlowGeo, eGlowMat));
-
-    // 2. JUPITER
-    let jupGeo = new THREE.SphereGeometry(28, 32, 32);
-    let jupMat = new THREE.MeshStandardMaterial({ color: 0xc49a6c, roughness: 0.7, flatShading: true });
-    let jupiter = new THREE.Mesh(jupGeo, jupMat);
-    jupiter.position.set(130, -20, -380);
-    planetGroup.add(jupiter);
-
-    // 3. SATURN + RINGS
-    let satGeo = new THREE.SphereGeometry(20, 32, 32);
-    let satMat = new THREE.MeshStandardMaterial({ color: 0xe2c589, roughness: 0.8 });
-    let saturn = new THREE.Mesh(satGeo, satMat);
-    saturn.position.set(-140, -50, -420);
-
-    let satRingGeo = new THREE.RingGeometry(26, 42, 32);
-    let satRingMat = new THREE.MeshStandardMaterial({ color: 0xd2b579, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
-    let satRing = new THREE.Mesh(satRingGeo, satRingMat);
-    satRing.rotation.x = Math.PI / 2.8;
-    saturn.add(satRing);
-    planetGroup.add(saturn);
-
-    // 4. URANUS
-    let urGeo = new THREE.SphereGeometry(15, 32, 32);
-    let urMat = new THREE.MeshStandardMaterial({ color: 0x4bdeed, roughness: 0.4 });
-    let uranus = new THREE.Mesh(urGeo, urMat);
-    uranus.position.set(100, 60, -320);
-
-    let urRingGeo = new THREE.RingGeometry(18, 22, 32);
-    let urRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
-    let urRing = new THREE.Mesh(urRingGeo, urRingMat);
-    urRing.rotation.y = Math.PI / 2.2;
-    uranus.add(urRing);
-    planetGroup.add(uranus);
-
-    // 5. NEPTUNE
-    let nepGeo = new THREE.SphereGeometry(14, 32, 32);
-    let nepMat = new THREE.MeshStandardMaterial({ color: 0x2244bb, roughness: 0.3 });
-    let neptune = new THREE.Mesh(nepGeo, nepMat);
-    neptune.position.set(-60, -70, -350);
-    planetGroup.add(neptune);
-
-    scene.add(planetGroup);
+/* HISTORY */
+function addHistory(color,number){
+  history.push({
+    color,
+    number
+  });
 }
-
-function buildStarfield() {
-    let count = 3500;
-    let geo = new THREE.BufferGeometry();
-    let pos = new Float32Array(count * 3);
-    for(let i=0; i<count*3; i+=3) {
-        pos[i] = (Math.random() - 0.5) * 500;
-        pos[i+1] = (Math.random() - 0.5) * 500;
-        pos[i+2] = (Math.random() - 0.5) * 600;
-    }
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    let mat = new THREE.PointsMaterial({ color: 0x00f0ff, size: 1.2, transparent: true, opacity: 0.85 });
-    starField = new THREE.Points(geo, mat);
-    scene.add(starField);
+function renderHistory(){
+  historyBox.innerHTML="";
+  history.forEach(item=>{
+    const el=document.createElement("div");
+    el.className="history-item";
+    el.innerHTML=`
+      <div
+        class="history-dot"
+        style="
+          background:${item.color.css};
+          color:${item.color.css};
+        ">
+      </div>
+      <div class="history-number">
+        #${item.number} · ${item.color.name}
+      </div>
+    `;
+    historyBox.appendChild(el);
+  });
+  document.getElementById("historyCount").textContent =
+    history.length + " RESULTS";
 }
-
-function buildPlayerCraft() {
-    playerCraft = new THREE.Group();
-
-    // Main Craft Body
-    let bodyGeo = new THREE.ConeGeometry(0.85, 3.4, 6);
-    bodyGeo.rotateX(Math.PI / 2);
-    let bodyMat = new THREE.MeshStandardMaterial({ color: 0x061226, metalness: 0.95, roughness: 0.15 });
-    let mainBody = new THREE.Mesh(bodyGeo, bodyMat);
-    mainBody.castShadow = true;
-    mainBody.receiveShadow = true;
-    playerCraft.add(mainBody);
-
-    // Wings
-    let wingGeo = new THREE.BoxGeometry(3.4, 0.08, 1.2);
-    let wingMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, metalness: 0.8, roughness: 0.2 });
-    let wings = new THREE.Mesh(wingGeo, wingMat);
-    wings.position.set(0, 0, 0.2);
-    wings.castShadow = true;
-    playerCraft.add(wings);
-
-    // Cockpit Glass
-    let glassGeo = new THREE.SphereGeometry(0.48, 12, 12);
-    glassGeo.scale(0.8, 0.5, 1.6);
-    let glassMat = new THREE.MeshPhysicalMaterial({ color: 0x00f0ff, roughness: 0.05, transmission: 0.9, transparent: true });
-    let cockpit = new THREE.Mesh(glassGeo, glassMat);
-    cockpit.position.set(0, 0.32, -0.2);
-    playerCraft.add(cockpit);
-
-    // ANIMATED GLOWING SHIELD AURA
-    let auraGeo = new THREE.SphereGeometry(2.1, 16, 16);
-    auraGeo.scale(1.0, 0.6, 1.3);
-    let auraMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.25, wireframe: true });
-    shieldAura = new THREE.Mesh(auraGeo, auraMat);
-    playerCraft.add(shieldAura);
-
-    scene.add(playerCraft);
+/* DEMO PATTERN MODEL */
+function updatePrediction(){
+  const counts = {
+    RED:0,
+    GREEN:0,
+    BLUE:0
+  };
+  history.forEach(item=>{
+    counts[item.color.name]++;
+  });
+  const total = history.length || 1;
+  let red = Math.round((counts.RED/total)*100);
+  let green = Math.round((counts.GREEN/total)*100);
+  let blue = 100-red-green;
+  redValue.textContent=red+"%";
+  greenValue.textContent=green+"%";
+  blueValue.textContent=blue+"%";
+  setTimeout(()=>{
+    redBar.style.width=red+"%";
+    greenBar.style.width=green+"%";
+    blueBar.style.width=blue+"%";
+  },50);
+  const values=[
+    {name:"RED",value:red,color:"#ff477e"},
+    {name:"GREEN",value:green,color:"#21e58b"},
+    {name:"BLUE",value:blue,color:"#4da3ff"}
+  ];
+  values.sort((a,b)=>b.value-a.value);
+  const selected=values[0];
+  /*
+    This is intentionally presented as a
+    historical-frequency simulation rather
+    than a guaranteed prediction.
+  */
+  let simulatedConfidence =
+    Math.min(95,Math.max(34,selected.value + Math.floor(Math.random()*10)));
+  prediction.textContent=selected.name;
+  prediction.style.color=selected.color;
+  confidence.textContent=
+    simulatedConfidence+"%";
+  confidenceBar.style.width=
+    simulatedConfidence+"%";
+  confidenceBar.style.background=
+    selected.color;
 }
-
-function spawnAsteroid() {
-    let size = 1.2 + Math.random() * 2.2;
-    let geo = new THREE.DodecahedronGeometry(size, 1);
-    let mat = new THREE.MeshStandardMaterial({ color: 0x162238, roughness: 0.8, flatShading: true });
-    let mesh = new THREE.Mesh(geo, mat);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    let posX = (Math.random() - 0.5) * (BOUNDS_X * 2);
-    let posY = (Math.random() - 0.5) * (BOUNDS_Y * 2);
-    let posZ = -180 - Math.random() * 60;
-
-    mesh.position.set(posX, posY, posZ);
-    let rotSpeed = { x: (Math.random() - 0.5) * 0.03, y: (Math.random() - 0.5) * 0.03 };
-
-    asteroids.push({ mesh, rotSpeed, radius: size * 0.8, passed: false });
-    scene.add(mesh);
-}
-
-function spawnSubstance() {
-    let geo = new THREE.TorusGeometry(2.6, 0.16, 12, 24);
-    let mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true });
-    let mesh = new THREE.Mesh(geo, mat);
-
-    let posX = (Math.random() - 0.5) * (BOUNDS_X * 1.5);
-    let posY = (Math.random() - 0.5) * (BOUNDS_Y * 1.5);
-    let posZ = -200 - Math.random() * 50;
-
-    mesh.position.set(posX, posY, posZ);
-    substances.push({ mesh });
-    scene.add(mesh);
-}
-
-function runLoadingSequence() {
-    let bar = document.getElementById('loader-bar');
-    let pct = document.getElementById('loader-percent');
-    let log = document.getElementById('loader-log');
-    let progress = 0;
-
-    let interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 15) + 6;
-        if(progress > 100) progress = 100;
-        bar.style.width = progress + '%';
-        pct.innerText = `LOADING ${progress}%`;
-
-        if(progress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => showScreen('auth-screen'), 400);
-        }
-    }, 80);
-}
-
-function showScreen(screenId) {
-    sound.init();
-    sound.playClick();
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    if(screenId === 'menu-screen') {
-        document.getElementById('hud').style.display = 'none';
-        gameActive = false;
-        resetShip();
-    }
-}
-
-function startGame() {
-    sound.playClick();
-    gameActive = true;
-    distanceTraveled = 0;
-    currentScore = 0;
-    speedLevel = 1;
-    dodgedCount = 0;
-    totalRocksPassed = 0;
-
-    asteroids.forEach(a => scene.remove(a.mesh));
-    substances.forEach(s => scene.remove(s.mesh));
-    asteroids = [];
-    substances = [];
-
-    for(let i=0; i<18; i++) spawnAsteroid();
-    for(let i=0; i<3; i++) spawnSubstance();
-
-    resetShip();
-
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('hud').style.display = 'block';
-}
-
-function resetShip() {
-    if(playerCraft) {
-        playerCraft.position.set(0, 0, 0);
-        playerCraft.rotation.set(0, 0, 0);
-    }
-    craftVelocity = { x: 0, y: 0 };
-}
-
-/* SPEED MILESTONE: EVERY 50 ROCKS (+1 SPEED) OR 100 ROCKS (+10 SPEED) */
-function checkRockMilestones() {
-    totalRocksPassed++;
-    dodgedCount++;
-
-    if(totalRocksPassed % 100 === 0) {
-        speedLevel += 10;
-        triggerSpeedIncrease(`+10 SPEED BOOST! (${totalRocksPassed} ROCKS PASSED)`);
-        dodgedCount = 0;
-    } else if(dodgedCount >= 50) {
-        speedLevel += 1;
-        triggerSpeedIncrease(`SPEED +1! (${totalRocksPassed} ROCKS PASSED)`);
-        dodgedCount = 0;
-    }
-}
-
-function triggerSpeedIncrease(msg) {
-    sound.playSpeedUp();
-    let notify = document.getElementById('speed-notify');
-    document.getElementById('notify-title').innerText = "SPEED MILESTONE!";
-    document.getElementById('speed-notify-val').innerText = msg;
-    notify.classList.add('active');
-    setTimeout(() => notify.classList.remove('active'), 1500);
-}
-
-function onGameOver() {
-    gameActive = false;
-    sound.playExplosion();
-
-    if(currentScore > userData.score) userData.score = currentScore;
-    if(distanceTraveled > userData.distance) userData.distance = distanceTraveled;
-    if(totalRocksPassed > (userData.maxRocks || 0)) userData.maxRocks = totalRocksPassed;
-    saveUserData();
-
-    document.getElementById('go-dist').innerText = Math.floor(distanceTraveled) + ' m';
-    document.getElementById('go-score').innerText = Math.floor(currentScore);
-    document.getElementById('go-rocks').innerText = totalRocksPassed + ' Rocks';
-    document.getElementById('go-speed').innerText = 'Speed ' + speedLevel;
-
-    setTimeout(() => {
-        document.getElementById('hud').style.display = 'none';
-        showScreen('gameover-screen');
-    }, 800);
-}
-
-/* --- RENDER LOOP (CONTROLLED SLOW SPEED & ANIMATIONS) --- */
-let lastTime = performance.now();
-
-function renderLoop(time) {
-    requestAnimationFrame(renderLoop);
-    let delta = (time - lastTime) / 1000;
-    if(delta > 0.1) delta = 0.1;
-    lastTime = time;
-
-    // Pulse Glowing Aura
-    if(shieldAura) {
-        shieldAura.rotation.y += 0.01;
-        shieldAura.rotation.z += 0.005;
-        shieldAura.material.opacity = 0.2 + Math.sin(time * 0.004) * 0.1;
-    }
-
-    if(gameActive) {
-        // SLOW CONTROLLED SPEED BASE
-        let baseSpeed = 16 + (speedLevel - 1) * 3;
-        let speedMult = isBoosting ? baseSpeed + 4 : baseSpeed; // Gentle +1/Controlled boost
-
-        distanceTraveled += (speedMult * 0.4) * delta;
-        currentScore += (speedMult * 0.6) * delta;
-
-        // Steering Physics
-        let targetVelX = inputVector.x * 20;
-        let targetVelY = inputVector.y * 16;
-        
-        craftVelocity.x += (targetVelX - craftVelocity.x) * 0.1;
-        craftVelocity.y += (targetVelY - craftVelocity.y) * 0.1;
-
-        playerCraft.position.x += craftVelocity.x * delta;
-        playerCraft.position.y += craftVelocity.y * delta;
-
-        playerCraft.position.x = Math.max(-BOUNDS_X, Math.min(BOUNDS_X, playerCraft.position.x));
-        playerCraft.position.y = Math.max(-BOUNDS_Y, Math.min(BOUNDS_Y, playerCraft.position.y));
-
-        playerCraft.rotation.z = -craftVelocity.x * 0.035;
-        playerCraft.rotation.x = craftVelocity.y * 0.025;
-
-        // SUBSTANCE BOOST FIELDS LOGIC
-        if(substances.length < 3) spawnSubstance();
-        for(let i = substances.length - 1; i >= 0; i--) {
-            let sub = substances[i];
-            sub.mesh.position.z += speedMult * delta;
-            sub.mesh.rotation.z += 0.015;
-
-            if(playerCraft.position.distanceTo(sub.mesh.position) < 2.6) {
-                currentScore += 300;
-                speedLevel += 1; // Controlled +1 boost
-                userData.substances++;
-                sound.playBoost();
-
-                let notify = document.getElementById('speed-notify');
-                document.getElementById('notify-title').innerText = "SUBSTANCE POWER!";
-                document.getElementById('speed-notify-val').innerText = "+1 SPEED BOOST & +300 PTS";
-                notify.classList.add('active');
-                setTimeout(() => notify.classList.remove('active'), 1200);
-
-                scene.remove(sub.mesh);
-                substances.splice(i, 1);
-            } else if(sub.mesh.position.z > 15) {
-                scene.remove(sub.mesh);
-                substances.splice(i, 1);
-            }
-        }
-
-        // ASTEROIDS LOGIC
-        if(asteroids.length < 18 + Math.floor(speedLevel * 0.5)) spawnAsteroid();
-        for(let i = asteroids.length - 1; i >= 0; i--) {
-            let ast = asteroids[i];
-            ast.mesh.position.z += speedMult * delta;
-            ast.mesh.rotation.x += ast.rotSpeed.x;
-            ast.mesh.rotation.y += ast.rotSpeed.y;
-
-            if(!ast.passed && ast.mesh.position.z > playerCraft.position.z) {
-                ast.passed = true;
-                checkRockMilestones();
-            }
-
-            if(playerCraft.position.distanceTo(ast.mesh.position) < (ast.radius + 0.85)) {
-                onGameOver();
-            }
-
-            if(ast.mesh.position.z > 15) {
-                scene.remove(ast.mesh);
-                asteroids.splice(i, 1);
-            }
-        }
-
-        // HUD Updates
-        document.getElementById('hud-dist').innerText = Math.floor(distanceTraveled) + ' m';
-        document.getElementById('hud-score').innerText = Math.floor(currentScore);
-        document.getElementById('hud-rocks-count').innerText = `ROCKS PASSED: ${totalRocksPassed}`;
-        document.getElementById('hud-speed-lvl').innerText = `SPEED ${speedLevel}`;
-        document.getElementById('hud-speed-progress').style.width = Math.min(100, (dodgedCount / 50) * 100) + '%';
-    }
-
-    // Starfield & Planets Orbit
-    if(starField) {
-        let p = starField.geometry.attributes.position;
-        let starSpd = gameActive ? (18 + speedLevel * 2) : 8;
-        for(let i=2; i<p.count*3; i+=3) {
-            p.array[i] += starSpd * delta;
-            if(p.array[i] > 100) p.array[i] = -400;
-        }
-        p.needsUpdate = true;
-    }
-
-    if(planetGroup) {
-        planetGroup.rotation.y += 0.0003;
-    }
-
-    // Natural Smooth Camera Drift
-    let targetCamX = gameActive ? playerCraft.position.x * 0.22 : 0;
-    let targetCamY = gameActive ? playerCraft.position.y * 0.22 + 2.5 : 2.5;
-
-    camera.position.x += (targetCamX - camera.position.x) * 0.05;
-    camera.position.y += (targetCamY - camera.position.y) * 0.05;
-
-    renderer.render(scene, camera);
-}
-
-/* --- JOYSTICK STYLES & CONTROLS --- */
-function applyJoystickStyle(style) {
-    let zone = document.getElementById('joystick-zone');
-    let knob = document.getElementById('joystick-knob');
-    let dpad = document.getElementById('dpad-overlay');
-
-    zone.className = '';
-    knob.className = '';
-    knob.style.display = 'block';
-    dpad.style.display = 'none';
-
-    if(style === 'round') {
-        zone.classList.add('shape-round');
-        knob.classList.add('shape-round');
-    } else if(style === 'square') {
-        zone.classList.add('shape-square');
-        knob.classList.add('shape-square');
-    } else if(style === 'dpad') {
-        zone.classList.add('shape-square');
-        knob.style.display = 'none';
-        dpad.style.display = 'block';
-    }
-}
-
-function setupControls() {
-    let keys = {};
-
-    window.addEventListener('keydown', (e) => { keys[e.code] = true; updateKeyInput(); });
-    window.addEventListener('keyup', (e) => { keys[e.code] = false; updateKeyInput(); });
-
-    function updateKeyInput() {
-        if(!gameActive) return;
-        let x = 0, y = 0;
-        if(keys['KeyA'] || keys['ArrowLeft']) x -= 1;
-        if(keys['KeyD'] || keys['ArrowRight']) x += 1;
-        if(keys['KeyW'] || keys['ArrowUp']) y += 1;
-        if(keys['KeyS'] || keys['ArrowDown']) y -= 1;
-        
-        inputVector.x = x;
-        inputVector.y = y;
-        isBoosting = !!(keys['Space'] || keys['ShiftLeft']);
-    }
-
-    // Touch Joystick Engine
-    let zone = document.getElementById('joystick-zone');
-    let knob = document.getElementById('joystick-knob');
-    let activeTouchId = null;
-    let origin = { x: 0, y: 0 };
-
-    function handleTouchStart(e) {
-        e.preventDefault();
-        for(let i=0; i<e.changedTouches.length; i++) {
-            let touch = e.changedTouches[i];
-            let rect = zone.getBoundingClientRect();
-            activeTouchId = touch.identifier;
-            origin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
-            moveJoystick(touch);
-            break;
-        }
-    }
-
-    function handleTouchMove(e) {
-        if(activeTouchId === null) return;
-        for(let i=0; i<e.changedTouches.length; i++) {
-            if(e.changedTouches[i].identifier === activeTouchId) {
-                moveJoystick(e.changedTouches[i]);
-                break;
-            }
-        }
-    }
-
-    function handleTouchEnd(e) {
-        if(activeTouchId === null) return;
-        for(let i=0; i<e.changedTouches.length; i++) {
-            if(e.changedTouches[i].identifier === activeTouchId) {
-                activeTouchId = null;
-                knob.style.transform = `translate(0px, 0px)`;
-                inputVector = { x: 0, y: 0 };
-                break;
-            }
-        }
-    }
-
-    function moveJoystick(touch) {
-        let dx = touch.clientX - origin.x;
-        let dy = touch.clientY - origin.y;
-        let maxLen = 42;
-
-        let dist = Math.hypot(dx, dy);
-        if(dist > maxLen) {
-            dx = (dx / dist) * maxLen;
-            dy = (dy / dist) * maxLen;
-        }
-
-        knob.style.transform = `translate(${dx}px, ${dy}px)`;
-
-        inputVector.x = dx / maxLen;
-        inputVector.y = -dy / maxLen; 
-    }
-
-    zone.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
-
-    // Boost Control
-    let boostBtn = document.getElementById('boost-btn');
-    boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBoosting = true; }, { passive: false });
-    boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); isBoosting = false; });
-}
-
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-document.addEventListener('mouseover', (e) => {
-    if(e.target.classList.contains('btn')) sound.playHover();
+/* KEYBOARD */
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space"){
+    e.preventDefault();
+    rollDice();
+  }
 });
-
-window.addEventListener('load', initEngine);
+/* SMALL LIVE VISUAL EFFECT */
+setInterval(()=>{
+  if(!rolling && history.length){
+    const bars=[
+      redBar,
+      greenBar,
+      blueBar
+    ];
+    bars.forEach(bar=>{
+      bar.style.filter =
+        "brightness("+(1+Math.random()*.12)+")";
+    });
+  }
+},1200);
+renderHistory();
 </script>
 </body>
 </html>
