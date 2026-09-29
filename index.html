@@ -3,25 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>COLOR//DICE — User Analyzer</title>
+<title>COLOR//DICE — Roll Analyzer</title>
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#03050a;
-  --panel:rgba(12,16,27,.82);
+  --bg:#05060a;
+  --panel:#0d111b;
+  --card:#121722;
   --line:rgba(255,255,255,.09);
-  --text:#f7f9ff;
-  --muted:#7f879d;
-  --cyan:#00e5ff;
+  --text:#f5f7ff;
+  --muted:#7f879b;
   --blue:#3295ff;
-  --red:#ff3e69;
-  --purple:#9b62ff;
-  --orange:#ff8b2c;
-  --green:#21e58b;
+  --red:#ff3d68;
+  --purple:#9b61ff;
+  --orange:#ff8a2b;
+  --green:#20df89;
   --yellow:#ffd43b;
 }
 body{
@@ -29,8 +25,8 @@ body{
   color:var(--text);
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at 10% 0%,rgba(0,150,255,.17),transparent 28%),
-    radial-gradient(circle at 90% 100%,rgba(145,65,255,.14),transparent 30%),
+    radial-gradient(circle at 15% 0%,rgba(0,145,255,.14),transparent 28%),
+    radial-gradient(circle at 90% 100%,rgba(145,65,255,.11),transparent 30%),
     var(--bg);
   overflow-x:hidden;
 }
@@ -39,17 +35,17 @@ body:before{
   position:fixed;
   inset:0;
   pointer-events:none;
-  opacity:.14;
+  opacity:.13;
   background-image:
     linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:40px 40px;
+  background-size:42px 42px;
 }
 .app{
   position:relative;
-  width:min(1180px,94%);
+  width:min(1100px,94%);
   margin:auto;
-  padding:25px 0 50px;
+  padding:24px 0 50px;
 }
 /* HEADER */
 header{
@@ -58,26 +54,27 @@ header{
   justify-content:space-between;
   margin-bottom:20px;
 }
-.brand{
+.logo-area{
   display:flex;
   align-items:center;
   gap:12px;
 }
 .logo{
-  width:46px;
-  height:46px;
-  border-radius:14px;
+  width:45px;
+  height:45px;
   display:grid;
   place-items:center;
-  font-size:22px;
-  background:linear-gradient(135deg,#1681ff,#00dfff);
-  box-shadow:0 0 35px rgba(0,190,255,.3);
+  border-radius:14px;
+  font-size:21px;
+  background:linear-gradient(135deg,#1680ff,#00dfff);
+  box-shadow:0 0 35px rgba(0,190,255,.25);
 }
-.brand h1{
+.logo-text h1{
   font-size:17px;
   letter-spacing:3px;
 }
-.brand p{
+.logo-text span{
+  display:block;
   color:var(--muted);
   font-size:9px;
   letter-spacing:2px;
@@ -90,8 +87,8 @@ header{
   padding:9px 13px;
   border:1px solid var(--line);
   border-radius:30px;
-  background:rgba(255,255,255,.035);
-  color:#abb2c5;
+  background:rgba(255,255,255,.03);
+  color:#aeb4c5;
   font-size:9px;
 }
 .status-dot{
@@ -105,180 +102,63 @@ header{
 .hero{
   position:relative;
   overflow:hidden;
-  padding:30px;
+  padding:28px;
   border:1px solid var(--line);
-  border-radius:25px;
-  background:
-    linear-gradient(145deg,rgba(18,23,38,.92),rgba(6,8,14,.8));
+  border-radius:24px;
+  background:linear-gradient(
+    145deg,
+    rgba(17,22,35,.9),
+    rgba(7,9,15,.82)
+  );
 }
-.hero:after{
-  content:"";
+.scan{
   position:absolute;
-  top:0;
-  left:-40%;
   width:35%;
   height:1px;
+  top:0;
+  left:-40%;
   background:linear-gradient(
     90deg,
     transparent,
-    var(--cyan),
+    #00e5ff,
     transparent
   );
   animation:scan 4s linear infinite;
 }
 @keyframes scan{
-  to{
-    left:110%;
-  }
+  to{left:110%}
 }
 .eyebrow{
-  color:var(--cyan);
+  color:#00e5ff;
   font-size:9px;
   letter-spacing:3px;
 }
 .hero h2{
-  margin-top:9px;
-  font-size:clamp(31px,5vw,55px);
+  margin-top:8px;
+  font-size:clamp(30px,5vw,52px);
   line-height:1;
   letter-spacing:-2px;
 }
 .hero p{
   max-width:650px;
-  margin-top:14px;
-  color:var(--muted);
-  line-height:1.6;
-  font-size:13px;
-}
-/* VERIFICATION */
-.verify{
-  margin-top:18px;
-  padding:20px;
-  border-radius:21px;
-  border:1px solid var(--line);
-  background:var(--panel);
-}
-.verify-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:13px;
-}
-.verify-title h3{
-  font-size:14px;
-}
-.verify-title span{
-  color:var(--muted);
-  font-size:9px;
-  letter-spacing:1px;
-}
-.verify-row{
-  display:flex;
-  gap:10px;
-}
-#userId{
-  flex:1;
-  min-width:0;
-  color:white;
-  outline:none;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:13px;
-  padding:14px;
-  background:rgba(255,255,255,.04);
-  font-size:13px;
-}
-#userId:focus{
-  border-color:rgba(0,229,255,.45);
-  box-shadow:0 0 20px rgba(0,229,255,.08);
-}
-#verifyBtn{
-  border:0;
-  border-radius:13px;
-  padding:0 23px;
-  color:white;
-  font-weight:800;
-  cursor:pointer;
-  background:linear-gradient(135deg,#177cff,#00d9ff);
-  box-shadow:0 10px 30px rgba(0,170,255,.22);
-}
-#verifyBtn:active{
-  transform:scale(.96);
-}
-.verify-status{
-  display:none;
   margin-top:13px;
-  padding:12px;
-  border-radius:12px;
-  background:rgba(33,229,139,.06);
-  border:1px solid rgba(33,229,139,.15);
-  color:#8df0be;
-  font-size:10px;
-}
-/* USER CARD */
-.user-card{
-  display:none;
-  margin-top:15px;
-  padding:18px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.025);
-}
-.user-card.show{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.user-info{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.avatar{
-  width:45px;
-  height:45px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,#19283e,#0c111c);
-  border:1px solid rgba(255,255,255,.1);
-}
-.user-name{
-  font-weight:800;
-  font-size:13px;
-}
-.user-id-display{
   color:var(--muted);
-  font-size:9px;
-  margin-top:3px;
+  font-size:13px;
+  line-height:1.6;
 }
-.verified{
-  color:var(--green);
-  font-size:9px;
-}
-/* DASHBOARD */
-.dashboard{
-  display:none;
-  grid-template-columns:1.15fr .85fr;
-  gap:18px;
-  margin-top:18px;
-}
-.dashboard.show{
-  display:grid;
-}
+/* INPUT AREA */
 .panel{
-  padding:22px;
-  border-radius:22px;
+  margin-top:18px;
+  padding:21px;
   border:1px solid var(--line);
-  background:var(--panel);
+  border-radius:22px;
+  background:rgba(13,17,27,.82);
   backdrop-filter:blur(18px);
-}
-/* PREDICTION */
-.prediction-panel{
-  min-height:460px;
 }
 .heading{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
 }
 .heading h3{
   font-size:14px;
@@ -288,28 +168,136 @@ header{
   font-size:9px;
   letter-spacing:1px;
 }
-.prediction-box{
-  position:relative;
-  overflow:hidden;
+.roll-input{
   margin-top:17px;
-  padding:30px 20px;
-  border-radius:20px;
-  text-align:center;
+  padding:20px;
+  border:1px solid var(--line);
+  border-radius:18px;
   background:rgba(255,255,255,.025);
+}
+.roll-label{
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:2px;
+  margin-bottom:13px;
+}
+.color-buttons{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:9px;
+}
+.color-btn{
+  min-height:58px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;
+  color:white;
+  cursor:pointer;
+  background:#161b27;
+  transition:.2s;
+  font-size:10px;
+  font-weight:800;
+}
+.color-btn:hover{
+  transform:translateY(-2px);
+}
+.color-btn.selected{
+  transform:translateY(-2px);
+  box-shadow:
+    0 0 0 2px currentColor,
+    0 0 25px currentColor;
+}
+.color-preview{
+  width:19px;
+  height:19px;
+  margin:0 auto 6px;
+  border-radius:50%;
+}
+/* FOUR SLOTS */
+.slots{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:17px;
+}
+.slot{
+  min-height:88px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:1px dashed rgba(255,255,255,.13);
+  border-radius:15px;
+  background:rgba(255,255,255,.02);
+}
+.slot-number{
+  color:var(--muted);
+  font-size:8px;
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+.slot-color{
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  display:none;
+  box-shadow:0 0 18px currentColor;
+}
+.slot-name{
+  color:#6e7588;
+  font-size:9px;
+  margin-top:6px;
+}
+.actions{
+  display:flex;
+  gap:9px;
+  margin-top:15px;
+}
+.action{
+  min-height:44px;
+  border:0;
+  border-radius:12px;
+  padding:0 19px;
+  cursor:pointer;
+  color:white;
+  font-weight:800;
+  font-size:10px;
+}
+.add{
+  flex:1;
+  background:linear-gradient(135deg,#167cff,#00d8ff);
+}
+.clear{
+  background:#181d29;
   border:1px solid var(--line);
 }
-.prediction-box:before{
+/* ANALYSIS */
+.analysis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+.prediction-card{
+  position:relative;
+  overflow:hidden;
+  margin-top:15px;
+  padding:27px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  text-align:center;
+  background:rgba(255,255,255,.025);
+}
+.prediction-card:before{
   content:"";
   position:absolute;
-  width:170px;
-  height:170px;
-  border-radius:50%;
+  width:160px;
+  height:160px;
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  opacity:.12;
-  filter:blur(35px);
-  background:var(--prediction-color,#00e5ff);
+  border-radius:50%;
+  background:var(--prediction,#00e5ff);
+  opacity:.09;
+  filter:blur(40px);
   transition:.5s;
 }
 .prediction-label{
@@ -318,65 +306,62 @@ header{
   font-size:9px;
   letter-spacing:2px;
 }
-#prediction{
+.prediction{
   position:relative;
-  font-size:38px;
+  margin:9px 0;
+  font-size:32px;
   font-weight:950;
-  margin:12px 0;
-  transition:.4s;
+  transition:.35s;
 }
-.signal{
+.confidence{
   position:relative;
-  color:#aeb5c7;
+  color:#aeb5c5;
   font-size:11px;
 }
 .progress{
   position:relative;
-  height:8px;
-  margin-top:14px;
-  border-radius:20px;
+  height:7px;
+  margin-top:13px;
   overflow:hidden;
-  background:#191d29;
+  border-radius:20px;
+  background:#1a1f2c;
 }
-#confidenceBar{
+.progress-fill{
   height:100%;
   width:0;
   border-radius:20px;
   transition:1s;
 }
-/* COLORS */
-.colors{
+/* DISTRIBUTION */
+.distribution{
+  margin-top:15px;
   display:flex;
   flex-direction:column;
-  gap:11px;
-  margin-top:18px;
-}
-.color-row{
-  display:grid;
-  grid-template-columns:75px 1fr 45px;
-  align-items:center;
   gap:10px;
+}
+.dist-row{
+  display:grid;
+  grid-template-columns:70px 1fr 40px;
+  align-items:center;
+  gap:9px;
   font-size:10px;
 }
 .track{
   height:7px;
-  border-radius:20px;
   overflow:hidden;
-  background:#191d29;
+  border-radius:20px;
+  background:#1a1f2c;
 }
 .fill{
-  width:0;
   height:100%;
+  width:0;
   border-radius:20px;
   transition:1s;
 }
 /* HISTORY */
-.history-panel{
-  margin-top:18px;
-}
 .history{
   display:flex;
-  gap:9px;
+  gap:8px;
   overflow-x:auto;
   padding-top:15px;
   scrollbar-width:none;
@@ -384,87 +369,65 @@ header{
 .history::-webkit-scrollbar{
   display:none;
 }
-.history-item{
-  min-width:70px;
-  height:73px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  border-radius:14px;
+.history-roll{
+  min-width:128px;
+  padding:10px;
   border:1px solid var(--line);
+  border-radius:14px;
   background:rgba(255,255,255,.025);
 }
-.dot{
-  width:23px;
-  height:23px;
-  border-radius:50%;
-  margin-bottom:6px;
-  box-shadow:0 0 16px currentColor;
-}
-.history-name{
-  color:#858c9f;
+.roll-number{
+  color:var(--muted);
   font-size:8px;
+  margin-bottom:8px;
+}
+.mini-colors{
+  display:flex;
+  gap:5px;
+}
+.mini{
+  width:17px;
+  height:17px;
+  border-radius:50%;
+  box-shadow:0 0 8px currentColor;
 }
 /* STATS */
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
+  gap:10px;
   margin-top:18px;
 }
 .stat{
-  padding:17px;
-  border-radius:18px;
+  padding:16px;
   border:1px solid var(--line);
+  border-radius:16px;
   background:rgba(255,255,255,.025);
 }
 .stat small{
   color:var(--muted);
   font-size:8px;
-  letter-spacing:1.5px;
+  letter-spacing:1px;
 }
 .stat strong{
   display:block;
   margin-top:6px;
-  font-size:23px;
-}
-/* LOADING */
-.loading{
-  display:none;
-  align-items:center;
-  gap:10px;
-  margin-top:14px;
-  color:#9ca4b8;
-  font-size:10px;
-}
-.loading.show{
-  display:flex;
-}
-.loader{
-  width:15px;
-  height:15px;
-  border:2px solid rgba(255,255,255,.1);
-  border-top-color:var(--cyan);
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-}
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
+  font-size:21px;
 }
 .notice{
-  margin-top:18px;
+  margin-top:17px;
   text-align:center;
-  color:#62697b;
+  color:#626a7c;
   font-size:9px;
   line-height:1.6;
 }
 /* MOBILE */
 @media(max-width:800px){
-  .dashboard.show{
+  .analysis{
     grid-template-columns:1fr;
+  }
+  .color-buttons{
+    grid-template-columns:repeat(3,1fr);
   }
   .stats{
     grid-template-columns:repeat(2,1fr);
@@ -473,27 +436,24 @@ header{
 @media(max-width:500px){
   .app{
     width:92%;
-    padding-top:17px;
   }
   .hero{
     padding:23px;
   }
-  .hero h2{
-    font-size:32px;
-  }
-  .panel,
-  .verify{
+  .panel{
     padding:17px;
   }
-  .verify-row{
-    flex-direction:column;
+  .slots{
+    gap:7px;
   }
-  #verifyBtn{
-    height:45px;
+  .slot{
+    min-height:78px;
+  }
+  .color-btn{
+    min-height:53px;
   }
   .status{
     font-size:8px;
-    padding:8px;
   }
 }
 </style>
@@ -501,11 +461,11 @@ header{
 <body>
 <main class="app">
 <header>
-  <div class="brand">
+  <div class="logo-area">
     <div class="logo">🎲</div>
-    <div>
+    <div class="logo-text">
       <h1>COLOR//DICE</h1>
-      <p>USER INTELLIGENCE ANALYZER</p>
+      <span>ROLL PATTERN ANALYZER</span>
     </div>
   </div>
   <div class="status">
@@ -514,319 +474,327 @@ header{
   </div>
 </header>
 <section class="hero">
+  <div class="scan"></div>
   <div class="eyebrow">
-    SIX-COLOR ANALYSIS SYSTEM
+    FOUR-COLOR ROLL INPUT
   </div>
   <h2>
-    Verify a user.<br>
-    Analyze the history.
+    Enter the roll.<br>
+    Analyze the sequence.
   </h2>
   <p>
-    Enter a user ID to load a simulated result history,
-    calculate color frequencies and generate a
-    historical-frequency signal for the next color.
+    Select the four colors shown on each roll.
+    The analyzer stores your history and calculates
+    historical color frequencies and pattern signals.
   </p>
 </section>
-<section class="verify">
-  <div class="verify-title">
-    <h3>User Verification</h3>
-    <span>IDENTITY CHECK</span>
+<!-- INPUT -->
+<section class="panel">
+  <div class="heading">
+    <h3>Current Roll</h3>
+    <span id="slotStatus">0 / 4 SELECTED</span>
   </div>
-  <div class="verify-row">
-    <input
-      id="userId"
-      type="text"
-      placeholder="Enter User ID..."
-      autocomplete="off"
-    >
-    <button id="verifyBtn">
-      VERIFY USER
-    </button>
-  </div>
-  <div class="loading" id="loading">
-    <div class="loader"></div>
-    <span id="loadingText">
-      Verifying user...
-    </span>
-  </div>
-  <div class="verify-status" id="verifyStatus">
-    ✓ User verified. Demo history loaded.
-  </div>
-  <div class="user-card" id="userCard">
-    <div class="user-info">
-      <div class="avatar">
-        👤
+  <div class="roll-input">
+    <div class="roll-label">
+      SELECT COLORS IN THE ORDER THEY APPEARED
+    </div>
+    <div class="color-buttons" id="colorButtons"></div>
+    <div class="slots">
+      <div class="slot">
+        <div class="slot-number">COLOR 01</div>
+        <div class="slot-color" id="slot0Color"></div>
+        <div class="slot-name" id="slot0Name">EMPTY</div>
       </div>
-      <div>
-        <div class="user-name" id="displayName">
-          User
-        </div>
-        <div class="user-id-display" id="displayId">
-          ID: —
-        </div>
+      <div class="slot">
+        <div class="slot-number">COLOR 02</div>
+        <div class="slot-color" id="slot1Color"></div>
+        <div class="slot-name" id="slot1Name">EMPTY</div>
+      </div>
+      <div class="slot">
+        <div class="slot-number">COLOR 03</div>
+        <div class="slot-color" id="slot2Color"></div>
+        <div class="slot-name" id="slot2Name">EMPTY</div>
+      </div>
+      <div class="slot">
+        <div class="slot-number">COLOR 04</div>
+        <div class="slot-color" id="slot3Color"></div>
+        <div class="slot-name" id="slot3Name">EMPTY</div>
       </div>
     </div>
-    <div class="verified">
-      ● VERIFIED
+    <div class="actions">
+      <button class="action add" id="addRoll">
+        + ADD ROLL TO HISTORY
+      </button>
+      <button class="action clear" id="clearCurrent">
+        CLEAR
+      </button>
     </div>
   </div>
 </section>
-<section class="dashboard" id="dashboard">
-  <div class="panel prediction-panel">
+<!-- ANALYSIS -->
+<section class="analysis">
+  <div class="panel">
     <div class="heading">
-      <h3>Next Color Signal</h3>
+      <h3>Next-Color Signal</h3>
       <span>HISTORICAL MODEL</span>
     </div>
-    <div class="prediction-box" id="predictionBox">
+    <div class="prediction-card" id="predictionCard">
       <div class="prediction-label">
-        NEXT SIMULATED COLOR
+        STATISTICAL SIGNAL
       </div>
-      <div id="prediction">
-        ANALYZING
+      <div class="prediction" id="prediction">
+        WAITING
       </div>
-      <div class="signal">
-        Historical signal:
+      <div class="confidence">
+        Signal strength:
         <b id="confidence">0%</b>
       </div>
       <div class="progress">
-        <div id="confidenceBar"></div>
+        <div class="progress-fill" id="confidenceBar"></div>
       </div>
     </div>
-    <div class="heading">
-      <h3>Color Distribution</h3>
-      <span>USER HISTORY</span>
+    <div class="heading" style="margin-top:20px">
+      <h3>Color Frequency</h3>
+      <span>ALL ENTERED ROLLS</span>
     </div>
-    <div class="colors">
-      <div class="color-row">
+    <div class="distribution">
+      <div class="dist-row">
         <span>BLUE</span>
-        <div class="track">
-          <div class="fill" id="blueFill"></div>
-        </div>
-        <span id="blueValue">0%</span>
+        <div class="track"><div class="fill" id="blue"></div></div>
+        <span id="blueV">0%</span>
       </div>
-      <div class="color-row">
+      <div class="dist-row">
         <span>RED</span>
-        <div class="track">
-          <div class="fill" id="redFill"></div>
-        </div>
-        <span id="redValue">0%</span>
+        <div class="track"><div class="fill" id="red"></div></div>
+        <span id="redV">0%</span>
       </div>
-      <div class="color-row">
+      <div class="dist-row">
         <span>PURPLE</span>
-        <div class="track">
-          <div class="fill" id="purpleFill"></div>
-        </div>
-        <span id="purpleValue">0%</span>
+        <div class="track"><div class="fill" id="purple"></div></div>
+        <span id="purpleV">0%</span>
       </div>
-      <div class="color-row">
+      <div class="dist-row">
         <span>ORANGE</span>
-        <div class="track">
-          <div class="fill" id="orangeFill"></div>
-        </div>
-        <span id="orangeValue">0%</span>
+        <div class="track"><div class="fill" id="orange"></div></div>
+        <span id="orangeV">0%</span>
       </div>
-      <div class="color-row">
+      <div class="dist-row">
         <span>GREEN</span>
-        <div class="track">
-          <div class="fill" id="greenFill"></div>
-        </div>
-        <span id="greenValue">0%</span>
+        <div class="track"><div class="fill" id="green"></div></div>
+        <span id="greenV">0%</span>
       </div>
-      <div class="color-row">
+      <div class="dist-row">
         <span>YELLOW</span>
-        <div class="track">
-          <div class="fill" id="yellowFill"></div>
-        </div>
-        <span id="yellowValue">0%</span>
+        <div class="track"><div class="fill" id="yellow"></div></div>
+        <span id="yellowV">0%</span>
       </div>
     </div>
   </div>
   <div class="panel">
     <div class="heading">
-      <h3>Analysis Statistics</h3>
-      <span>LIVE</span>
+      <h3>Roll History</h3>
+      <span id="rollCount">0 ROLLS</span>
     </div>
-    <div class="stats" style="grid-template-columns:1fr 1fr;margin-top:17px">
+    <div class="history" id="history"></div>
+    <div class="stats">
       <div class="stat">
-        <small>TOTAL RESULTS</small>
+        <small>TOTAL ROLLS</small>
         <strong id="total">0</strong>
       </div>
       <div class="stat">
-        <small>STREAK</small>
-        <strong id="streak">0</strong>
+        <small>TOTAL COLORS</small>
+        <strong id="totalColors">0</strong>
+      </div>
+      <div class="stat">
+        <small>HOT COLOR</small>
+        <strong id="hot">—</strong>
       </div>
       <div class="stat">
         <small>LAST COLOR</small>
-        <strong id="lastColor">—</strong>
-      </div>
-      <div class="stat">
-        <small>LAST NUMBER</small>
-        <strong id="lastNumber">—</strong>
+        <strong id="last">—</strong>
       </div>
     </div>
-    <div class="heading" style="margin-top:25px">
-      <h3>Recent Sequence</h3>
-      <span>LAST 20</span>
-    </div>
-    <div class="history" id="history"></div>
   </div>
 </section>
 <div class="notice">
-  DEMO / ANALYSIS MODE — The displayed signal is calculated from
-  supplied historical results. It does not guarantee or determine
-  the next outcome of a real random dice game.
+  The signal is calculated only from the history you enter.
+  It is a statistical pattern indicator, not a guaranteed prediction
+  of a random game's next result.
 </div>
 </main>
 <script>
 /* =========================================================
-   SIX COLORS
+   COLORS
 ========================================================= */
 const COLORS = [
-  {
-    name:"BLUE",
-    hex:"#3295ff"
-  },
-  {
-    name:"RED",
-    hex:"#ff3e69"
-  },
-  {
-    name:"PURPLE",
-    hex:"#9b62ff"
-  },
-  {
-    name:"ORANGE",
-    hex:"#ff8b2c"
-  },
-  {
-    name:"GREEN",
-    hex:"#21e58b"
-  },
-  {
-    name:"YELLOW",
-    hex:"#ffd43b"
-  }
+  {name:"BLUE",hex:"#3295ff"},
+  {name:"RED",hex:"#ff3d68"},
+  {name:"PURPLE",hex:"#9b61ff"},
+  {name:"ORANGE",hex:"#ff8a2b"},
+  {name:"GREEN",hex:"#20df89"},
+  {name:"YELLOW",hex:"#ffd43b"}
 ];
+/* =========================================================
+   STATE
+========================================================= */
+let currentRoll = [];
 let history = [];
 /* =========================================================
-   VERIFY USER
+   BUILD COLOR BUTTONS
 ========================================================= */
-document
-.getElementById("verifyBtn")
-.addEventListener("click",verifyUser);
-document
-.getElementById("userId")
-.addEventListener("keydown",event=>{
-  if(event.key==="Enter"){
-    verifyUser();
-  }
+const colorButtons =
+  document.getElementById("colorButtons");
+COLORS.forEach((color,index)=>{
+  const button =
+    document.createElement("button");
+  button.type="button";
+  button.className="color-btn";
+  button.innerHTML=`
+    <div
+      class="color-preview"
+      style="
+        background:${color.hex};
+        color:${color.hex};
+        box-shadow:0 0 12px ${color.hex};
+      ">
+    </div>
+    ${color.name}
+  `;
+  button.addEventListener("click",()=>{
+    selectColor(index,button);
+  });
+  colorButtons.appendChild(button);
 });
-function verifyUser(){
-  const input =
-    document.getElementById("userId");
-  const id =
-    input.value.trim();
-  if(!id){
-    input.focus();
+/* =========================================================
+   SELECT COLOR
+========================================================= */
+function selectColor(index,button){
+  if(currentRoll.length>=4){
     return;
   }
-  const button =
-    document.getElementById("verifyBtn");
-  const loading =
-    document.getElementById("loading");
-  const loadingText =
-    document.getElementById("loadingText");
-  const dashboard =
-    document.getElementById("dashboard");
-  button.disabled=true;
-  loading.classList.add("show");
-  dashboard.classList.remove("show");
-  document.getElementById("verifyStatus")
-    .style.display="none";
-  /*
-    Animated verification sequence.
-  */
-  const steps=[
-    "Checking user ID...",
-    "Loading result profile...",
-    "Reading historical data...",
-    "Calculating color frequencies...",
-    "Building analysis..."
-  ];
-  let step=0;
-  const interval=setInterval(()=>{
-    loadingText.textContent=
-      steps[step];
-    step++;
-    if(step>=steps.length){
-      clearInterval(interval);
-      setTimeout(()=>{
-        finishVerification(id);
-      },350);
-    }
-  },400);
+  const color=COLORS[index];
+  currentRoll.push(color);
+  button.classList.add("selected");
+  updateSlots();
 }
 /* =========================================================
-   FINISH VERIFICATION
+   UPDATE FOUR SLOTS
 ========================================================= */
-function finishVerification(id){
-  document.getElementById("loading")
-    .classList.remove("show");
-  document.getElementById("verifyStatus")
-    .style.display="block";
-  document.getElementById("userCard")
-    .classList.add("show");
-  document.getElementById("displayName")
+function updateSlots(){
+  for(let i=0;i<4;i++){
+    const colorElement =
+      document.getElementById(
+        "slot"+i+"Color"
+      );
+    const nameElement =
+      document.getElementById(
+        "slot"+i+"Name"
+      );
+    if(currentRoll[i]){
+      colorElement.style.display="block";
+      colorElement.style.background=
+        currentRoll[i].hex;
+      colorElement.style.color=
+        currentRoll[i].hex;
+      colorElement.style.boxShadow=
+        "0 0 18px "+currentRoll[i].hex;
+      nameElement.textContent=
+        currentRoll[i].name;
+      nameElement.style.color=
+        currentRoll[i].hex;
+    }else{
+      colorElement.style.display="none";
+      nameElement.textContent="EMPTY";
+      nameElement.style.color="#6e7588";
+    }
+  }
+  document.getElementById("slotStatus")
     .textContent=
-    "USER_"+id.slice(-6);
-  document.getElementById("displayId")
-    .textContent=
-    "ID: "+id;
-  document.getElementById("verifyBtn")
-    .disabled=false;
+    currentRoll.length+" / 4 SELECTED";
+}
+/* =========================================================
+   ADD ROLL
+========================================================= */
+document
+.getElementById("addRoll")
+.addEventListener("click",()=>{
+  if(currentRoll.length!==4){
+    document.getElementById("slotStatus")
+      .textContent=
+      "SELECT ALL 4 COLORS";
+    return;
+  }
   /*
-    Demo history.
-    Replace loadHistory(id) with an
-    authorized API request when you
-    have a legitimate data source.
+    Store a copy of the current four-color roll.
   */
-  history=loadHistory(id);
+  history.unshift([...currentRoll]);
+  /*
+    Keep the interface bounded.
+  */
+  if(history.length>100){
+    history.pop();
+  }
+  currentRoll=[];
+  resetColorButtons();
+  updateSlots();
   renderHistory();
   analyze();
-  document.getElementById("dashboard")
-    .classList.add("show");
+});
+/* =========================================================
+   CLEAR CURRENT
+========================================================= */
+document
+.getElementById("clearCurrent")
+.addEventListener("click",()=>{
+  currentRoll=[];
+  resetColorButtons();
+  updateSlots();
+});
+/* =========================================================
+   RESET BUTTON STATES
+========================================================= */
+function resetColorButtons(){
+  document
+    .querySelectorAll(".color-btn")
+    .forEach(button=>{
+      button.classList.remove("selected");
+    });
 }
 /* =========================================================
-   DEMO HISTORY LOADER
+   HISTORY
 ========================================================= */
-function loadHistory(userId){
-  const results=[];
-  /*
-    The ID creates a repeatable demo
-    history so the same ID produces
-    the same dataset during the session.
-  */
-  let seed=0;
-  for(let i=0;i<userId.length;i++){
-    seed =
-      (seed*31 + userId.charCodeAt(i))
-      >>> 0;
-  }
-  function random(){
-    seed =
-      (1664525*seed + 1013904223)
-      >>> 0;
-    return seed/4294967296;
-  }
-  for(let i=0;i<50;i++){
-    const number =
-      Math.floor(random()*6);
-    results.push({
-      color:COLORS[number],
-      number:number+1
-    });
-  }
-  return results;
+function renderHistory(){
+  const box=
+    document.getElementById("history");
+  box.innerHTML="";
+  history.forEach((roll,index)=>{
+    const item=
+      document.createElement("div");
+    item.className="history-roll";
+    const colorsHTML=
+      roll.map(color=>`
+        <div
+          class="mini"
+          title="${color.name}"
+          style="
+            background:${color.hex};
+            color:${color.hex};
+          ">
+        </div>
+      `).join("");
+    item.innerHTML=`
+      <div class="roll-number">
+        ROLL #${history.length-index}
+      </div>
+      <div class="mini-colors">
+        ${colorsHTML}
+      </div>
+    `;
+    box.appendChild(item);
+  });
+  document.getElementById("rollCount")
+    .textContent=
+    history.length+" ROLLS";
 }
 /* =========================================================
    ANALYSIS
@@ -836,80 +804,109 @@ function analyze(){
   COLORS.forEach(color=>{
     counts[color.name]=0;
   });
-  history.forEach(item=>{
-    counts[item.color.name]++;
+  /*
+    Count every color in every
+    four-color roll.
+  */
+  history.forEach(roll=>{
+    roll.forEach(color=>{
+      counts[color.name]++;
+    });
   });
-  const total=
-    history.length || 1;
-  let highest=
-    COLORS[0];
+  const totalColors=
+    history.length*4;
+  if(!totalColors){
+    setWaiting();
+    return;
+  }
+  /*
+    Percentages
+  */
   COLORS.forEach(color=>{
-    if(
-      counts[color.name] >
-      counts[highest.name]
-    ){
-      highest=color;
-    }
-  });
-  COLORS.forEach(color=>{
-    const name=
-      color.name.toLowerCase();
-    const percentage=
+    const percent=
       Math.round(
-        counts[color.name] /
-        total *
+        counts[color.name]/
+        totalColors*
         100
       );
     const fill=
       document.getElementById(
-        name+"Fill"
+        color.name.toLowerCase()
       );
     const value=
       document.getElementById(
-        name+"Value"
+        color.name.toLowerCase()+"V"
       );
     fill.style.width=
-      percentage+"%";
+      percent+"%";
     fill.style.background=
       color.hex;
     value.textContent=
-      percentage+"%";
+      percent+"%";
   });
   /*
-    Historical frequency signal.
-    This deliberately does not claim
-    certainty about a future random roll.
+    Find historically most frequent color.
   */
-  const highestPercentage=
+  let hottest=COLORS[0];
+  COLORS.forEach(color=>{
+    if(
+      counts[color.name]>
+      counts[hottest.name]
+    ){
+      hottest=color;
+    }
+  });
+  const hottestPercent=
     Math.round(
-      counts[highest.name] /
-      total *
+      counts[hottest.name]/
+      totalColors*
       100
     );
+  /*
+    Small signal adjustment based on
+    the most recent rolls.
+    This is still historical analysis,
+    not guaranteed future knowledge.
+  */
+  const recent=
+    history
+      .slice(0,10)
+      .flat();
+  const recentCount=
+    recent.filter(
+      color=>color.name===hottest.name
+    ).length;
+  const recentPercent=
+    recent.length
+      ? Math.round(
+          recentCount/recent.length*100
+        )
+      : 0;
   const signal=
     Math.max(
-      16,
+      1,
       Math.min(
-        95,
-        highestPercentage+
-        Math.floor(Math.random()*6)
+        99,
+        Math.round(
+          hottestPercent*.6+
+          recentPercent*.4
+        )
       )
     );
   const prediction=
     document.getElementById("prediction");
   prediction.textContent=
-    highest.name;
+    hottest.name;
   prediction.style.color=
-    highest.hex;
-  document.getElementById(
-    "predictionBox"
-  ).style.setProperty(
-    "--prediction-color",
-    highest.hex
-  );
-  document.getElementById(
-    "confidence"
-  ).textContent=
+    hottest.hex;
+  document
+    .getElementById("predictionCard")
+    .style.setProperty(
+      "--prediction",
+      hottest.hex
+    );
+  document.getElementById("confidence")
+    .textContent=
     signal+"%";
   const bar=
     document.getElementById(
@@ -918,97 +915,74 @@ function analyze(){
   bar.style.width=
     signal+"%";
   bar.style.background=
-    highest.hex;
+    hottest.hex;
   /*
     Statistics
   */
   document.getElementById("total")
     .textContent=
     history.length;
-  document.getElementById("lastColor")
+  document.getElementById("totalColors")
     .textContent=
-    history[0]?.color.name || "—";
-  document.getElementById("lastNumber")
+    totalColors;
+  document.getElementById("hot")
     .textContent=
-    history[0]?.number || "—";
-  document.getElementById("streak")
-    .textContent=
-    calculateStreak();
-}
-/* =========================================================
-   STREAK
-========================================================= */
-function calculateStreak(){
-  if(!history.length){
-    return 0;
+    hottest.name;
+  document.getElementById("hot")
+    .style.color=
+    hottest.hex;
+  const lastRoll=
+    history[0];
+  if(lastRoll){
+    const lastColor=
+      lastRoll[lastRoll.length-1];
+    document.getElementById("last")
+      .textContent=
+      lastColor.name;
+    document.getElementById("last")
+      .style.color=
+      lastColor.hex;
   }
-  const first=
-    history[0].color.name;
-  let count=0;
-  for(const item of history){
-    if(item.color.name===first){
-      count++;
-    }else{
-      break;
-    }
-  }
-  return count;
 }
 /* =========================================================
-   HISTORY UI
+   WAITING STATE
 ========================================================= */
-function renderHistory(){
-  const box=
-    document.getElementById("history");
-  box.innerHTML="";
-  history
-    .slice(0,20)
-    .forEach(item=>{
-      const element=
-        document.createElement("div");
-      element.className=
-        "history-item";
-      element.innerHTML=`
-        <div
-          class="dot"
-          style="
-            background:${item.color.hex};
-            color:${item.color.hex};
-          ">
-        </div>
-        <div class="history-name">
-          ${item.color.name}
-        </div>
-      `;
-      box.appendChild(element);
-    });
+function setWaiting(){
+  document.getElementById("prediction")
+    .textContent=
+    "WAITING";
+  document.getElementById("prediction")
+    .style.color=
+    "#f5f7ff";
+  document.getElementById("confidence")
+    .textContent="0%";
+  document.getElementById("confidenceBar")
+    .style.width="0%";
 }
 /* =========================================================
-   OPTIONAL: ADD A MANUAL RESULT
+   DEMO DATA
 =========================================================
-   You can call:
-   addResult("BLUE",1)
-   to add a result from an authorized
-   source or manually entered history.
-========================================================= */
-function addResult(colorName,number){
-  const color=
-    COLORS.find(
-      c=>c.name===colorName
-    );
-  if(!color)return;
-  history.unshift({
-    color,
-    number
-  });
-  if(history.length>100){
-    history.pop();
-  }
-  renderHistory();
-  analyze();
-}
-/* Make addResult available in console */
-window.addResult=addResult;
+   Uncomment this block if you want
+   the website to start with sample rolls.
+   Each array contains exactly four
+   colors, just like one roll.
+*/
+/*
+[
+  ["BLUE","RED","GREEN","YELLOW"],
+  ["PURPLE","BLUE","RED","ORANGE"],
+  ["GREEN","GREEN","BLUE","RED"],
+  ["YELLOW","PURPLE","ORANGE","BLUE"]
+].forEach(names=>{
+  history.push(
+    names.map(name=>
+      COLORS.find(c=>c.name===name)
+    )
+  );
+});
+renderHistory();
+analyze();
+*/
 </script>
 </body>
 </html>
