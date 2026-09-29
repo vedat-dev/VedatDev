@@ -2,987 +2,1224 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>COLOR//DICE — Roll Analyzer</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>COLOR//DICE X — Prediction Lab</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
 :root{
-  --bg:#05060a;
-  --panel:#0d111b;
-  --card:#121722;
+  --bg:#03050a;
+  --panel:rgba(12,16,27,.82);
+  --panel2:rgba(18,23,37,.78);
   --line:rgba(255,255,255,.09);
-  --text:#f5f7ff;
-  --muted:#7f879b;
+  --text:#f7f9ff;
+  --muted:#778197;
+  --cyan:#00eaff;
   --blue:#3295ff;
   --red:#ff3d68;
-  --purple:#9b61ff;
-  --orange:#ff8a2b;
-  --green:#20df89;
+  --purple:#a565ff;
+  --orange:#ff8b32;
+  --green:#20e58c;
   --yellow:#ffd43b;
 }
+
+html,body{min-height:100%}
+
 body{
-  min-height:100vh;
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
-    radial-gradient(circle at 15% 0%,rgba(0,145,255,.14),transparent 28%),
-    radial-gradient(circle at 90% 100%,rgba(145,65,255,.11),transparent 30%),
+    radial-gradient(circle at 10% 0%,rgba(0,190,255,.16),transparent 28%),
+    radial-gradient(circle at 90% 20%,rgba(130,70,255,.13),transparent 27%),
+    radial-gradient(circle at 50% 100%,rgba(0,100,255,.10),transparent 35%),
     var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
   overflow-x:hidden;
 }
+
 body:before{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
-  opacity:.13;
+  opacity:.12;
   background-image:
     linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:42px 42px;
+  background-size:38px 38px;
 }
+
+body:after{
+  content:"";
+  position:fixed;
+  left:0;
+  right:0;
+  height:2px;
+  top:-5px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  box-shadow:0 0 25px var(--cyan);
+  animation:screenScan 6s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes screenScan{
+  0%{top:-5px}
+  100%{top:105%}
+}
+
 .app{
-  position:relative;
-  width:min(1100px,94%);
+  width:min(1150px,94%);
   margin:auto;
-  padding:24px 0 50px;
+  padding:22px 0 55px;
 }
+
 /* HEADER */
+
 header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
-.logo-area{
+
+.brand{
   display:flex;
   align-items:center;
   gap:12px;
 }
+
 .logo{
-  width:45px;
-  height:45px;
+  width:46px;
+  height:46px;
+  border-radius:15px;
   display:grid;
   place-items:center;
-  border-radius:14px;
   font-size:21px;
-  background:linear-gradient(135deg,#1680ff,#00dfff);
-  box-shadow:0 0 35px rgba(0,190,255,.25);
+  background:linear-gradient(135deg,#087cff,#00eaff);
+  box-shadow:
+    0 0 30px rgba(0,220,255,.3),
+    inset 0 0 15px rgba(255,255,255,.2);
 }
-.logo-text h1{
+
+.brand h1{
   font-size:17px;
   letter-spacing:3px;
 }
-.logo-text span{
-  display:block;
-  color:var(--muted);
-  font-size:9px;
+
+.brand small{
+  color:#68738a;
+  font-size:8px;
   letter-spacing:2px;
-  margin-top:3px;
 }
-.status{
+
+.live{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:7px;
   padding:9px 13px;
   border:1px solid var(--line);
   border-radius:30px;
-  background:rgba(255,255,255,.03);
-  color:#aeb4c5;
-  font-size:9px;
+  background:rgba(255,255,255,.035);
+  color:#aeb6c8;
+  font-size:8px;
+  letter-spacing:1px;
 }
-.status-dot{
+
+.live i{
   width:7px;
   height:7px;
   border-radius:50%;
   background:var(--green);
   box-shadow:0 0 12px var(--green);
+  animation:pulse 1.4s infinite;
 }
+
+@keyframes pulse{
+  50%{opacity:.35;transform:scale(.65)}
+}
+
 /* HERO */
+
 .hero{
   position:relative;
   overflow:hidden;
-  padding:28px;
+  padding:30px;
   border:1px solid var(--line);
-  border-radius:24px;
-  background:linear-gradient(
-    145deg,
-    rgba(17,22,35,.9),
-    rgba(7,9,15,.82)
-  );
+  border-radius:27px;
+  background:
+    linear-gradient(145deg,rgba(16,23,38,.94),rgba(5,8,15,.92));
+  box-shadow:0 25px 70px rgba(0,0,0,.3);
 }
-.scan{
+
+.heroGlow{
   position:absolute;
-  width:35%;
-  height:1px;
-  top:0;
-  left:-40%;
-  background:linear-gradient(
-    90deg,
-    transparent,
-    #00e5ff,
-    transparent
-  );
-  animation:scan 4s linear infinite;
+  width:260px;
+  height:260px;
+  right:-80px;
+  top:-120px;
+  border-radius:50%;
+  background:#008cff;
+  opacity:.13;
+  filter:blur(60px);
 }
-@keyframes scan{
-  to{left:110%}
-}
+
 .eyebrow{
-  color:#00e5ff;
+  color:var(--cyan);
   font-size:9px;
   letter-spacing:3px;
 }
+
 .hero h2{
   margin-top:8px;
-  font-size:clamp(30px,5vw,52px);
-  line-height:1;
-  letter-spacing:-2px;
+  font-size:clamp(31px,6vw,58px);
+  line-height:.98;
+  letter-spacing:-3px;
 }
+
 .hero p{
-  max-width:650px;
-  margin-top:13px;
+  max-width:680px;
+  margin-top:15px;
   color:var(--muted);
-  font-size:13px;
-  line-height:1.6;
+  font-size:12px;
+  line-height:1.7;
 }
-/* INPUT AREA */
+
 .panel{
-  margin-top:18px;
+  margin-top:17px;
   padding:21px;
   border:1px solid var(--line);
-  border-radius:22px;
-  background:rgba(13,17,27,.82);
-  backdrop-filter:blur(18px);
+  border-radius:23px;
+  background:var(--panel);
+  backdrop-filter:blur(20px);
 }
-.heading{
+
+.sectionHead{
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-.heading h3{
+
+.sectionHead h3{
   font-size:14px;
 }
-.heading span{
-  color:var(--muted);
-  font-size:9px;
-  letter-spacing:1px;
+
+.sectionHead span{
+  color:#667086;
+  font-size:8px;
+  letter-spacing:1.5px;
 }
-.roll-input{
-  margin-top:17px;
-  padding:20px;
+
+/* ROLL INPUT */
+
+.rollBox{
+  margin-top:16px;
+  padding:17px;
   border:1px solid var(--line);
   border-radius:18px;
   background:rgba(255,255,255,.025);
 }
-.roll-label{
-  color:var(--muted);
-  font-size:9px;
-  letter-spacing:2px;
-  margin-bottom:13px;
-}
-.color-buttons{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:9px;
-}
-.color-btn{
-  min-height:58px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:13px;
-  color:white;
-  cursor:pointer;
-  background:#161b27;
-  transition:.2s;
-  font-size:10px;
-  font-weight:800;
-}
-.color-btn:hover{
-  transform:translateY(-2px);
-}
-.color-btn.selected{
-  transform:translateY(-2px);
-  box-shadow:
-    0 0 0 2px currentColor,
-    0 0 25px currentColor;
-}
-.color-preview{
-  width:19px;
-  height:19px;
-  margin:0 auto 6px;
-  border-radius:50%;
-}
-/* FOUR SLOTS */
+
 .slots{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-top:17px;
+  gap:9px;
 }
+
 .slot{
-  min-height:88px;
+  min-height:91px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   border:1px dashed rgba(255,255,255,.13);
-  border-radius:15px;
-  background:rgba(255,255,255,.02);
+  border-radius:16px;
+  background:rgba(255,255,255,.018);
+  transition:.25s;
 }
-.slot-number{
-  color:var(--muted);
+
+.slot.active{
+  border-style:solid;
+  transform:translateY(-2px);
+}
+
+.slotNum{
+  color:#697389;
   font-size:8px;
   letter-spacing:1px;
   margin-bottom:8px;
 }
-.slot-color{
-  width:25px;
-  height:25px;
+
+.dot{
+  width:27px;
+  height:27px;
   border-radius:50%;
   display:none;
-  box-shadow:0 0 18px currentColor;
+  box-shadow:0 0 25px currentColor;
+  animation:appear .3s ease;
 }
-.slot-name{
-  color:#6e7588;
+
+@keyframes appear{
+  from{transform:scale(.3);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.slotName{
+  color:#626d82;
+  font-size:8px;
+  margin-top:7px;
+}
+
+.colors{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+  margin-top:13px;
+}
+
+.colorBtn{
+  min-height:58px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:13px;
+  background:#151a27;
+  color:white;
+  cursor:pointer;
   font-size:9px;
-  margin-top:6px;
+  font-weight:800;
+  transition:.18s;
 }
+
+.colorBtn:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,255,255,.2);
+}
+
+.colorBtn:active{
+  transform:scale(.95);
+}
+
+.colorDot{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  margin:0 auto 6px;
+}
+
 .actions{
   display:flex;
-  gap:9px;
-  margin-top:15px;
+  gap:8px;
+  margin-top:12px;
 }
-.action{
-  min-height:44px;
+
+.btn{
+  height:45px;
   border:0;
   border-radius:12px;
-  padding:0 19px;
   cursor:pointer;
   color:white;
-  font-weight:800;
-  font-size:10px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.5px;
 }
+
 .add{
   flex:1;
-  background:linear-gradient(135deg,#167cff,#00d8ff);
+  background:linear-gradient(135deg,#087cff,#00ddff);
+  box-shadow:0 8px 25px rgba(0,190,255,.16);
 }
-.clear{
-  background:#181d29;
+
+.undo,.clear{
+  padding:0 16px;
+  background:#171c29;
   border:1px solid var(--line);
 }
-/* ANALYSIS */
-.analysis{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
+
+/* PREDICTIONS */
+
+.predictionHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
-.prediction-card{
+
+.modelBadge{
+  color:var(--cyan);
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+.predictions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.predictCard{
   position:relative;
   overflow:hidden;
-  margin-top:15px;
-  padding:27px;
+  padding:18px 12px;
+  text-align:center;
   border:1px solid var(--line);
   border-radius:18px;
-  text-align:center;
   background:rgba(255,255,255,.025);
+  transition:.3s;
 }
-.prediction-card:before{
-  content:"";
-  position:absolute;
-  width:160px;
-  height:160px;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
+
+.predictCard:hover{
+  transform:translateY(-4px);
+}
+
+.rank{
+  color:#606b80;
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+.predictDot{
+  width:44px;
+  height:44px;
+  margin:12px auto 9px;
   border-radius:50%;
-  background:var(--prediction,#00e5ff);
-  opacity:.09;
-  filter:blur(40px);
-  transition:.5s;
+  box-shadow:0 0 25px currentColor;
+  animation:float 2.5s ease-in-out infinite;
 }
-.prediction-label{
-  position:relative;
-  color:var(--muted);
+
+@keyframes float{
+  50%{transform:translateY(-4px)}
+}
+
+.predictName{
+  font-size:12px;
+  font-weight:900;
+}
+
+.score{
+  margin-top:6px;
+  color:#aab3c5;
   font-size:9px;
-  letter-spacing:2px;
 }
-.prediction{
-  position:relative;
-  margin:9px 0;
-  font-size:32px;
-  font-weight:950;
-  transition:.35s;
-}
-.confidence{
-  position:relative;
-  color:#aeb5c5;
-  font-size:11px;
-}
-.progress{
-  position:relative;
-  height:7px;
-  margin-top:13px;
+
+.scoreBar{
+  height:5px;
+  margin-top:11px;
+  border-radius:10px;
   overflow:hidden;
-  border-radius:20px;
-  background:#1a1f2c;
+  background:#1c2230;
 }
-.progress-fill{
+
+.scoreFill{
   height:100%;
   width:0;
-  border-radius:20px;
+  border-radius:10px;
   transition:1s;
 }
-/* DISTRIBUTION */
-.distribution{
-  margin-top:15px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+
+.reason{
+  margin-top:9px;
+  color:#626c80;
+  font-size:7px;
+  line-height:1.4;
 }
-.dist-row{
+
+/* DASHBOARD */
+
+.dashboard{
   display:grid;
-  grid-template-columns:70px 1fr 40px;
+  grid-template-columns:1.15fr .85fr;
+  gap:17px;
+}
+
+.chart{
+  margin-top:15px;
+}
+
+.barRow{
+  display:grid;
+  grid-template-columns:65px 1fr 35px;
   align-items:center;
   gap:9px;
-  font-size:10px;
+  margin:10px 0;
+  font-size:9px;
 }
-.track{
+
+.barTrack{
   height:7px;
   overflow:hidden;
   border-radius:20px;
-  background:#1a1f2c;
+  background:#191f2c;
 }
-.fill{
+
+.barFill{
   height:100%;
   width:0;
   border-radius:20px;
   transition:1s;
 }
+
 /* HISTORY */
+
 .history{
   display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding-top:15px;
-  scrollbar-width:none;
+  flex-direction:column;
+  gap:7px;
+  max-height:330px;
+  overflow-y:auto;
+  margin-top:14px;
 }
+
 .history::-webkit-scrollbar{
-  display:none;
+  width:3px;
 }
-.history-roll{
-  min-width:128px;
-  padding:10px;
+
+.history::-webkit-scrollbar-thumb{
+  background:#293244;
+}
+
+.historyRoll{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
   border:1px solid var(--line);
-  border-radius:14px;
-  background:rgba(255,255,255,.025);
+  border-radius:12px;
+  background:rgba(255,255,255,.02);
 }
-.roll-number{
-  color:var(--muted);
+
+.historyID{
+  color:#68748a;
   font-size:8px;
-  margin-bottom:8px;
 }
-.mini-colors{
+
+.miniColors{
   display:flex;
   gap:5px;
 }
+
 .mini{
   width:17px;
   height:17px;
   border-radius:50%;
-  box-shadow:0 0 8px currentColor;
+  box-shadow:0 0 9px currentColor;
 }
+
 /* STATS */
+
 .stats{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-top:18px;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:13px;
 }
+
 .stat{
-  padding:16px;
+  padding:14px;
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:14px;
   background:rgba(255,255,255,.025);
 }
+
 .stat small{
-  color:var(--muted);
-  font-size:8px;
+  color:#68748a;
+  font-size:7px;
   letter-spacing:1px;
 }
+
 .stat strong{
   display:block;
-  margin-top:6px;
-  font-size:21px;
+  margin-top:5px;
+  font-size:19px;
 }
-.notice{
-  margin-top:17px;
+
+.empty{
+  padding:35px 10px;
   text-align:center;
-  color:#626a7c;
+  color:#5f697d;
   font-size:9px;
   line-height:1.6;
 }
-/* MOBILE */
+
+.notice{
+  margin:16px auto 0;
+  max-width:750px;
+  color:#535e73;
+  text-align:center;
+  font-size:8px;
+  line-height:1.6;
+}
+
 @media(max-width:800px){
-  .analysis{
+
+  .dashboard{
     grid-template-columns:1fr;
   }
-  .color-buttons{
-    grid-template-columns:repeat(3,1fr);
-  }
-  .stats{
+
+  .predictions{
     grid-template-columns:repeat(2,1fr);
   }
+
+  .colors{
+    grid-template-columns:repeat(3,1fr);
+  }
 }
+
 @media(max-width:500px){
+
   .app{
     width:92%;
   }
+
   .hero{
     padding:23px;
   }
+
   .panel{
-    padding:17px;
+    padding:16px;
   }
+
   .slots{
-    gap:7px;
+    gap:6px;
   }
+
   .slot{
     min-height:78px;
   }
-  .color-btn{
-    min-height:53px;
+
+  .colors{
+    gap:6px;
   }
-  .status{
-    font-size:8px;
+
+  .colorBtn{
+    min-height:52px;
+  }
+
+  .predictions{
+    gap:7px;
   }
 }
 </style>
 </head>
+
 <body>
-<main class="app">
+
+<div class="app">
+
 <header>
-  <div class="logo-area">
-    <div class="logo">🎲</div>
-    <div class="logo-text">
-      <h1>COLOR//DICE</h1>
-      <span>ROLL PATTERN ANALYZER</span>
+
+  <div class="brand">
+    <div class="logo">◈</div>
+    <div>
+      <h1>COLOR//DICE X</h1>
+      <small>MULTI-SIGNAL ANALYSIS ENGINE</small>
     </div>
   </div>
-  <div class="status">
-    <div class="status-dot"></div>
-    ANALYZER READY
+
+  <div class="live">
+    <i></i>
+    ANALYZER ONLINE
   </div>
+
 </header>
+
 <section class="hero">
-  <div class="scan"></div>
-  <div class="eyebrow">
-    FOUR-COLOR ROLL INPUT
-  </div>
+
+  <div class="heroGlow"></div>
+
+  <div class="eyebrow">ADVANCED ROLL ANALYSIS</div>
+
   <h2>
-    Enter the roll.<br>
-    Analyze the sequence.
+    Four signals.<br>
+    One live model.
   </h2>
+
   <p>
-    Select the four colors shown on each roll.
-    The analyzer stores your history and calculates
-    historical color frequencies and pattern signals.
+    Enter each four-color roll exactly as it appeared.
+    The engine compares frequency, recency, transitions,
+    position behavior, streaks and recent sequences to
+    produce four ranked historical signals.
   </p>
+
 </section>
+
 <!-- INPUT -->
+
 <section class="panel">
-  <div class="heading">
-    <h3>Current Roll</h3>
-    <span id="slotStatus">0 / 4 SELECTED</span>
+
+  <div class="sectionHead">
+    <h3>ENTER CURRENT ROLL</h3>
+    <span id="slotCounter">0 / 4</span>
   </div>
-  <div class="roll-input">
-    <div class="roll-label">
-      SELECT COLORS IN THE ORDER THEY APPEARED
-    </div>
-    <div class="color-buttons" id="colorButtons"></div>
+
+  <div class="rollBox">
+
     <div class="slots">
-      <div class="slot">
-        <div class="slot-number">COLOR 01</div>
-        <div class="slot-color" id="slot0Color"></div>
-        <div class="slot-name" id="slot0Name">EMPTY</div>
+
+      <div class="slot" id="slot0">
+        <div class="slotNum">POSITION 01</div>
+        <div class="dot" id="dot0"></div>
+        <div class="slotName" id="name0">EMPTY</div>
       </div>
-      <div class="slot">
-        <div class="slot-number">COLOR 02</div>
-        <div class="slot-color" id="slot1Color"></div>
-        <div class="slot-name" id="slot1Name">EMPTY</div>
+
+      <div class="slot" id="slot1">
+        <div class="slotNum">POSITION 02</div>
+        <div class="dot" id="dot1"></div>
+        <div class="slotName" id="name1">EMPTY</div>
       </div>
-      <div class="slot">
-        <div class="slot-number">COLOR 03</div>
-        <div class="slot-color" id="slot2Color"></div>
-        <div class="slot-name" id="slot2Name">EMPTY</div>
+
+      <div class="slot" id="slot2">
+        <div class="slotNum">POSITION 03</div>
+        <div class="dot" id="dot2"></div>
+        <div class="slotName" id="name2">EMPTY</div>
       </div>
-      <div class="slot">
-        <div class="slot-number">COLOR 04</div>
-        <div class="slot-color" id="slot3Color"></div>
-        <div class="slot-name" id="slot3Name">EMPTY</div>
+
+      <div class="slot" id="slot3">
+        <div class="slotNum">POSITION 04</div>
+        <div class="dot" id="dot3"></div>
+        <div class="slotName" id="name3">EMPTY</div>
       </div>
+
     </div>
+
+    <div class="colors" id="colors"></div>
+
     <div class="actions">
-      <button class="action add" id="addRoll">
-        + ADD ROLL TO HISTORY
+
+      <button class="btn add" id="add">
+        ADD ROLL + ANALYZE
       </button>
-      <button class="action clear" id="clearCurrent">
+
+      <button class="btn undo" id="undo">
+        UNDO
+      </button>
+
+      <button class="btn clear" id="clear">
         CLEAR
       </button>
+
     </div>
+
   </div>
+
 </section>
-<!-- ANALYSIS -->
-<section class="analysis">
-  <div class="panel">
-    <div class="heading">
-      <h3>Next-Color Signal</h3>
-      <span>HISTORICAL MODEL</span>
-    </div>
-    <div class="prediction-card" id="predictionCard">
-      <div class="prediction-label">
-        STATISTICAL SIGNAL
-      </div>
-      <div class="prediction" id="prediction">
-        WAITING
-      </div>
-      <div class="confidence">
-        Signal strength:
-        <b id="confidence">0%</b>
-      </div>
-      <div class="progress">
-        <div class="progress-fill" id="confidenceBar"></div>
-      </div>
-    </div>
-    <div class="heading" style="margin-top:20px">
-      <h3>Color Frequency</h3>
-      <span>ALL ENTERED ROLLS</span>
-    </div>
-    <div class="distribution">
-      <div class="dist-row">
-        <span>BLUE</span>
-        <div class="track"><div class="fill" id="blue"></div></div>
-        <span id="blueV">0%</span>
-      </div>
-      <div class="dist-row">
-        <span>RED</span>
-        <div class="track"><div class="fill" id="red"></div></div>
-        <span id="redV">0%</span>
-      </div>
-      <div class="dist-row">
-        <span>PURPLE</span>
-        <div class="track"><div class="fill" id="purple"></div></div>
-        <span id="purpleV">0%</span>
-      </div>
-      <div class="dist-row">
-        <span>ORANGE</span>
-        <div class="track"><div class="fill" id="orange"></div></div>
-        <span id="orangeV">0%</span>
-      </div>
-      <div class="dist-row">
-        <span>GREEN</span>
-        <div class="track"><div class="fill" id="green"></div></div>
-        <span id="greenV">0%</span>
-      </div>
-      <div class="dist-row">
-        <span>YELLOW</span>
-        <div class="track"><div class="fill" id="yellow"></div></div>
-        <span id="yellowV">0%</span>
-      </div>
-    </div>
+
+<!-- PREDICTION -->
+
+<section class="panel">
+
+  <div class="predictionHeader">
+
+    <h3>TOP 4 NEXT-COLOR SIGNALS</h3>
+
+    <span class="modelBadge">
+      ENSEMBLE ENGINE
+    </span>
+
   </div>
-  <div class="panel">
-    <div class="heading">
-      <h3>Roll History</h3>
-      <span id="rollCount">0 ROLLS</span>
+
+  <div class="predictions" id="predictions">
+
+    <div class="empty" style="grid-column:1/-1">
+      Enter several rolls to activate the model.
     </div>
-    <div class="history" id="history"></div>
-    <div class="stats">
-      <div class="stat">
-        <small>TOTAL ROLLS</small>
-        <strong id="total">0</strong>
-      </div>
-      <div class="stat">
-        <small>TOTAL COLORS</small>
-        <strong id="totalColors">0</strong>
-      </div>
-      <div class="stat">
-        <small>HOT COLOR</small>
-        <strong id="hot">—</strong>
-      </div>
-      <div class="stat">
-        <small>LAST COLOR</small>
-        <strong id="last">—</strong>
-      </div>
-    </div>
+
   </div>
+
 </section>
-<div class="notice">
-  The signal is calculated only from the history you enter.
-  It is a statistical pattern indicator, not a guaranteed prediction
-  of a random game's next result.
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+
+<section class="panel">
+
+  <div class="sectionHead">
+    <h3>COLOR DISTRIBUTION</h3>
+    <span>ALL HISTORY</span>
+  </div>
+
+  <div class="chart" id="chart"></div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <small>ROLLS</small>
+      <strong id="rolls">0</strong>
+    </div>
+
+    <div class="stat">
+      <small>OBSERVATIONS</small>
+      <strong id="observations">0</strong>
+    </div>
+
+    <div class="stat">
+      <small>HOT COLOR</small>
+      <strong id="hot">—</strong>
+    </div>
+
+    <div class="stat">
+      <small>LAST</small>
+      <strong id="last">—</strong>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="panel">
+
+  <div class="sectionHead">
+    <h3>ROLL HISTORY</h3>
+    <span>RECENT FIRST</span>
+  </div>
+
+  <div class="history" id="history">
+
+    <div class="empty">
+      No rolls entered yet.
+    </div>
+
+  </div>
+
+</section>
+
 </div>
-</main>
+
+<div class="notice">
+  Historical pattern analysis cannot guarantee the outcome of a genuinely random roll.
+  The four signals are ranked from the data entered into this page.
+</div>
+
+</div>
+
 <script>
+
 /* =========================================================
-   COLORS
+   COLOR DATA
 ========================================================= */
+
 const COLORS = [
-  {name:"BLUE",hex:"#3295ff"},
-  {name:"RED",hex:"#ff3d68"},
-  {name:"PURPLE",hex:"#9b61ff"},
-  {name:"ORANGE",hex:"#ff8a2b"},
-  {name:"GREEN",hex:"#20df89"},
-  {name:"YELLOW",hex:"#ffd43b"}
+  {name:"BLUE",   hex:"#3295ff"},
+  {name:"RED",    hex:"#ff3d68"},
+  {name:"PURPLE", hex:"#a565ff"},
+  {name:"ORANGE", hex:"#ff8b32"},
+  {name:"GREEN",  hex:"#20e58c"},
+  {name:"YELLOW", hex:"#ffd43b"}
 ];
-/* =========================================================
-   STATE
-========================================================= */
-let currentRoll = [];
+
+let current = [];
 let history = [];
+
 /* =========================================================
-   BUILD COLOR BUTTONS
+   STORAGE
 ========================================================= */
-const colorButtons =
-  document.getElementById("colorButtons");
+
+try{
+  const saved=localStorage.getItem("colorDiceHistoryX");
+
+  if(saved){
+    const parsed=JSON.parse(saved);
+
+    history=parsed.map(roll=>
+      roll.map(name=>
+        COLORS.find(c=>c.name===name)
+      ).filter(Boolean)
+    );
+  }
+}catch(e){
+  history=[];
+}
+
+/* =========================================================
+   BUILD BUTTONS
+========================================================= */
+
+const colorsBox=document.getElementById("colors");
+
 COLORS.forEach((color,index)=>{
-  const button =
-    document.createElement("button");
-  button.type="button";
-  button.className="color-btn";
-  button.innerHTML=`
+
+  const btn=document.createElement("button");
+
+  btn.className="colorBtn";
+
+  btn.innerHTML=`
     <div
-      class="color-preview"
+      class="colorDot"
       style="
         background:${color.hex};
         color:${color.hex};
-        box-shadow:0 0 12px ${color.hex};
+        box-shadow:0 0 13px ${color.hex};
       ">
     </div>
     ${color.name}
   `;
-  button.addEventListener("click",()=>{
-    selectColor(index,button);
-  });
-  colorButtons.appendChild(button);
+
+  btn.onclick=()=>addColor(index);
+
+  colorsBox.appendChild(btn);
 });
+
 /* =========================================================
-   SELECT COLOR
+   ADD COLOR
 ========================================================= */
-function selectColor(index,button){
-  if(currentRoll.length>=4){
-    return;
-  }
-  const color=COLORS[index];
-  currentRoll.push(color);
-  button.classList.add("selected");
+
+function addColor(index){
+
+  if(current.length>=4)return;
+
+  current.push(COLORS[index]);
+
   updateSlots();
+
 }
+
 /* =========================================================
-   UPDATE FOUR SLOTS
+   UPDATE SLOTS
 ========================================================= */
+
 function updateSlots(){
+
+  document.getElementById("slotCounter")
+    .textContent=current.length+" / 4";
+
   for(let i=0;i<4;i++){
-    const colorElement =
-      document.getElementById(
-        "slot"+i+"Color"
-      );
-    const nameElement =
-      document.getElementById(
-        "slot"+i+"Name"
-      );
-    if(currentRoll[i]){
-      colorElement.style.display="block";
-      colorElement.style.background=
-        currentRoll[i].hex;
-      colorElement.style.color=
-        currentRoll[i].hex;
-      colorElement.style.boxShadow=
-        "0 0 18px "+currentRoll[i].hex;
-      nameElement.textContent=
-        currentRoll[i].name;
-      nameElement.style.color=
-        currentRoll[i].hex;
+
+    const slot=document.getElementById("slot"+i);
+    const dot=document.getElementById("dot"+i);
+    const name=document.getElementById("name"+i);
+
+    if(current[i]){
+
+      slot.classList.add("active");
+
+      slot.style.borderColor=
+        current[i].hex;
+
+      dot.style.display="block";
+      dot.style.background=current[i].hex;
+      dot.style.color=current[i].hex;
+
+      name.textContent=current[i].name;
+      name.style.color=current[i].hex;
+
     }else{
-      colorElement.style.display="none";
-      nameElement.textContent="EMPTY";
-      nameElement.style.color="#6e7588";
+
+      slot.classList.remove("active");
+      slot.style.borderColor="";
+
+      dot.style.display="none";
+
+      name.textContent="EMPTY";
+      name.style.color="#626d82";
+
     }
   }
-  document.getElementById("slotStatus")
-    .textContent=
-    currentRoll.length+" / 4 SELECTED";
 }
+
 /* =========================================================
    ADD ROLL
 ========================================================= */
-document
-.getElementById("addRoll")
-.addEventListener("click",()=>{
-  if(currentRoll.length!==4){
-    document.getElementById("slotStatus")
-      .textContent=
-      "SELECT ALL 4 COLORS";
+
+document.getElementById("add").onclick=()=>{
+
+  if(current.length!==4){
+
+    document.getElementById("slotCounter")
+      .textContent="NEED 4 COLORS";
+
     return;
   }
-  /*
-    Store a copy of the current four-color roll.
-  */
-  history.unshift([...currentRoll]);
-  /*
-    Keep the interface bounded.
-  */
-  if(history.length>100){
+
+  history.unshift([...current]);
+
+  if(history.length>250){
     history.pop();
   }
-  currentRoll=[];
-  resetColorButtons();
+
+  current=[];
+
   updateSlots();
+  save();
   renderHistory();
   analyze();
-});
+
+};
+
+/* =========================================================
+   UNDO LAST ROLL
+========================================================= */
+
+document.getElementById("undo").onclick=()=>{
+
+  if(!history.length)return;
+
+  history.shift();
+
+  save();
+  renderHistory();
+  analyze();
+
+};
+
 /* =========================================================
    CLEAR CURRENT
 ========================================================= */
-document
-.getElementById("clearCurrent")
-.addEventListener("click",()=>{
-  currentRoll=[];
-  resetColorButtons();
+
+document.getElementById("clear").onclick=()=>{
+
+  current=[];
+
   updateSlots();
-});
+
+};
+
 /* =========================================================
-   RESET BUTTON STATES
+   SAVE
 ========================================================= */
-function resetColorButtons(){
-  document
-    .querySelectorAll(".color-btn")
-    .forEach(button=>{
-      button.classList.remove("selected");
-    });
-}
-/* =========================================================
-   HISTORY
-========================================================= */
-function renderHistory(){
-  const box=
-    document.getElementById("history");
-  box.innerHTML="";
-  history.forEach((roll,index)=>{
-    const item=
-      document.createElement("div");
-    item.className="history-roll";
-    const colorsHTML=
-      roll.map(color=>`
-        <div
-          class="mini"
-          title="${color.name}"
-          style="
-            background:${color.hex};
-            color:${color.hex};
-          ">
-        </div>
-      `).join("");
-    item.innerHTML=`
-      <div class="roll-number">
-        ROLL #${history.length-index}
-      </div>
-      <div class="mini-colors">
-        ${colorsHTML}
-      </div>
-    `;
-    box.appendChild(item);
-  });
-  document.getElementById("rollCount")
-    .textContent=
-    history.length+" ROLLS";
-}
-/* =========================================================
-   ANALYSIS
-========================================================= */
-function analyze(){
-  const counts={};
-  COLORS.forEach(color=>{
-    counts[color.name]=0;
-  });
-  /*
-    Count every color in every
-    four-color roll.
-  */
-  history.forEach(roll=>{
-    roll.forEach(color=>{
-      counts[color.name]++;
-    });
-  });
-  const totalColors=
-    history.length*4;
-  if(!totalColors){
-    setWaiting();
-    return;
-  }
-  /*
-    Percentages
-  */
-  COLORS.forEach(color=>{
-    const percent=
-      Math.round(
-        counts[color.name]/
-        totalColors*
-        100
-      );
-    const fill=
-      document.getElementById(
-        color.name.toLowerCase()
-      );
-    const value=
-      document.getElementById(
-        color.name.toLowerCase()+"V"
-      );
-    fill.style.width=
-      percent+"%";
-    fill.style.background=
-      color.hex;
-    value.textContent=
-      percent+"%";
-  });
-  /*
-    Find historically most frequent color.
-  */
-  let hottest=COLORS[0];
-  COLORS.forEach(color=>{
-    if(
-      counts[color.name]>
-      counts[hottest.name]
-    ){
-      hottest=color;
-    }
-  });
-  const hottestPercent=
-    Math.round(
-      counts[hottest.name]/
-      totalColors*
-      100
-    );
-  /*
-    Small signal adjustment based on
-    the most recent rolls.
-    This is still historical analysis,
-    not guaranteed future knowledge.
-  */
-  const recent=
-    history
-      .slice(0,10)
-      .flat();
-  const recentCount=
-    recent.filter(
-      color=>color.name===hottest.name
-    ).length;
-  const recentPercent=
-    recent.length
-      ? Math.round(
-          recentCount/recent.length*100
-        )
-      : 0;
-  const signal=
-    Math.max(
-      1,
-      Math.min(
-        99,
-        Math.round(
-          hottestPercent*.6+
-          recentPercent*.4
+
+function save(){
+
+  try{
+
+    localStorage.setItem(
+      "colorDiceHistoryX",
+      JSON.stringify(
+        history.map(roll=>
+          roll.map(c=>c.name)
         )
       )
     );
-  const prediction=
-    document.getElementById("prediction");
-  prediction.textContent=
-    hottest.name;
-  prediction.style.color=
-    hottest.hex;
-  document
-    .getElementById("predictionCard")
-    .style.setProperty(
-      "--prediction",
-      hottest.hex
-    );
-  document.getElementById("confidence")
-    .textContent=
-    signal+"%";
-  const bar=
-    document.getElementById(
-      "confidenceBar"
-    );
-  bar.style.width=
-    signal+"%";
-  bar.style.background=
-    hottest.hex;
-  /*
-    Statistics
-  */
-  document.getElementById("total")
-    .textContent=
-    history.length;
-  document.getElementById("totalColors")
-    .textContent=
-    totalColors;
-  document.getElementById("hot")
-    .textContent=
-    hottest.name;
-  document.getElementById("hot")
-    .style.color=
-    hottest.hex;
-  const lastRoll=
-    history[0];
-  if(lastRoll){
-    const lastColor=
-      lastRoll[lastRoll.length-1];
-    document.getElementById("last")
-      .textContent=
-      lastColor.name;
-    document.getElementById("last")
-      .style.color=
-      lastColor.hex;
-  }
+
+  }catch(e){}
+
 }
+
 /* =========================================================
-   WAITING STATE
+   RENDER HISTORY
 ========================================================= */
-function setWaiting(){
-  document.getElementById("prediction")
-    .textContent=
-    "WAITING";
-  document.getElementById("prediction")
-    .style.color=
-    "#f5f7ff";
-  document.getElementById("confidence")
-    .textContent="0%";
-  document.getElementById("confidenceBar")
-    .style.width="0%";
+
+function renderHistory(){
+
+  const box=document.getElementById("history");
+
+  box.innerHTML="";
+
+  if(!history.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        No rolls entered yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  history.forEach((roll,i)=>{
+
+    const item=document.createElement("div");
+
+    item.className="historyRoll";
+
+    item.innerHTML=`
+
+      <span class="historyID">
+        ROLL ${history.length-i}
+      </span>
+
+      <div class="miniColors">
+
+        ${roll.map(color=>`
+
+          <div
+            class="mini"
+            title="${color.name}"
+            style="
+              background:${color.hex};
+              color:${color.hex};
+            ">
+          </div>
+
+        `).join("")}
+
+      </div>
+    `;
+
+    box.appendChild(item);
+
+  });
 }
+
 /* =========================================================
-   DEMO DATA
-=========================================================
-   Uncomment this block if you want
-   the website to start with sample rolls.
-   Each array contains exactly four
-   colors, just like one roll.
-*/
-/*
-[
-  ["BLUE","RED","GREEN","YELLOW"],
-  ["PURPLE","BLUE","RED","ORANGE"],
-  ["GREEN","GREEN","BLUE","RED"],
-  ["YELLOW","PURPLE","ORANGE","BLUE"]
-].forEach(names=>{
-  history.push(
-    names.map(name=>
-      COLORS.find(c=>c.name===name)
-    )
-  );
-});
-renderHistory();
-analyze();
-*/
-</script>
-</body>
-</html>
+   ADVANCED ENSEMBLE MODEL
+========================================================= */
+
+function calculateScores(){
+
+  const scores={};
+
+  COLORS.forEach(c=>{
+    scores[c.name]={
+      color:c,
+      frequency:0,
+      recent:0,
+      transition:0,
+      position:0,
+      streak:0,
+      sequence:0,
+      total:0
+    };
+  });
+
+  const observations=history.flat();
+
+  if(!observations.length){
+    return [];
+  }
+
+  /* -----------------------------------------
+     1. GLOBAL FREQUENCY
+  ----------------------------------------- */
+
+  observations.forEach(color=>{
+    scores[color.name].frequency++;
+  });
+
+  /* -----------------------------------------
+     2. RECENCY WEIGHT
+  ----------------------------------------- */
+
+  history.slice(0,25).forEach((roll,rollIndex)=>{
+
+    const weight=Math.pow(.92,rollIndex);
+
+    roll.forEach(color=>{
+      scores[color.name].recent+=weight;
+    });
+
+  });
+
+  /* -----------------------------------------
+     3. TRANSITION ANALYSIS
+     
+     Look at what historically followed
+     the last observed color.
+  ----------------------------------------- */
+
+  const lastColor=
+    observations[observations.length-1];
+
+  if(lastColor){
+
+    for(let i=0;i<observations.length-1;i++){
+
+      if(
+        observations[i].name===
+        lastColor.name
+      ){
+
+        const next=
+          observations[i+1];
+
+        scores[next.name].transition++;
+
+      }
+    }
+  }
+
+  /* -----------------------------------------
+     4. POSITION ANALYSIS
+     
+     Compare colors appearing in the same
+     slot across previous rolls.
+  ----------------------------------------- */
+
+  if(history.length){
+
+    const latestPosition=3;
+
+    history.forEach((roll,rollIndex)=>{
+
+      const color=roll[latestPosition];
+
+      if(!color)return;
+
+      const weight=
+        Math.pow(.94,rollIndex);
+
+      scores[color.name].position+=weight;
+
+    });
+
+  }
+
+  /* -----------------------------------------
+     5. STREAK / REPETITION ANALYSIS
+  ----------------------------------------- */
+
+  const recent=observations.slice(0,20);
+
+  if(recent.length){
+
+    const last=recent[0];
+
+    let streak=0;
+
+    for(const color of recent){
+
+      if(color.name===last.name){
+        streak++;
+      }else{
+        break;
+      }
+
+    }
+
+    if(streak>=2){
+
+      scores[last.name].streak+=
+        Math.min(streak*2,10);
+
+    }
+
+  }
+
+  /* -----------------------------------------
+     6. SHORT SEQUENCE MATCHING
+     
+     Find historical occurrences of the
+     last 2-color sequence.
+  ----------------------------------------- */
+
+  if(observations.length>=2){
+
+    const a=
+      observations[observations.length-2];
+
+    const b=
+      observations[observations.length-1];
+
+    for(let i=0;i<observations.length-2;i++){
+
+      if(
+        observations[i].name===a.name &&
+        observations[i+1].name===b.name
+      ){
+
+        scores[
+          observations[i+2].name
+        ].sequence+=2;
+
+      }
+
+    }
+
+  }
+
+  /* -----------------------------------------
+     NORMALIZE EACH SIGNAL
+  ----------------------------------------- */
+
+  const maxOf=key=>
+    Math.max(
+      1,
+      ...COLORS.map(
+        c=>scores[c.name][
