@@ -115,11 +115,11 @@ body {
 
 .secret-color {
     position: absolute;
-    top: 12px;
-    right: 14px;
+    top: 13px;
+    right: 15px;
 
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
 
     display: flex;
     align-items: center;
@@ -136,6 +136,8 @@ body {
 
     -webkit-appearance: none;
     appearance: none;
+
+    opacity: .65;
 }
 
 .secret-color:hover,
@@ -148,19 +150,22 @@ body {
 }
 
 .secret-dot {
-    width: 9px;
-    height: 9px;
+    width: 6px;
+    height: 6px;
 
     border-radius: 50%;
 
     background: #22c55e;
 
     box-shadow:
-        0 0 8px currentColor;
+        0 0 4px currentColor;
+
+    opacity: .65;
 
     transition:
         background-color .2s ease,
-        box-shadow .2s ease;
+        box-shadow .2s ease,
+        opacity .2s ease;
 }
 
 /* =========================
@@ -737,17 +742,20 @@ body {
 
     <div class="panel">
 
-        <!-- ONLY THE BLOCKED COLOR DOT -->
+        <!-- SECRET COLOR DOT ONLY -->
+
         <button
             class="secret-color"
             id="secretColor"
             type="button"
             aria-label="Change blocked color"
         >
+
             <span
                 class="secret-dot"
                 id="secretDot"
             ></span>
+
         </button>
 
 
@@ -1036,15 +1044,6 @@ let totalRolls = 0;
 
 let rolling = false;
 
-/*
-0 = GREEN
-1 = BLUE
-2 = YELLOW
-3 = ORANGE
-4 = PURPLE
-5 = RED
-*/
-
 let secretIndex = 0;
 
 
@@ -1062,12 +1061,13 @@ function updateSecretColor() {
 
     secretDot.style.color =
         selectedColor.hex;
+
 }
 
 
 /* =========================
    RANDOM COLOR
-   EXCLUDES SECRET DOT COLOR
+   EXCLUDES SECRET COLOR
 ========================= */
 
 function getRandomColor() {
@@ -1081,13 +1081,16 @@ function getRandomColor() {
             }
         );
 
+
     const randomIndex =
         Math.floor(
             Math.random() *
             availableColors.length
         );
 
+
     return availableColors[randomIndex];
+
 }
 
 
@@ -1137,7 +1140,8 @@ function finishRoll() {
 
     rolling = false;
 
-    rerollBtn.disabled = false;
+    rerollBtn.disabled =
+        false;
 
 }
 
@@ -1151,7 +1155,9 @@ function addHistory(
 ) {
 
     if (historyEmpty) {
+
         historyEmpty.remove();
+
     }
 
 
@@ -1185,11 +1191,14 @@ function addHistory(
             const smallBox =
                 document.createElement("div");
 
+
             smallBox.className =
                 "history-color";
 
+
             smallBox.style.backgroundColor =
                 color.hex;
+
 
             colorsContainer.appendChild(
                 smallBox
@@ -1218,7 +1227,10 @@ function addHistory(
     row.appendChild(status);
 
 
-    historyElement.prepend(row);
+    historyElement.prepend(
+        row
+    );
+
 }
 
 
@@ -1237,19 +1249,16 @@ rerollBtn.addEventListener(
 
         rolling = true;
 
-        rerollBtn.disabled = true;
+        rerollBtn.disabled =
+            true;
 
-
-        /*
-           All four become white
-           immediately.
-        */
 
         dice.forEach(
             function(die) {
 
                 die.style.backgroundColor =
                     "#ffffff";
+
 
                 die.classList.add(
                     "rolling"
@@ -1258,10 +1267,6 @@ rerollBtn.addEventListener(
             }
         );
 
-
-        /*
-           Shake for exactly 1 second.
-        */
 
         setTimeout(
             function() {
@@ -1287,10 +1292,6 @@ secretControl.addEventListener(
         event.preventDefault();
 
 
-        /*
-           Move to the next color.
-        */
-
         secretIndex++;
 
 
@@ -1303,17 +1304,8 @@ secretControl.addEventListener(
         }
 
 
-        /*
-           Change only the dot.
-        */
-
         updateSecretColor();
 
-
-        /*
-           Prevent white mobile
-           focus outline.
-        */
 
         secretControl.blur();
 
@@ -1322,7 +1314,7 @@ secretControl.addEventListener(
 
 
 /* =========================
-   INITIALIZE DOT
+   INITIALIZE
 ========================= */
 
 updateSecretColor();
@@ -1337,6 +1329,7 @@ dice.forEach(
 
         const initialColor =
             getRandomColor();
+
 
         die.style.backgroundColor =
             initialColor.hex;
