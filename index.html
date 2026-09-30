@@ -6,319 +6,297 @@
 <title>Online Dice</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
 }
 
-body {
-    min-height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
+body{
+    min-height:100vh;
     background:
-        radial-gradient(circle at 20% 20%, #24304d 0%, transparent 30%),
-        radial-gradient(circle at 80% 80%, #182642 0%, transparent 30%),
-        #070a12;
-    color: white;
-    overflow-x: hidden;
+        radial-gradient(circle at 50% 0%,#173d70 0%,transparent 45%),
+        linear-gradient(180deg,#061a35,#020b18);
+    font-family:Arial,sans-serif;
+    color:white;
 }
 
-.container {
-    width: min(900px, 94%);
-    margin: auto;
-    padding: 35px 0 50px;
+.app{
+    width:min(780px,94%);
+    margin:auto;
+    padding:28px 0 45px;
 }
 
-/* TOP */
+/* HEADER */
 
-.top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 30px;
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
 }
 
-.logo h1 {
-    font-size: 34px;
-    letter-spacing: 2px;
+.logo{
+    font-size:27px;
+    font-weight:900;
+    letter-spacing:2px;
 }
 
-.logo p {
-    margin-top: 6px;
-    color: #8993aa;
-    font-size: 13px;
+.subtitle{
+    margin-top:5px;
+    color:#6682a8;
+    font-size:10px;
+    letter-spacing:2px;
 }
 
-/* COLOR SELECTOR */
+/* SECRET COLOR BUTTON */
 
-.color-box {
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
-    padding: 12px 16px;
-    border-radius: 14px;
-    min-width: 150px;
-    cursor: pointer;
-    transition: .2s;
-    text-align: right;
+.secret-color{
+    font-size:8px;
+    color:#354b68;
+    cursor:pointer;
+    user-select:none;
+    transition:.2s;
 }
 
-.color-box:hover {
-    background: rgba(255,255,255,.1);
-    transform: translateY(-2px);
+.secret-color:hover{
+    color:#7893b8;
 }
 
-.color-label {
-    font-size: 10px;
-    color: #7f8ba5;
-    letter-spacing: 2px;
+#secretColor{
+    font-weight:bold;
 }
 
-.selected-color {
-    margin-top: 4px;
-    font-size: 17px;
-    font-weight: bold;
+/* PANEL */
+
+.panel{
+    background:rgba(5,19,39,.94);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 25px 70px rgba(0,0,0,.45);
 }
 
-/* MAIN CARD */
+/* FOUR SMALL BOXES */
 
-.main-card {
-    background: rgba(13,17,29,.88);
-    border: 1px solid rgba(255,255,255,.09);
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 25px 80px rgba(0,0,0,.35);
+.dice-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
 }
 
-/* DICE */
+.dice-box{
+    height:105px;
+    border-radius:16px;
+    background:#16304f;
+    border:2px solid white;
 
-.dice-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 290px;
-}
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-.dice {
-    width: 190px;
-    height: 190px;
-    border-radius: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 70px;
-    font-weight: 900;
+    position:relative;
+    overflow:hidden;
+
+    transition:.25s;
+
     box-shadow:
-        inset 0 -15px 30px rgba(0,0,0,.18),
-        0 25px 60px rgba(0,0,0,.45);
-    border: 5px solid rgba(255,255,255,.15);
-    transition: .35s;
+        inset 0 0 25px rgba(0,0,0,.25),
+        0 8px 20px rgba(0,0,0,.25);
 }
 
-.dice.rolling {
-    animation: shake .15s infinite;
+/* WHITE DOT IN CENTER */
+
+.dice-box::after{
+    content:"";
+    position:absolute;
+
+    width:13px;
+    height:13px;
+
+    background:white;
+    border-radius:50%;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    box-shadow:
+        0 0 10px rgba(255,255,255,.9);
 }
 
-@keyframes shake {
-    0% { transform: rotate(-5deg) scale(1); }
-    50% { transform: rotate(5deg) scale(1.04); }
-    100% { transform: rotate(-5deg) scale(1); }
+/* COLOR NAME */
+
+.color-name{
+    position:absolute;
+    bottom:9px;
+
+    font-size:8px;
+    font-weight:900;
+    letter-spacing:1px;
+
+    text-shadow:0 1px 5px rgba(0,0,0,.8);
+
+    z-index:2;
 }
 
-/* RESULT */
+/* ROLL ANIMATION */
 
-.result {
-    text-align: center;
-    margin-bottom: 25px;
+.rolling{
+    animation:shake .11s infinite;
 }
 
-.result-title {
-    color: #8993aa;
-    font-size: 12px;
-    letter-spacing: 2px;
+@keyframes shake{
+    0%{transform:rotate(-2deg) scale(1)}
+    50%{transform:rotate(2deg) scale(1.03)}
+    100%{transform:rotate(-2deg) scale(1)}
 }
 
-.result-color {
-    font-size: 35px;
-    font-weight: 900;
-    margin-top: 7px;
+/* REROLL */
+
+.reroll{
+    width:100%;
+    margin-top:20px;
+
+    padding:16px;
+
+    border:2px solid #fff1a6;
+    border-radius:14px;
+
+    background:#fff0a3;
+    color:#182033;
+
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:2px;
+
+    cursor:pointer;
+
+    transition:.2s;
 }
 
-/* BUTTON */
-
-.roll-button {
-    display: block;
-    width: 100%;
-    max-width: 430px;
-    margin: auto;
-    padding: 18px;
-    border: none;
-    border-radius: 15px;
-    background: linear-gradient(135deg,#ffffff,#cbd4e8);
-    color: #080b12;
-    font-size: 18px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: .2s;
+.reroll:hover{
+    background:#fff6bf;
+    transform:translateY(-2px);
 }
 
-.roll-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(255,255,255,.12);
+.reroll:active{
+    transform:scale(.98);
 }
 
-.roll-button:active {
-    transform: scale(.97);
+/* STATUS */
+
+.status{
+    text-align:center;
+    color:#7189a8;
+    font-size:11px;
+    margin-top:15px;
 }
 
-/* INFO */
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 12px;
-    margin-top: 25px;
+.status strong{
+    color:white;
 }
 
-.info {
-    background: rgba(255,255,255,.045);
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 14px;
-    padding: 15px;
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-top:20px;
 }
 
-.info small {
-    display: block;
-    color: #717d98;
-    font-size: 10px;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
+.stat{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px;
+    padding:12px;
 }
 
-.info strong {
-    font-size: 17px;
+.stat-title{
+    color:#58708f;
+    font-size:8px;
+    letter-spacing:1px;
 }
 
-/* COLORS */
-
-.color-list {
-    display: grid;
-    grid-template-columns: repeat(6,1fr);
-    gap: 9px;
-    margin-top: 25px;
-}
-
-.color-item {
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: bold;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.color-item:hover {
-    transform: translateY(-2px);
-}
-
-.color-item.active {
-    border-color: white;
-    box-shadow: 0 0 15px rgba(255,255,255,.25);
+.stat-value{
+    margin-top:5px;
+    font-size:12px;
+    font-weight:bold;
 }
 
 /* HISTORY */
 
-.history-section {
-    margin-top: 30px;
+.history-title{
+    margin-top:25px;
+    margin-bottom:9px;
+    color:#6d86a5;
+    font-size:10px;
+    letter-spacing:1px;
 }
 
-.section-title {
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
+.history{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
 }
 
-.history {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
+.history-item{
+    min-width:58px;
+    height:30px;
 
-.history-item {
-    width: 45px;
-    height: 45px;
-    border-radius: 11px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 10px;
-    font-weight: bold;
-}
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-/* DETAILS */
+    border-radius:8px;
 
-.details {
-    margin-top: 25px;
-    padding: 18px;
-    border-radius: 15px;
-    background: rgba(255,255,255,.035);
-    border-left: 3px solid #fff;
-}
+    font-size:8px;
+    font-weight:bold;
 
-.details-title {
-    font-weight: bold;
-    margin-bottom: 7px;
-}
-
-.details-text {
-    color: #8b96ad;
-    font-size: 13px;
-    line-height: 1.6;
+    border:1px solid rgba(255,255,255,.4);
 }
 
 /* MOBILE */
 
-@media(max-width:650px) {
+@media(max-width:600px){
 
-    .container {
-        padding-top: 20px;
+    .app{
+        width:94%;
+        padding-top:20px;
     }
 
-    .top {
-        align-items: center;
+    .logo{
+        font-size:22px;
     }
 
-    .logo h1 {
-        font-size: 27px;
+    .panel{
+        padding:15px;
     }
 
-    .color-box {
-        min-width: 125px;
-        padding: 10px;
+    .dice-grid{
+        gap:7px;
     }
 
-    .main-card {
-        padding: 18px;
+    .dice-box{
+        height:82px;
+        border-radius:13px;
     }
 
-    .dice {
-        width: 155px;
-        height: 155px;
-        font-size: 55px;
+    .dice-box::after{
+        width:10px;
+        height:10px;
     }
 
-    .info-grid {
-        grid-template-columns: 1fr;
+    .color-name{
+        font-size:6px;
+        bottom:7px;
     }
 
-    .color-list {
-        grid-template-columns: repeat(3,1fr);
+    .stats{
+        grid-template-columns:1fr;
     }
 }
 </style>
@@ -326,354 +304,447 @@ body {
 
 <body>
 
-<div class="container">
+<div class="app">
 
-    <div class="top">
+    <div class="header">
 
-        <div class="logo">
-            <h1>ONLINE DICE</h1>
-            <p>COLOR ROLLING SYSTEM</p>
+        <div>
+            <div class="logo">ONLINE DICE</div>
+            <div class="subtitle">COLOR ROLL SYSTEM</div>
         </div>
 
-        <!-- TAP THIS TO CHANGE THE EXCLUDED COLOR -->
-        <div class="color-box" onclick="changeExcludedColor()">
-            <div class="color-label">COLOR</div>
-            <div class="selected-color" id="excludedText">
-                GREEN
-            </div>
+        <!-- TAP THIS TEXT TO CHANGE SECRET COLOR -->
+        <div
+            class="secret-color"
+            onclick="changeSecretColor()"
+        >
+            COLOR:
+            <span id="secretColor">GREEN</span>
         </div>
 
     </div>
 
-    <div class="main-card">
 
-        <div class="dice-area">
-            <div class="dice" id="dice">
-                ?
+    <div class="panel">
+
+        <!-- FOUR SMALL COLOR BOXES -->
+
+        <div class="dice-grid">
+
+            <div class="dice-box" id="box0">
+                <div class="color-name">READY</div>
             </div>
+
+            <div class="dice-box" id="box1">
+                <div class="color-name">READY</div>
+            </div>
+
+            <div class="dice-box" id="box2">
+                <div class="color-name">READY</div>
+            </div>
+
+            <div class="dice-box" id="box3">
+                <div class="color-name">READY</div>
+            </div>
+
         </div>
 
-        <div class="result">
-            <div class="result-title">LATEST RESULT</div>
-            <div class="result-color" id="resultText">
-                READY
-            </div>
-        </div>
 
-        <button class="roll-button" onclick="rollDice()">
-            ROLL DICE
+        <button
+            class="reroll"
+            onclick="reroll()"
+        >
+            REROLL
         </button>
 
-        <div class="info-grid">
 
-            <div class="info">
-                <small>ROLLS</small>
-                <strong id="rollCount">0</strong>
+        <div class="status" id="status">
+            Ready to roll
+        </div>
+
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-title">
+                    TOTAL ROLLS
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="totalRolls"
+                >
+                    0
+                </div>
             </div>
 
-            <div class="info">
-                <small>EXCLUDED</small>
-                <strong id="excludedInfo">GREEN</strong>
+
+            <div class="stat">
+                <div class="stat-title">
+                    LAST COLORS
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="lastColors"
+                >
+                    —
+                </div>
             </div>
 
-            <div class="info">
-                <small>LAST COLOR</small>
-                <strong id="lastColor">—</strong>
+
+            <div class="stat">
+                <div class="stat-title">
+                    SECRET COLOR
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="secretStat"
+                >
+                    GREEN
+                </div>
             </div>
 
         </div>
 
-        <div class="color-list" id="colorList"></div>
 
-        <div class="history-section">
-
-            <div class="section-title">
-                ROLL HISTORY
-            </div>
-
-            <div class="history" id="history">
-                <span style="color:#657089;font-size:12px;">
-                    No rolls yet
-                </span>
-            </div>
-
+        <div class="history-title">
+            RECENT RESULTS
         </div>
 
-        <div class="details">
-
-            <div class="details-title" id="detailsTitle">
-                COLOR SETTINGS
-            </div>
-
-            <div class="details-text" id="detailsText">
-                GREEN is currently excluded. Tap the COLOR box in the
-                top-right corner to change the excluded color.
-                The selected color will not appear during the simulated roll.
-            </div>
-
+        <div
+            class="history"
+            id="history"
+        >
+            <span style="color:#4d6280;font-size:9px;">
+                No rolls yet
+            </span>
         </div>
 
     </div>
 
 </div>
 
+
 <script>
 
+/* COLORS */
+
 const colors = [
+
     {
-        name: "GREEN",
-        hex: "#22c55e"
+        name:"GREEN",
+        hex:"#22c55e"
     },
+
     {
-        name: "BLUE",
-        hex: "#3b82f6"
+        name:"BLUE",
+        hex:"#3b82f6"
     },
+
     {
-        name: "YELLOW",
-        hex: "#eab308"
+        name:"YELLOW",
+        hex:"#eab308"
     },
+
     {
-        name: "ORANGE",
-        hex: "#f97316"
+        name:"ORANGE",
+        hex:"#f97316"
     },
+
     {
-        name: "PURPLE",
-        hex: "#a855f7"
+        name:"PURPLE",
+        hex:"#a855f7"
     },
+
     {
-        name: "RED",
-        hex: "#ef4444"
+        name:"RED",
+        hex:"#ef4444"
     }
+
 ];
 
-let excludedIndex = 0;
-let rolls = 0;
-let history = [];
+
+let secretIndex = 0;
+
+let totalRolls = 0;
+
 let rolling = false;
 
-const dice = document.getElementById("dice");
-const resultText = document.getElementById("resultText");
-const excludedText = document.getElementById("excludedText");
-const excludedInfo = document.getElementById("excludedInfo");
-const lastColor = document.getElementById("lastColor");
-const rollCount = document.getElementById("rollCount");
-const historyBox = document.getElementById("history");
-const colorList = document.getElementById("colorList");
+let history = [];
 
-/* CREATE COLOR BUTTONS */
 
-function createColorButtons() {
+const boxes = [
 
-    colorList.innerHTML = "";
+    document.getElementById("box0"),
+    document.getElementById("box1"),
+    document.getElementById("box2"),
+    document.getElementById("box3")
 
-    colors.forEach((color,index) => {
+];
 
-        const item = document.createElement("div");
 
-        item.className = "color-item";
+/* CHANGE SECRET COLOR BY TAPPING TEXT */
 
-        item.innerText = color.name;
+function changeSecretColor(){
 
-        item.style.background = color.hex;
+    secretIndex++;
 
-        item.style.color =
-            color.name === "YELLOW"
-            ? "#111"
-            : "white";
-
-        item.onclick = () => {
-            excludedIndex = index;
-            updateExcluded();
-        };
-
-        colorList.appendChild(item);
-
-    });
-
-    updateColorButtons();
-}
-
-/* UPDATE EXCLUDED COLOR */
-
-function updateExcluded() {
-
-    const color = colors[excludedIndex];
-
-    excludedText.innerText = color.name;
-    excludedInfo.innerText = color.name;
-
-    excludedText.style.color = color.hex;
-
-    updateColorButtons();
-
-    document.getElementById("detailsText").innerText =
-        color.name +
-        " is currently excluded. Tap COLOR or select another color below to change the excluded color.";
-
-}
-
-/* HIGHLIGHT COLOR */
-
-function updateColorButtons() {
-
-    [...colorList.children].forEach((item,index) => {
-
-        item.classList.toggle(
-            "active",
-            index === excludedIndex
-        );
-
-    });
-
-}
-
-/* TAP TOP-RIGHT COLOR */
-
-function changeExcludedColor() {
-
-    excludedIndex++;
-
-    if(excludedIndex >= colors.length) {
-        excludedIndex = 0;
+    if(secretIndex >= colors.length){
+        secretIndex = 0;
     }
 
-    updateExcluded();
+    const color =
+        colors[secretIndex];
+
+    document.getElementById(
+        "secretColor"
+    ).innerText =
+        color.name;
+
+    document.getElementById(
+        "secretColor"
+    ).style.color =
+        color.hex;
+
+    document.getElementById(
+        "secretStat"
+    ).innerText =
+        color.name;
 
 }
 
-/* ROLL */
 
-function rollDice() {
+/* GET A RANDOM COLOR
+   EXCLUDING SECRET COLOR */
+
+function getRandomColor(){
+
+    const available =
+        colors.filter(
+            (_,index) =>
+                index !== secretIndex
+        );
+
+    return available[
+        Math.floor(
+            Math.random() *
+            available.length
+        )
+    ];
+
+}
+
+
+/* REROLL */
+
+function reroll(){
 
     if(rolling) return;
 
     rolling = true;
 
-    dice.classList.add("rolling");
+    totalRolls++;
 
-    resultText.innerText = "ROLLING...";
-    resultText.style.color = "white";
+    document.getElementById(
+        "totalRolls"
+    ).innerText =
+        totalRolls;
 
-    /*
-       Build a list WITHOUT the excluded color.
-    */
+    document.getElementById(
+        "status"
+    ).innerHTML =
+        "<strong>ROLLING...</strong>";
 
-    const availableColors =
-        colors.filter((_,index) => index !== excludedIndex);
 
-    let animationTime = 0;
+    boxes.forEach(
+        box => {
 
-    const animation = setInterval(() => {
-
-        const random =
-            availableColors[
-                Math.floor(
-                    Math.random() *
-                    availableColors.length
-                )
-            ];
-
-        dice.style.background = random.hex;
-        dice.innerText =
-            Math.floor(Math.random() * 6) + 1;
-
-        animationTime += 100;
-
-        if(animationTime >= 900) {
-
-            clearInterval(animation);
-
-            finishRoll();
+            box.classList.add(
+                "rolling"
+            );
 
         }
+    );
 
-    },100);
+
+    let time = 0;
+
+
+    const animation =
+        setInterval(() => {
+
+            boxes.forEach(
+                box => {
+
+                    const color =
+                        getRandomColor();
+
+                    box.style.background =
+                        color.hex;
+
+                    box.querySelector(
+                        ".color-name"
+                    ).innerText =
+                        color.name;
+
+                }
+            );
+
+
+            time += 100;
+
+
+            if(time >= 900){
+
+                clearInterval(
+                    animation
+                );
+
+                finishRoll();
+
+            }
+
+        },100);
 
 }
 
-/* FINISH ROLL */
 
-function finishRoll() {
+/* FINAL RESULT */
 
-    const availableColors =
-        colors.filter((_,index) => index !== excludedIndex);
+function finishRoll(){
 
-    const selected =
-        availableColors[
-            Math.floor(
-                Math.random() *
-                availableColors.length
-            )
-        ];
+    const results = [];
 
-    rolls++;
 
-    history.unshift(selected);
+    boxes.forEach(
+        box => {
 
-    if(history.length > 12) {
-        history.pop();
-    }
+            const color =
+                getRandomColor();
 
-    dice.classList.remove("rolling");
+            results.push(color);
 
-    dice.style.background = selected.hex;
 
-    dice.innerText =
-        Math.floor(Math.random() * 6) + 1;
+            box.classList.remove(
+                "rolling"
+            );
 
-    resultText.innerText =
-        selected.name;
 
-    resultText.style.color =
-        selected.hex;
+            box.style.background =
+                color.hex;
 
-    rollCount.innerText =
-        rolls;
 
-    lastColor.innerText =
-        selected.name;
+            /* KEEP OUTLINE WHITE */
 
-    updateHistory();
+            box.style.borderColor =
+                "white";
+
+
+            box.querySelector(
+                ".color-name"
+            ).innerText =
+                color.name;
+
+        }
+    );
+
+
+    const names =
+        results.map(
+            color => color.name
+        );
+
+
+    document.getElementById(
+        "lastColors"
+    ).innerText =
+        names.join(" • ");
+
+
+    document.getElementById(
+        "status"
+    ).innerHTML =
+        "Results: <strong>" +
+        names.join(" • ") +
+        "</strong>";
+
+
+    addHistory(results);
 
     rolling = false;
 
 }
 
+
 /* HISTORY */
 
-function updateHistory() {
+function addHistory(results){
+
+    results.forEach(
+        color => {
+
+            history.unshift(
+                color
+            );
+
+        }
+    );
+
+
+    if(history.length > 20){
+        history.length = 20;
+    }
+
+
+    const historyBox =
+        document.getElementById(
+            "history"
+        );
+
 
     historyBox.innerHTML = "";
 
-    history.forEach(color => {
 
-        const item =
-            document.createElement("div");
+    history.forEach(
+        color => {
 
-        item.className =
-            "history-item";
+            const item =
+                document.createElement(
+                    "div"
+                );
 
-        item.innerText =
-            color.name;
+            item.className =
+                "history-item";
 
-        item.style.background =
-            color.hex;
+            item.innerText =
+                color.name;
 
-        item.style.color =
-            color.name === "YELLOW"
-            ? "#111"
-            : "white";
+            item.style.background =
+                color.hex;
 
-        historyBox.appendChild(item);
+            item.style.color =
+                color.name === "YELLOW"
+                ? "#111"
+                : "white";
 
-    });
+            historyBox.appendChild(
+                item
+            );
+
+        }
+    );
 
 }
 
-/* INITIALIZE */
 
-createColorButtons();
-updateExcluded();
+/* INITIAL SECRET COLOR */
+
+document.getElementById(
+    "secretColor"
+).style.color =
+    colors[0].hex;
 
 </script>
 
