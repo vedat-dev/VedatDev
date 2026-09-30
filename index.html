@@ -25,7 +25,6 @@ body {
     justify-content: center;
     align-items: flex-start;
 
-    /* PUT minecraft.jpg IN THE SAME FOLDER AS THIS HTML FILE */
     background:
         linear-gradient(
             rgba(2, 12, 28, .60),
@@ -41,7 +40,9 @@ body {
     color: white;
 }
 
-/* MAIN APP */
+/* =========================
+   MAIN APP
+========================= */
 
 .app {
     width: min(760px, 97vw);
@@ -76,7 +77,9 @@ body {
     overflow: hidden;
 }
 
-/* TOP */
+/* =========================
+   HEADER
+========================= */
 
 .top {
     text-align: center;
@@ -85,6 +88,7 @@ body {
 
 .title {
     margin: 0;
+
     font-size: 31px;
     font-weight: 1000;
     letter-spacing: 3px;
@@ -105,32 +109,30 @@ body {
     color: #7190b8;
 }
 
-/* SECRET COLOR */
+/* =========================
+   SECRET COLOR DOT
+========================= */
 
 .secret-color {
     position: absolute;
-    top: 11px;
-    right: 12px;
+    top: 12px;
+    right: 14px;
 
-    padding: 5px 7px;
+    width: 18px;
+    height: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
 
     border: none !important;
     outline: none !important;
-
     background: transparent !important;
-
-    color: #7190b8;
-
-    font-size: 7px;
-    font-weight: 900;
-    letter-spacing: 1.3px;
+    box-shadow: none !important;
 
     cursor: pointer;
-    user-select: none;
-
-    opacity: .55;
-
-    box-shadow: none !important;
 
     -webkit-appearance: none;
     appearance: none;
@@ -143,12 +145,27 @@ body {
     outline: none !important;
     background: transparent !important;
     box-shadow: none !important;
-
-    color: #7190b8;
-    opacity: .55;
 }
 
-/* INFO */
+.secret-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 8px currentColor;
+
+    transition:
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+/* =========================
+   TOP INFO
+========================= */
 
 .top-info {
     margin-top: 18px;
@@ -182,7 +199,9 @@ body {
     background: rgba(59,130,246,.08);
 }
 
-/* DETAILS */
+/* =========================
+   DETAILS
+========================= */
 
 .details {
     margin-top: 15px;
@@ -208,7 +227,9 @@ body {
     background: rgba(0,0,0,.13);
 }
 
-/* DICE AREA */
+/* =========================
+   DICE AREA
+========================= */
 
 .dice-section {
     margin-top: 22px;
@@ -228,7 +249,9 @@ body {
     letter-spacing: 2px;
 }
 
-/* DICE */
+/* =========================
+   DICE
+========================= */
 
 .dice-row {
     width: 100%;
@@ -266,8 +289,6 @@ body {
         box-shadow .15s ease;
 }
 
-/* WHITE DOT */
-
 .dice-dot {
     width: 12px;
     height: 12px;
@@ -280,7 +301,9 @@ body {
         0 0 8px rgba(255,255,255,.85);
 }
 
-/* SHAKE */
+/* =========================
+   SHAKE
+========================= */
 
 .dice-box.rolling {
     animation: diceShake .20s ease-in-out infinite alternate;
@@ -291,6 +314,7 @@ body {
 }
 
 @keyframes diceShake {
+
     0% {
         transform: translateX(-4px) rotate(-4deg);
     }
@@ -312,7 +336,9 @@ body {
     }
 }
 
-/* DICE EXTRA TEXT */
+/* =========================
+   DICE DETAILS
+========================= */
 
 .dice-details {
     margin-top: 13px;
@@ -360,7 +386,9 @@ body {
     letter-spacing: 1px;
 }
 
-/* REROLL */
+/* =========================
+   REROLL
+========================= */
 
 .reroll-area {
     display: flex;
@@ -414,7 +442,9 @@ body {
     transform: none;
 }
 
-/* STATS */
+/* =========================
+   STATS
+========================= */
 
 .stats {
     margin-top: 18px;
@@ -454,7 +484,9 @@ body {
     font-weight: 1000;
 }
 
-/* HISTORY */
+/* =========================
+   HISTORY
+========================= */
 
 .history-section {
     margin-top: 19px;
@@ -573,7 +605,9 @@ body {
     letter-spacing: .8px;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 .footer {
     margin-top: auto;
@@ -589,7 +623,9 @@ body {
     letter-spacing: 1.4px;
 }
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 600px) {
 
@@ -687,6 +723,10 @@ body {
         width: 18px;
         height: 18px;
     }
+
+    .secret-color {
+        right: 7px;
+    }
 }
 </style>
 </head>
@@ -697,12 +737,22 @@ body {
 
     <div class="panel">
 
-        <!-- SECRET COLOR CONTROL -->
-        <button class="secret-color" id="secretColor">
-            COLOR: GREEN
+        <!-- ONLY THE BLOCKED COLOR DOT -->
+        <button
+            class="secret-color"
+            id="secretColor"
+            type="button"
+            aria-label="Change blocked color"
+        >
+            <span
+                class="secret-dot"
+                id="secretDot"
+            ></span>
         </button>
 
+
         <!-- HEADER -->
+
         <div class="top">
 
             <h1 class="title">
@@ -715,7 +765,9 @@ body {
 
         </div>
 
+
         <!-- INFO -->
+
         <div class="top-info">
 
             <div class="info-box active">
@@ -732,7 +784,9 @@ body {
 
         </div>
 
-        <!-- DETAIL TAGS -->
+
+        <!-- DETAILS -->
+
         <div class="details">
 
             <div class="detail">
@@ -757,12 +811,15 @@ body {
 
         </div>
 
+
         <!-- DICE -->
+
         <div class="dice-section">
 
             <div class="section-label">
                 FOUR COLOR OUTPUTS
             </div>
+
 
             <div class="dice-row">
 
@@ -784,13 +841,23 @@ body {
 
             </div>
 
+
             <div class="dice-details">
 
-                <span>FOUR OUTPUTS</span>
-                <span>LIVE STATUS</span>
-                <span>READY</span>
+                <span>
+                    FOUR OUTPUTS
+                </span>
+
+                <span>
+                    LIVE STATUS
+                </span>
+
+                <span>
+                    READY
+                </span>
 
             </div>
+
 
             <div class="dice-description">
                 EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT
@@ -798,16 +865,24 @@ body {
 
         </div>
 
+
         <!-- REROLL -->
+
         <div class="reroll-area">
 
-            <button class="reroll" id="reroll">
+            <button
+                class="reroll"
+                id="reroll"
+                type="button"
+            >
                 REROLL
             </button>
 
         </div>
 
+
         <!-- STATS -->
+
         <div class="stats">
 
             <div class="stat">
@@ -816,11 +891,15 @@ body {
                     TOTAL ROLLS
                 </div>
 
-                <div class="stat-value" id="totalRolls">
+                <div
+                    class="stat-value"
+                    id="totalRolls"
+                >
                     0
                 </div>
 
             </div>
+
 
             <div class="stat">
 
@@ -836,7 +915,9 @@ body {
 
         </div>
 
+
         <!-- HISTORY -->
+
         <div class="history-section">
 
             <div class="history-title">
@@ -851,9 +932,16 @@ body {
 
             </div>
 
-            <div class="history" id="history">
 
-                <div class="history-empty" id="historyEmpty">
+            <div
+                class="history"
+                id="history"
+            >
+
+                <div
+                    class="history-empty"
+                    id="historyEmpty"
+                >
                     NO ROLLS RECORDED YET
                 </div>
 
@@ -861,7 +949,9 @@ body {
 
         </div>
 
+
         <!-- FOOTER -->
+
         <div class="footer">
             ONLINE DICE • COLOR ENGINE • READY
         </div>
@@ -870,10 +960,11 @@ body {
 
 </div>
 
+
 <script>
 
 /* =========================
-   COLOR DATABASE
+   COLORS
 ========================= */
 
 const colors = [
@@ -915,7 +1006,8 @@ const colors = [
    ELEMENTS
 ========================= */
 
-const dice = document.querySelectorAll(".dice-box");
+const dice =
+    document.querySelectorAll(".dice-box");
 
 const rerollBtn =
     document.getElementById("reroll");
@@ -932,6 +1024,9 @@ const historyEmpty =
 const secretControl =
     document.getElementById("secretColor");
 
+const secretDot =
+    document.getElementById("secretDot");
+
 
 /* =========================
    VARIABLES
@@ -941,29 +1036,58 @@ let totalRolls = 0;
 
 let rolling = false;
 
+/*
+0 = GREEN
+1 = BLUE
+2 = YELLOW
+3 = ORANGE
+4 = PURPLE
+5 = RED
+*/
+
 let secretIndex = 0;
 
 
 /* =========================
+   SECRET DOT
+========================= */
+
+function updateSecretColor() {
+
+    const selectedColor =
+        colors[secretIndex];
+
+    secretDot.style.backgroundColor =
+        selectedColor.hex;
+
+    secretDot.style.color =
+        selectedColor.hex;
+}
+
+
+/* =========================
    RANDOM COLOR
+   EXCLUDES SECRET DOT COLOR
 ========================= */
 
 function getRandomColor() {
 
-    let availableColors =
-        colors.filter(function(color, index) {
+    const availableColors =
+        colors.filter(
+            function(color, index) {
 
-            return index !== secretIndex;
+                return index !== secretIndex;
 
-        });
+            }
+        );
 
     const randomIndex =
         Math.floor(
-            Math.random() * availableColors.length
+            Math.random() *
+            availableColors.length
         );
 
     return availableColors[randomIndex];
-
 }
 
 
@@ -975,21 +1099,29 @@ function finishRoll() {
 
     const resultColors = [];
 
-    dice.forEach(function(die) {
 
-        die.classList.remove("rolling");
+    dice.forEach(
+        function(die) {
 
-        const selectedColor =
-            getRandomColor();
+            die.classList.remove(
+                "rolling"
+            );
 
-        die.style.backgroundColor =
-            selectedColor.hex;
 
-        resultColors.push(
-            selectedColor
-        );
+            const selectedColor =
+                getRandomColor();
 
-    });
+
+            die.style.backgroundColor =
+                selectedColor.hex;
+
+
+            resultColors.push(
+                selectedColor
+            );
+
+        }
+    );
 
 
     totalRolls++;
@@ -998,7 +1130,9 @@ function finishRoll() {
         totalRolls;
 
 
-    addHistory(resultColors);
+    addHistory(
+        resultColors
+    );
 
 
     rolling = false;
@@ -1012,12 +1146,12 @@ function finishRoll() {
    HISTORY
 ========================= */
 
-function addHistory(resultColors) {
+function addHistory(
+    resultColors
+) {
 
     if (historyEmpty) {
-
         historyEmpty.remove();
-
     }
 
 
@@ -1045,22 +1179,24 @@ function addHistory(resultColors) {
         "history-colors";
 
 
-    resultColors.forEach(function(color) {
+    resultColors.forEach(
+        function(color) {
 
-        const smallBox =
-            document.createElement("div");
+            const smallBox =
+                document.createElement("div");
 
-        smallBox.className =
-            "history-color";
+            smallBox.className =
+                "history-color";
 
-        smallBox.style.backgroundColor =
-            color.hex;
+            smallBox.style.backgroundColor =
+                color.hex;
 
-        colorsContainer.appendChild(
-            smallBox
-        );
+            colorsContainer.appendChild(
+                smallBox
+            );
 
-    });
+        }
+    );
 
 
     const status =
@@ -1075,18 +1211,19 @@ function addHistory(resultColors) {
 
     row.appendChild(number);
 
-    row.appendChild(colorsContainer);
+    row.appendChild(
+        colorsContainer
+    );
 
     row.appendChild(status);
 
 
     historyElement.prepend(row);
-
 }
 
 
 /* =========================
-   REROLL BUTTON
+   REROLL
 ========================= */
 
 rerollBtn.addEventListener(
@@ -1103,21 +1240,28 @@ rerollBtn.addEventListener(
         rerollBtn.disabled = true;
 
 
-        /* TURN ALL DICE WHITE */
+        /*
+           All four become white
+           immediately.
+        */
 
-        dice.forEach(function(die) {
+        dice.forEach(
+            function(die) {
 
-            die.style.backgroundColor =
-                "#ffffff";
+                die.style.backgroundColor =
+                    "#ffffff";
 
-            die.classList.add(
-                "rolling"
-            );
+                die.classList.add(
+                    "rolling"
+                );
 
-        });
+            }
+        );
 
 
-        /* EXACTLY 1 SECOND */
+        /*
+           Shake for exactly 1 second.
+        */
 
         setTimeout(
             function() {
@@ -1133,7 +1277,7 @@ rerollBtn.addEventListener(
 
 
 /* =========================
-   SECRET COLOR CONTROL
+   SECRET DOT BUTTON
 ========================= */
 
 secretControl.addEventListener(
@@ -1142,6 +1286,10 @@ secretControl.addEventListener(
 
         event.preventDefault();
 
+
+        /*
+           Move to the next color.
+        */
 
         secretIndex++;
 
@@ -1155,15 +1303,16 @@ secretControl.addEventListener(
         }
 
 
-        secretControl.textContent =
-            "COLOR: " +
-            colors[secretIndex].name;
+        /*
+           Change only the dot.
+        */
+
+        updateSecretColor();
 
 
         /*
-            Removes mobile/browser focus
-            so the white outline does not
-            appear after pressing it.
+           Prevent white mobile
+           focus outline.
         */
 
         secretControl.blur();
@@ -1173,18 +1322,27 @@ secretControl.addEventListener(
 
 
 /* =========================
-   INITIAL DICE COLORS
+   INITIALIZE DOT
 ========================= */
 
-dice.forEach(function(die) {
+updateSecretColor();
 
-    const initialColor =
-        getRandomColor();
 
-    die.style.backgroundColor =
-        initialColor.hex;
+/* =========================
+   INITIAL DICE
+========================= */
 
-});
+dice.forEach(
+    function(die) {
+
+        const initialColor =
+            getRandomColor();
+
+        die.style.backgroundColor =
+            initialColor.hex;
+
+    }
+);
 
 </script>
 
