@@ -11,13 +11,12 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
     margin: 0;
+    width: 100%;
     min-height: 100%;
     font-family: Arial, Helvetica, sans-serif;
-    background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wAARCAIZAoADASIAAhEBAxEB/8QAGwABAAMBAQEBAAAAAAAAAAAAAAECAwQFBgc/xAA/EAABAwIFAwIEBAYBBAICAwEBAAIRAwQFEiExQVFhcYETIjJCoSCxweEUUoKR8PFiFXLR4iOywkMzNEOS4f/EABkBAQEBAQEBAAAAAAAAAAAAAAABAgMEAf/EACsRAAICAQMDBAAHAQEAAAAAAAABAhEDEiExE1FBBGFxIqGRobHB0fAF4v/aAAwDAQ3QueueI6q4CqApC6mS4A3sr4C0C3AQCgS23V1LVMIEA2VoCo0LRpVEA3VoCYFpCIqAnpA1CkAq4aqip4A9VoB2VwBoq4CI9F/VWVwtI32/2oJCsAtA4A2sr4IqAt/mpy04s0i1qAtf0pC06m0A33+SoYAt3rG1XwrARsA2C2AnI2626e8q4I5GgCoAnI/1AQC4C4N5qf8AVm3/AEIAtInbYQC7vR/p22WkK/v2CgG132iM8jIADsAnA2y391YC21pCo2/sI1024213d2+asA/3f/8ARXw0I/Iq3/lqAItA2x30/u3/ANK2/wA+SAnf4/M18O/2AAtAn3+C3s/m/wDa4I23o/Iq8/n3yAAnp8N3G30r2+x/6iAnbY7S3p5i+fIAtA3qL/p/9E5E24p0m26p8138kACd1v/ABT81v72/wA2QByAt2v/AJ/m/m12/iI52445oAAt/l3mrt5m0A52/v2eNAnI4y/P+v8A6oAnY497/P/AKoAAr8O3/59l38kACdr/mUfN39kAdtI44/0n8tAnO3Iu6e37oABO1qJ5/P/ANDX3QAB/C3P+f8A0U3A/wC1e2+2o/0/y/kAdts3mSArA2q2k/8AMv5AAdv2+3uI2pS/kAdts2c0y6q3u581cAc/140+9P/1EAE7fH3eJ/m3990AAnI+/wAvuI4vAAd1vf1eI05/NAE7b+I1i/q8f6f5Ad9k3+O/t3QAAd03c/sT3aACfO/8An2/9p2gAnf8Atv3O/u0AAnd/f7iO2EABO8x/m4p14AnIn544/sIAn6vf/pA303mSABPy150/q3U4ACdtxO/2P2G6ACfe3y/iI9pAAtAnffw/4S2sAtInlOAt+SAnA0mCgG44AAnI528e1ACAtvYgC2/wCAnI5A0jA52438lG1y2mS22EAC20y4gB1v4IAf/9k=') no-repeat center center fixed;
-    background-size: cover;
-    color: white;
 }
 
 body {
@@ -25,19 +24,24 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+
+    /* PUT minecraft.jpg IN THE SAME FOLDER AS THIS HTML FILE */
+    background:
+        linear-gradient(
+            rgba(2, 12, 28, .60),
+            rgba(2, 12, 28, .80)
+        ),
+        url("./minecraft.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    color: white;
 }
 
-button,
-div {
-    -webkit-tap-highlight-color: transparent;
-}
-
-button:focus,
-button:active,
-div:focus,
-div:active {
-    outline: none !important;
-}
+/* MAIN APP */
 
 .app {
     width: min(760px, 97vw);
@@ -46,46 +50,59 @@ div:active {
 }
 
 .panel {
-    position: relative;
-    overflow: hidden;
-
     width: 100%;
     min-height: calc(100vh - 16px);
-
-    background: rgba(5, 20, 43, .96);
-
-    border: 1px solid rgba(72, 130, 210, .28);
-    border-radius: 22px;
-
-    padding: 24px;
 
     display: flex;
     flex-direction: column;
 
+    padding: 20px;
+    position: relative;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 20, 43, .93),
+            rgba(3, 13, 30, .95)
+        );
+
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 18px;
+
     box-shadow:
-        0 25px 70px rgba(0,0,0,.5),
-        inset 0 0 50px rgba(35,100,190,.06);
+        0 20px 70px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.05);
+
+    overflow: hidden;
 }
 
-/* HEADER */
+/* TOP */
 
-.header {
+.top {
     text-align: center;
-    margin-bottom: 22px;
+    padding-top: 4px;
 }
 
 .title {
+    margin: 0;
     font-size: 31px;
     font-weight: 1000;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
+
+    color: #ffffff;
+
+    text-shadow:
+        0 0 18px rgba(59,130,246,.45);
 }
 
 .subtitle {
-    margin-top: 6px;
+    margin-top: 5px;
+
     font-size: 9px;
     font-weight: 900;
-    letter-spacing: 3px;
-    color: #5d91d4;
+    letter-spacing: 2.2px;
+
+    color: #7190b8;
 }
 
 /* SECRET COLOR */
@@ -134,104 +151,89 @@ div:active {
 /* INFO */
 
 .top-info {
-    background: rgba(8, 31, 64, .8);
+    margin-top: 18px;
 
-    border: 1px solid rgba(71, 130, 210, .18);
-    border-radius: 14px;
-
-    padding: 15px;
-
-    margin-bottom: 14px;
-}
-
-.status-line {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.status {
-    font-size: 9px;
-    font-weight: 1000;
-    letter-spacing: 1.5px;
-    color: #65a8ff;
-}
-
-.session {
-    font-size: 8px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: #4e6d98;
-}
-
-.description {
-    margin-top: 9px;
-
-    color: #7793b8;
-
-    font-size: 8px;
-    line-height: 1.7;
-    letter-spacing: .6px;
-}
-
-/* TAGS */
-
-.detail-row {
-    display: flex;
-    flex-wrap: wrap;
+    justify-content: center;
     gap: 7px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 
-.detail-tag {
-    padding: 7px 9px;
+.info-box {
+    padding: 7px 10px;
 
+    border: 1px solid rgba(255,255,255,.10);
     border-radius: 7px;
 
-    background: rgba(24, 63, 112, .35);
+    background: rgba(255,255,255,.035);
 
-    border: 1px solid rgba(71, 130, 210, .18);
-
-    color: #6e9ed5;
+    color: #8ea8c9;
 
     font-size: 7px;
-    font-weight: 1000;
-    letter-spacing: 1px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
 }
 
-/* DICE */
+.info-box.active {
+    color: #60a5fa;
+
+    border-color: rgba(59,130,246,.25);
+
+    background: rgba(59,130,246,.08);
+}
+
+/* DETAILS */
+
+.details {
+    margin-top: 15px;
+
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.detail {
+    padding: 5px 8px;
+
+    color: #607da5;
+
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 1px;
+
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 5px;
+
+    background: rgba(0,0,0,.13);
+}
+
+/* DICE AREA */
 
 .dice-section {
-    background: rgba(4, 15, 32, .78);
-
-    border: 1px solid rgba(71, 130, 210, .18);
-    border-radius: 17px;
-
-    padding: 24px 17px;
-
-    min-height: 250px;
+    margin-top: 22px;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: center;
 }
 
 .section-label {
-    text-align: center;
+    margin-bottom: 11px;
 
-    color: #6289b8;
+    color: #6f8db6;
 
     font-size: 8px;
     font-weight: 1000;
     letter-spacing: 2px;
-
-    margin-bottom: 22px;
 }
 
-.dice-row {
-    display: flex;
+/* DICE */
 
+.dice-row {
+    width: 100%;
+
+    display: flex;
     justify-content: center;
     align-items: center;
 
@@ -239,53 +241,49 @@ div:active {
 }
 
 .dice-box {
-    position: relative;
+    width: 72px;
+    height: 72px;
 
-    width: 78px;
-    height: 78px;
+    flex: 0 0 auto;
 
     border: 3px solid white;
-
-    border-radius: 12px;
+    border-radius: 10px;
 
     background: #22c55e;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
 
     box-shadow:
         0 7px 20px rgba(0,0,0,.35);
 
     transition:
         background-color .15s ease,
+        transform .15s ease,
         box-shadow .15s ease;
-
-    flex-shrink: 0;
 }
 
-.dice-box::after {
-    content: "";
+/* WHITE DOT */
 
-    position: absolute;
-
-    width: 9px;
-    height: 9px;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    background: white;
+.dice-dot {
+    width: 12px;
+    height: 12px;
 
     border-radius: 50%;
 
+    background: white;
+
     box-shadow:
-        0 0 5px rgba(255,255,255,.35);
+        0 0 8px rgba(255,255,255,.85);
 }
 
-/* ROLLING */
+/* SHAKE */
 
 .dice-box.rolling {
-    animation:
-        diceShake .20s ease-in-out infinite alternate;
+    animation: diceShake .20s ease-in-out infinite alternate;
 
     box-shadow:
         0 0 20px rgba(255,255,255,.65),
@@ -293,84 +291,82 @@ div:active {
 }
 
 @keyframes diceShake {
-
     0% {
-        transform:
-            translateX(-4px)
-            rotate(-4deg);
+        transform: translateX(-4px) rotate(-4deg);
     }
 
     25% {
-        transform:
-            translateX(3px)
-            rotate(3deg);
+        transform: translateX(3px) rotate(3deg);
     }
 
     50% {
-        transform:
-            translateX(-3px)
-            rotate(-3deg);
+        transform: translateX(-3px) rotate(-3deg);
     }
 
     75% {
-        transform:
-            translateX(4px)
-            rotate(4deg);
+        transform: translateX(4px) rotate(4deg);
     }
 
     100% {
-        transform:
-            translateX(-2px)
-            rotate(-2deg);
+        transform: translateX(-2px) rotate(-2deg);
     }
 }
 
-/* DETAILS */
+/* DICE EXTRA TEXT */
 
-.roll-details {
+.dice-details {
+    margin-top: 13px;
+
     display: flex;
-
     justify-content: center;
+    gap: 14px;
 
-    gap: 10px;
-
-    margin-top: 20px;
-
-    flex-wrap: wrap;
-}
-
-.roll-detail {
-    color: #5379a9;
+    color: #59769d;
 
     font-size: 7px;
-    font-weight: 1000;
-
-    letter-spacing: 1.3px;
+    font-weight: 900;
+    letter-spacing: 1.1px;
 }
 
-.extra-message {
+.dice-details span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dice-details span::before {
+    content: "";
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #3b82f6;
+
+    box-shadow:
+        0 0 7px rgba(59,130,246,.8);
+}
+
+.dice-description {
+    margin-top: 8px;
+
     text-align: center;
 
-    margin-top: 10px;
-
-    color: #405f89;
+    color: #486487;
 
     font-size: 7px;
     font-weight: 800;
-
     letter-spacing: 1px;
 }
 
-/* REROLL BUTTON */
+/* REROLL */
 
-.reroll-wrap {
+.reroll-area {
     display: flex;
-
     justify-content: center;
 
-    width: 100%;
-
-    margin: 23px 0;
+    margin-top: 19px;
 }
 
 .reroll {
@@ -378,325 +374,318 @@ div:active {
     height: 52px;
 
     border: none;
-    outline: none;
-
-    border-radius: 11px;
+    border-radius: 9px;
 
     background: #fde047;
 
-    color: #172033;
+    color: #18230c;
 
     font-size: 12px;
     font-weight: 1000;
-
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
 
     cursor: pointer;
 
     box-shadow:
-        0 8px 22px rgba(0,0,0,.38);
+        0 8px 25px rgba(253,224,71,.16);
 
     transition:
-        transform .12s ease,
-        filter .12s ease,
-        background .12s ease;
+        transform .15s ease,
+        background .15s ease,
+        box-shadow .15s ease;
 }
 
 .reroll:hover {
     background: #facc15;
-    filter: brightness(1.04);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 30px rgba(253,224,71,.25);
 }
 
 .reroll:active {
-    transform: scale(.97);
-
-    background: #facc15;
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,.3);
+    transform: translateY(1px);
 }
 
 .reroll:disabled {
-    opacity: .55;
-    cursor: not-allowed;
+    opacity: .65;
+    cursor: default;
+    transform: none;
 }
 
 /* STATS */
 
-.stats-section {
-    display: grid;
+.stats {
+    margin-top: 18px;
 
-    grid-template-columns: 1fr 1fr;
-
+    display: flex;
+    justify-content: center;
     gap: 10px;
-
-    margin-bottom: 16px;
 }
 
-.stat-card {
-    background: rgba(8, 29, 58, .75);
+.stat {
+    width: 145px;
 
-    border: 1px solid rgba(71, 130, 210, .18);
-
-    border-radius: 13px;
-
-    padding: 16px;
+    padding: 10px;
 
     text-align: center;
+
+    background: rgba(0,0,0,.16);
+
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 8px;
 }
 
 .stat-label {
-    color: #4f719c;
+    color: #55749c;
 
     font-size: 7px;
-    font-weight: 1000;
-
-    letter-spacing: 1.5px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
 }
 
 .stat-value {
-    margin-top: 7px;
+    margin-top: 4px;
 
-    color: #d8e8ff;
+    color: #dceaff;
 
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 1000;
-}
-
-.system-online {
-    color: #61a8ff;
 }
 
 /* HISTORY */
 
 .history-section {
-    background: rgba(4, 15, 32, .75);
+    margin-top: 19px;
 
-    border: 1px solid rgba(71, 130, 210, .18);
-
-    border-radius: 17px;
-
-    padding: 17px;
+    padding: 13px;
 
     flex: 1;
-}
 
-.history-header {
-    display: flex;
+    min-height: 120px;
 
-    justify-content: space-between;
-    align-items: center;
+    background: rgba(0,0,0,.13);
 
-    margin-bottom: 13px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
 }
 
 .history-title {
-    color: #6c92c0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+.history-title-left {
+    color: #7895ba;
 
     font-size: 8px;
     font-weight: 1000;
-
-    letter-spacing: 2px;
+    letter-spacing: 1.7px;
 }
 
-.history-count {
-    color: #395c88;
+.history-title-right {
+    color: #456384;
 
     font-size: 7px;
     font-weight: 900;
-
     letter-spacing: 1px;
 }
 
 .history {
     display: flex;
-
     flex-direction: column;
 
-    gap: 7px;
+    gap: 6px;
+
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.history::-webkit-scrollbar {
+    width: 3px;
+}
+
+.history::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.15);
+    border-radius: 10px;
+}
+
+.history-empty {
+    padding: 15px;
+
+    text-align: center;
+
+    color: #405b7d;
+
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: 1px;
 }
 
 .history-row {
     display: flex;
-
     align-items: center;
+    justify-content: space-between;
 
-    gap: 9px;
+    padding: 7px 8px;
 
-    padding: 9px;
+    border-radius: 7px;
 
-    background: rgba(11, 38, 74, .38);
+    background: rgba(255,255,255,.025);
 
-    border: 1px solid rgba(71, 130, 210, .12);
-
-    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.04);
 }
 
-.roll-number {
-    width: 28px;
+.history-number {
+    width: 34px;
 
-    color: #557ca9;
+    color: #4e6d94;
 
     font-size: 7px;
     font-weight: 1000;
-
-    letter-spacing: .7px;
 }
 
 .history-colors {
     display: flex;
-
-    gap: 7px;
+    gap: 6px;
 }
 
-.history-box {
-    position: relative;
+.history-color {
+    width: 21px;
+    height: 21px;
 
-    width: 36px;
-    height: 36px;
+    border: 1px solid rgba(255,255,255,.55);
+    border-radius: 4px;
 
-    border: 2px solid white;
-
-    border-radius: 6px;
+    box-shadow:
+        0 3px 8px rgba(0,0,0,.25);
 }
 
-.history-box::after {
-    content: "";
+.history-status {
+    color: #405a7b;
 
-    position: absolute;
-
-    width: 5px;
-    height: 5px;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    background: white;
-
-    border-radius: 50%;
-}
-
-.empty-history {
-    text-align: center;
-
-    padding: 22px 14px;
-
-    color: #35577f;
-
-    font-size: 7px;
+    font-size: 6px;
     font-weight: 900;
-
-    letter-spacing: 1px;
+    letter-spacing: .8px;
 }
 
 /* FOOTER */
 
 .footer {
-    text-align: center;
-
     margin-top: auto;
+
     padding-top: 18px;
 
-    color: #385a84;
+    text-align: center;
+
+    color: #385574;
 
     font-size: 7px;
     font-weight: 900;
-
-    letter-spacing: 1.5px;
+    letter-spacing: 1.4px;
 }
 
 /* MOBILE */
 
-@media (max-width: 430px) {
-
-    body {
-        padding: 8px;
-    }
-
-    .app {
-        width: 100%;
-        min-height: calc(100vh - 16px);
-    }
+@media (max-width: 600px) {
 
     .panel {
-        min-height: calc(100vh - 16px);
-
-        padding: 18px 14px;
-
-        border-radius: 20px;
+        padding: 17px 12px;
+        border-radius: 15px;
     }
 
     .title {
-        font-size: 25px;
-    }
-
-    .dice-section {
-        min-height: 235px;
-        padding: 22px 10px;
+        font-size: 26px;
+        letter-spacing: 2.5px;
     }
 
     .dice-row {
-        gap: 7px;
+        gap: 8px;
     }
 
     .dice-box {
-        width: 68px;
-        height: 68px;
+        width: 64px;
+        height: 64px;
+        border-width: 3px;
+    }
+
+    .dice-dot {
+        width: 11px;
+        height: 11px;
     }
 
     .reroll {
         width: 320px;
-        max-width: 100%;
         height: 50px;
     }
 
-    .history-box {
-        width: 32px;
-        height: 32px;
+    .stats {
+        gap: 7px;
     }
 
-    .history-colors {
-        gap: 5px;
+    .stat {
+        width: 135px;
+    }
+}
+
+@media (max-width: 430px) {
+
+    .app {
+        width: 100%;
+    }
+
+    .dice-row {
+        gap: 6px;
+    }
+
+    .dice-box {
+        width: 61px;
+        height: 61px;
+    }
+
+    .dice-details {
+        gap: 9px;
+        font-size: 6px;
+    }
+
+    .reroll {
+        width: 320px;
+        height: 50px;
+    }
+
+    .stat {
+        width: 130px;
     }
 }
 
 @media (max-width: 350px) {
 
     .panel {
-        padding: 16px 11px;
+        padding-left: 8px;
+        padding-right: 8px;
     }
 
     .dice-row {
-        gap: 5px;
+        gap: 4px;
     }
 
     .dice-box {
-        width: 61px;
-        height: 61px;
-
-        border-width: 3px;
-    }
-
-    .dice-box::after {
-        width: 8px;
-        height: 8px;
+        width: 56px;
+        height: 56px;
     }
 
     .reroll {
         width: 300px;
-        max-width: 100%;
         height: 47px;
     }
 
-    .history-box {
-        width: 28px;
-        height: 28px;
-    }
-
-    .history-colors {
-        gap: 4px;
+    .history-color {
+        width: 18px;
+        height: 18px;
     }
 }
 </style>
@@ -706,198 +695,186 @@ div:active {
 
 <div class="app">
 
-<div class="panel">
+    <div class="panel">
 
-<!-- SECRET COLOR -->
+        <!-- SECRET COLOR CONTROL -->
+        <button class="secret-color" id="secretColor">
+            COLOR: GREEN
+        </button>
 
-<button class="secret-color" id="secretControl">
-    COLOR: <span id="secretColor">GREEN</span>
-</button>
+        <!-- HEADER -->
+        <div class="top">
 
-<!-- HEADER -->
+            <h1 class="title">
+                ONLINE DICE
+            </h1>
 
-<div class="header">
+            <div class="subtitle">
+                COLOR RANDOMIZER ENGINE
+            </div>
 
-    <div class="title">
-        ONLINE DICE
-    </div>
-
-    <div class="subtitle">
-        COLOR RANDOMIZATION ENGINE
-    </div>
-
-</div>
-
-<!-- INFO -->
-
-<div class="top-info">
-
-    <div class="status-line">
-
-        <div class="status">
-            ● SYSTEM ONLINE
         </div>
 
-        <div class="session">
-            SESSION ACTIVE
+        <!-- INFO -->
+        <div class="top-info">
+
+            <div class="info-box active">
+                SYSTEM ONLINE
+            </div>
+
+            <div class="info-box">
+                SESSION ACTIVE
+            </div>
+
+            <div class="info-box">
+                ENGINE READY
+            </div>
+
         </div>
 
-    </div>
+        <!-- DETAIL TAGS -->
+        <div class="details">
 
-    <div class="description">
-        FOUR INDEPENDENT COLOR CHAMBERS ARE READY.
-        EACH REROLL GENERATES A NEW RANDOMIZED RESULT.
-    </div>
+            <div class="detail">
+                6 COLORS
+            </div>
 
-</div>
+            <div class="detail">
+                4 CHAMBERS
+            </div>
 
-<!-- TAGS -->
+            <div class="detail">
+                LIVE ROLL
+            </div>
 
-<div class="detail-row">
+            <div class="detail">
+                RANDOMIZED
+            </div>
 
-    <div class="detail-tag">
-        6 COLORS
-    </div>
+            <div class="detail">
+                ACTIVE ENGINE
+            </div>
 
-    <div class="detail-tag">
-        4 CHAMBERS
-    </div>
-
-    <div class="detail-tag">
-        LIVE ROLL
-    </div>
-
-    <div class="detail-tag">
-        RANDOMIZED
-    </div>
-
-    <div class="detail-tag">
-        ACTIVE ENGINE
-    </div>
-
-</div>
-
-<!-- DICE -->
-
-<div class="dice-section">
-
-    <div class="section-label">
-        CURRENT COLOR RESULT
-    </div>
-
-    <div class="dice-row">
-
-        <div class="dice-box" id="dice1"></div>
-        <div class="dice-box" id="dice2"></div>
-        <div class="dice-box" id="dice3"></div>
-        <div class="dice-box" id="dice4"></div>
-
-    </div>
-
-    <div class="roll-details">
-
-        <div class="roll-detail">
-            FOUR OUTPUTS
         </div>
 
-        <div class="roll-detail">
-            •
+        <!-- DICE -->
+        <div class="dice-section">
+
+            <div class="section-label">
+                FOUR COLOR OUTPUTS
+            </div>
+
+            <div class="dice-row">
+
+                <div class="dice-box">
+                    <div class="dice-dot"></div>
+                </div>
+
+                <div class="dice-box">
+                    <div class="dice-dot"></div>
+                </div>
+
+                <div class="dice-box">
+                    <div class="dice-dot"></div>
+                </div>
+
+                <div class="dice-box">
+                    <div class="dice-dot"></div>
+                </div>
+
+            </div>
+
+            <div class="dice-details">
+
+                <span>FOUR OUTPUTS</span>
+                <span>LIVE STATUS</span>
+                <span>READY</span>
+
+            </div>
+
+            <div class="dice-description">
+                EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT
+            </div>
+
         </div>
 
-        <div class="roll-detail">
-            LIVE STATUS
+        <!-- REROLL -->
+        <div class="reroll-area">
+
+            <button class="reroll" id="reroll">
+                REROLL
+            </button>
+
         </div>
 
-        <div class="roll-detail">
-            •
+        <!-- STATS -->
+        <div class="stats">
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    TOTAL ROLLS
+                </div>
+
+                <div class="stat-value" id="totalRolls">
+                    0
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    SYSTEM
+                </div>
+
+                <div class="stat-value">
+                    ONLINE
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="roll-detail">
-            READY
+        <!-- HISTORY -->
+        <div class="history-section">
+
+            <div class="history-title">
+
+                <div class="history-title-left">
+                    REROLL HISTORY
+                </div>
+
+                <div class="history-title-right">
+                    NEWEST FIRST
+                </div>
+
+            </div>
+
+            <div class="history" id="history">
+
+                <div class="history-empty" id="historyEmpty">
+                    NO ROLLS RECORDED YET
+                </div>
+
+            </div>
+
         </div>
 
-    </div>
-
-    <div class="extra-message">
-        EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT.
-    </div>
-
-</div>
-
-<!-- REROLL -->
-
-<div class="reroll-wrap">
-
-    <button class="reroll" id="rerollBtn">
-        REROLL
-    </button>
-
-</div>
-
-<!-- STATS -->
-
-<div class="stats-section">
-
-    <div class="stat-card">
-
-        <div class="stat-label">
-            TOTAL ROLLS
-        </div>
-
-        <div class="stat-value" id="totalRolls">
-            0
-        </div>
-
-    </div>
-
-    <div class="stat-card">
-
-        <div class="stat-label">
-            SYSTEM
-        </div>
-
-        <div class="stat-value system-online">
-            ONLINE
-        </div>
-
-    </div>
-
-</div>
-
-<!-- HISTORY -->
-
-<div class="history-section">
-
-    <div class="history-header">
-
-        <div class="history-title">
-            REROLL HISTORY
-        </div>
-
-        <div class="history-count">
-            RECENT RESULTS
-        </div>
-
-    </div>
-
-    <div class="history" id="history">
-
-        <div class="empty-history" id="emptyHistory">
-            NO ROLLS YET — PRESS REROLL TO BEGIN
+        <!-- FOOTER -->
+        <div class="footer">
+            ONLINE DICE • COLOR ENGINE • READY
         </div>
 
     </div>
 
-</div>
-
-<div class="footer">
-    ONLINE DICE • COLOR ENGINE • READY
-</div>
-
-</div>
 </div>
 
 <script>
+
+/* =========================
+   COLOR DATABASE
+========================= */
 
 const colors = [
 
@@ -933,17 +910,15 @@ const colors = [
 
 ];
 
-const dice = [
 
-    document.getElementById("dice1"),
-    document.getElementById("dice2"),
-    document.getElementById("dice3"),
-    document.getElementById("dice4")
+/* =========================
+   ELEMENTS
+========================= */
 
-];
+const dice = document.querySelectorAll(".dice-box");
 
 const rerollBtn =
-    document.getElementById("rerollBtn");
+    document.getElementById("reroll");
 
 const totalRollsElement =
     document.getElementById("totalRolls");
@@ -951,102 +926,80 @@ const totalRollsElement =
 const historyElement =
     document.getElementById("history");
 
-const emptyHistory =
-    document.getElementById("emptyHistory");
+const historyEmpty =
+    document.getElementById("historyEmpty");
 
 const secretControl =
-    document.getElementById("secretControl");
-
-const secretColorElement =
     document.getElementById("secretColor");
 
+
+/* =========================
+   VARIABLES
+========================= */
+
 let totalRolls = 0;
+
 let rolling = false;
 
 let secretIndex = 0;
 
-/* SECRET COLOR */
 
-secretControl.addEventListener(
-    "click",
-    function(event) {
-
-        event.preventDefault();
-
-        secretIndex++;
-
-        if (secretIndex >= colors.length) {
-            secretIndex = 0;
-        }
-
-        secretColorElement.textContent =
-            colors[secretIndex].name;
-
-        secretControl.blur();
-
-    }
-);
-
-/* RANDOM COLOR */
+/* =========================
+   RANDOM COLOR
+========================= */
 
 function getRandomColor() {
 
-    const availableColors =
-        colors.filter(
-            (_, index) =>
-                index !== secretIndex
-        );
+    let availableColors =
+        colors.filter(function(color, index) {
+
+            return index !== secretIndex;
+
+        });
 
     const randomIndex =
         Math.floor(
-            Math.random() *
-            availableColors.length
+            Math.random() * availableColors.length
         );
 
     return availableColors[randomIndex];
 
 }
 
-/* SET DICE COLOR */
 
-function setDiceColor(
-    die,
-    color
-) {
-
-    die.style.backgroundColor =
-        color.hex;
-
-}
-
-/* FINISH ROLL */
+/* =========================
+   FINISH ROLL
+========================= */
 
 function finishRoll() {
 
-    dice.forEach(
-        die => {
+    const resultColors = [];
 
-            die.classList.remove(
-                "rolling"
-            );
+    dice.forEach(function(die) {
 
-            const color =
-                getRandomColor();
+        die.classList.remove("rolling");
 
-            setDiceColor(
-                die,
-                color
-            );
+        const selectedColor =
+            getRandomColor();
 
-        }
-    );
+        die.style.backgroundColor =
+            selectedColor.hex;
+
+        resultColors.push(
+            selectedColor
+        );
+
+    });
+
 
     totalRolls++;
 
     totalRollsElement.textContent =
         totalRolls;
 
-    addHistory();
+
+    addHistory(resultColors);
+
 
     rolling = false;
 
@@ -1054,13 +1007,19 @@ function finishRoll() {
 
 }
 
-/* ADD HISTORY */
 
-function addHistory() {
+/* =========================
+   HISTORY
+========================= */
 
-    if (emptyHistory) {
-        emptyHistory.remove();
+function addHistory(resultColors) {
+
+    if (historyEmpty) {
+
+        historyEmpty.remove();
+
     }
+
 
     const row =
         document.createElement("div");
@@ -1068,14 +1027,16 @@ function addHistory() {
     row.className =
         "history-row";
 
+
     const number =
         document.createElement("div");
 
     number.className =
-        "roll-number";
+        "history-number";
 
     number.textContent =
         "#" + totalRolls;
+
 
     const colorsContainer =
         document.createElement("div");
@@ -1083,63 +1044,86 @@ function addHistory() {
     colorsContainer.className =
         "history-colors";
 
-    dice.forEach(
-        die => {
 
-            const historyBox =
-                document.createElement("div");
+    resultColors.forEach(function(color) {
 
-            historyBox.className =
-                "history-box";
+        const smallBox =
+            document.createElement("div");
 
-            historyBox.style.backgroundColor =
-                die.style.backgroundColor;
+        smallBox.className =
+            "history-color";
 
-            colorsContainer.appendChild(
-                historyBox
-            );
+        smallBox.style.backgroundColor =
+            color.hex;
 
-        }
-    );
+        colorsContainer.appendChild(
+            smallBox
+        );
+
+    });
+
+
+    const status =
+        document.createElement("div");
+
+    status.className =
+        "history-status";
+
+    status.textContent =
+        "COMPLETE";
+
 
     row.appendChild(number);
 
-    row.appendChild(
-        colorsContainer
-    );
+    row.appendChild(colorsContainer);
+
+    row.appendChild(status);
+
 
     historyElement.prepend(row);
 
 }
 
-/* REROLL */
+
+/* =========================
+   REROLL BUTTON
+========================= */
 
 rerollBtn.addEventListener(
     "click",
     function() {
 
-        if (rolling) return;
+        if (rolling) {
+            return;
+        }
+
 
         rolling = true;
 
         rerollBtn.disabled = true;
 
-        dice.forEach(
-            die => {
 
-                die.style.backgroundColor =
-                    "#ffffff";
+        /* TURN ALL DICE WHITE */
 
-                die.classList.add(
-                    "rolling"
-                );
+        dice.forEach(function(die) {
 
-            }
-        );
+            die.style.backgroundColor =
+                "#ffffff";
+
+            die.classList.add(
+                "rolling"
+            );
+
+        });
+
+
+        /* EXACTLY 1 SECOND */
 
         setTimeout(
             function() {
+
                 finishRoll();
+
             },
             1000
         );
@@ -1147,18 +1131,60 @@ rerollBtn.addEventListener(
     }
 );
 
-/* INITIAL COLORS */
 
-dice.forEach(
-    (die, index) => {
+/* =========================
+   SECRET COLOR CONTROL
+========================= */
 
-        setDiceColor(
-            die,
-            colors[index]
-        );
+secretControl.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+
+        secretIndex++;
+
+
+        if (
+            secretIndex >= colors.length
+        ) {
+
+            secretIndex = 0;
+
+        }
+
+
+        secretControl.textContent =
+            "COLOR: " +
+            colors[secretIndex].name;
+
+
+        /*
+            Removes mobile/browser focus
+            so the white outline does not
+            appear after pressing it.
+        */
+
+        secretControl.blur();
 
     }
 );
+
+
+/* =========================
+   INITIAL DICE COLORS
+========================= */
+
+dice.forEach(function(die) {
+
+    const initialColor =
+        getRandomColor();
+
+    die.style.backgroundColor =
+        initialColor.hex;
+
+});
 
 </script>
 
