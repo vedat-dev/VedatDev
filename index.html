@@ -2,2007 +2,678 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>COLOR DICE // PREDICTOR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Dice</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-:root{
-  --bg:#07090d;
-  --block:#11151c;
-  --block2:#171c24;
-  --block3:#202631;
-  --border:#303844;
-  --white:#f4f7fb;
-  --muted:#7b8594;
-  --cyan:#00eaff;
-
-  --blue:#328cff;
-  --red:#ff3d61;
-  --purple:#9c62ff;
-  --orange:#ff8a2d;
-  --green:#20db84;
-  --yellow:#ffd43b;
-}
-
-body{
-  min-height:100vh;
-  background:
-    linear-gradient(135deg,#07090d,#0b0e14);
-  color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-body:before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.07;
-  background:
-    linear-gradient(90deg,#fff 1px,transparent 1px),
-    linear-gradient(#fff 1px,transparent 1px);
-  background-size:32px 32px;
-}
-
-.app{
-  width:min(1050px,94%);
-  margin:auto;
-  padding:18px 0 50px;
-}
-
-/* HEADER */
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:14px;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.logoBox{
-  width:43px;
-  height:43px;
-  display:grid;
-  place-items:center;
-  background:#00cfff;
-  color:#031016;
-  border:3px solid #063d4b;
-  box-shadow:4px 4px 0 #001e27;
-  font-size:20px;
-  font-weight:900;
-}
-
-.logoText{
-  font-size:16px;
-  font-weight:950;
-  letter-spacing:2px;
-}
-
-.logoSub{
-  display:block;
-  margin-top:2px;
-  color:var(--muted);
-  font-size:7px;
-  letter-spacing:2px;
-}
-
-.online{
-  padding:9px 12px;
-  background:#10161c;
-  border:2px solid #29323d;
-  box-shadow:3px 3px 0 #05070a;
-  color:#9ca7b6;
-  font-size:8px;
-  font-weight:900;
-}
-
-/* HERO */
-
-.hero{
-  position:relative;
-  padding:26px;
-  background:
-    linear-gradient(145deg,#151b24,#0e1218);
-  border:2px solid var(--border);
-  box-shadow:6px 6px 0 #020304;
-  overflow:hidden;
-}
-
-.hero:after{
-  content:"";
-  position:absolute;
-  right:-60px;
-  top:-80px;
-  width:220px;
-  height:220px;
-  background:var(--cyan);
-  opacity:.08;
-  transform:rotate(25deg);
-}
-
-.heroTag{
-  color:var(--cyan);
-  font-size:8px;
-  font-weight:900;
-  letter-spacing:3px;
-}
-
-.hero h1{
-  margin-top:8px;
-  max-width:700px;
-  font-size:clamp(30px,6vw,57px);
-  line-height:.94;
-  letter-spacing:-3px;
-  font-weight:950;
-}
-
-.hero p{
-  max-width:650px;
-  margin-top:13px;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.7;
-}
-
-/* BLOCK */
-
-.block{
-  margin-top:15px;
-  padding:18px;
-  background:var(--block);
-  border:2px solid var(--border);
-  box-shadow:5px 5px 0 #020304;
-}
-
-.blockHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.blockTitle{
-  display:flex;
-  align-items:center;
-  gap:9px;
-}
-
-.titleSquare{
-  width:27px;
-  height:27px;
-  display:grid;
-  place-items:center;
-  background:var(--cyan);
-  color:#001319;
-  font-size:11px;
-  font-weight:950;
-}
-
-.block h2{
-  font-size:13px;
-  font-weight:950;
-  letter-spacing:1px;
-}
-
-.blockHeader span{
-  color:#687382;
-  font-size:7px;
-  font-weight:900;
-  letter-spacing:1px;
-}
-
-/* PAST COLORS */
-
-.instruction{
-  margin-top:7px;
-  color:#707b8b;
-  font-size:9px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.pastSlots{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:15px;
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at 20% 20%, #24304d 0%, transparent 30%),
+        radial-gradient(circle at 80% 80%, #182642 0%, transparent 30%),
+        #070a12;
+    color: white;
+    overflow-x: hidden;
 }
 
-.pastSlot{
-  height:95px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  background:#0b0f14;
-  border:2px dashed #323b47;
-  transition:.15s;
+.container {
+    width: min(900px, 94%);
+    margin: auto;
+    padding: 35px 0 50px;
 }
 
-.pastSlot.filled{
-  border-style:solid;
-}
+/* TOP */
 
-.slotNum{
-  color:#596473;
-  font-size:7px;
-  font-weight:900;
-  margin-bottom:8px;
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
 }
 
-.slotDot{
-  width:28px;
-  height:28px;
-  display:none;
+.logo h1 {
+    font-size: 34px;
+    letter-spacing: 2px;
 }
 
-.slotName{
-  margin-top:7px;
-  font-size:8px;
-  font-weight:950;
-  color:#687381;
+.logo p {
+    margin-top: 6px;
+    color: #8993aa;
+    font-size: 13px;
 }
 
-/* COLOR CHOOSER */
+/* COLOR SELECTOR */
 
-.colorGrid{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:7px;
-  margin-top:10px;
+.color-box {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 12px 16px;
+    border-radius: 14px;
+    min-width: 150px;
+    cursor: pointer;
+    transition: .2s;
+    text-align: right;
 }
 
-.color{
-  min-height:62px;
-  background:var(--block2);
-  border:2px solid #29313b;
-  box-shadow:3px 3px 0 #05070a;
-  color:white;
-  cursor:pointer;
-  font-size:8px;
-  font-weight:950;
-  transition:.12s;
+.color-box:hover {
+    background: rgba(255,255,255,.1);
+    transform: translateY(-2px);
 }
 
-.color:hover{
-  transform:translate(-1px,-1px);
-  border-color:#596474;
+.color-label {
+    font-size: 10px;
+    color: #7f8ba5;
+    letter-spacing: 2px;
 }
 
-.color:active{
-  transform:translate(2px,2px);
-  box-shadow:0 0 0 #05070a;
+.selected-color {
+    margin-top: 4px;
+    font-size: 17px;
+    font-weight: bold;
 }
 
-.colorCircle{
-  width:20px;
-  height:20px;
-  margin:0 auto 6px;
-}
-
-/* PREDICT BUTTON */
+/* MAIN CARD */
 
-.predictButton{
-  width:100%;
-  height:55px;
-  margin-top:12px;
-  border:3px solid #004a58;
-  background:#00d9f5;
-  color:#001015;
-  box-shadow:5px 5px 0 #00252c;
-  cursor:pointer;
-  font-size:12px;
-  font-weight:950;
-  letter-spacing:1px;
-  transition:.12s;
+.main-card {
+    background: rgba(13,17,29,.88);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 25px 80px rgba(0,0,0,.35);
 }
 
-.predictButton:hover{
-  background:#36e6fa;
-}
+/* DICE */
 
-.predictButton:active{
-  transform:translate(4px,4px);
-  box-shadow:1px 1px 0 #00252c;
+.dice-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 290px;
 }
 
-/* SMALL BUTTONS */
-
-.smallButtons{
-  display:flex;
-  gap:7px;
-  margin-top:8px;
+.dice {
+    width: 190px;
+    height: 190px;
+    border-radius: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 70px;
+    font-weight: 900;
+    box-shadow:
+        inset 0 -15px 30px rgba(0,0,0,.18),
+        0 25px 60px rgba(0,0,0,.45);
+    border: 5px solid rgba(255,255,255,.15);
+    transition: .35s;
 }
 
-.smallButton{
-  flex:1;
-  height:37px;
-  background:#181e27;
-  border:2px solid #303844;
-  color:#aab3bf;
-  box-shadow:3px 3px 0 #05070a;
-  cursor:pointer;
-  font-size:8px;
-  font-weight:900;
+.dice.rolling {
+    animation: shake .15s infinite;
 }
 
-.smallButton:active{
-  transform:translate(2px,2px);
-  box-shadow:1px 1px 0 #05070a;
+@keyframes shake {
+    0% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.04); }
+    100% { transform: rotate(-5deg) scale(1); }
 }
 
-/* PREDICTIONS */
+/* RESULT */
 
-.predictionGrid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:13px;
+.result {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-.prediction{
-  position:relative;
-  padding:18px 10px;
-  background:#0d1218;
-  border:2px solid #2b333e;
-  box-shadow:4px 4px 0 #030405;
-  text-align:center;
-  overflow:hidden;
+.result-title {
+    color: #8993aa;
+    font-size: 12px;
+    letter-spacing: 2px;
 }
 
-.prediction:first-child{
-  border-color:var(--cyan);
+.result-color {
+    font-size: 35px;
+    font-weight: 900;
+    margin-top: 7px;
 }
 
-.rank{
-  color:#606b79;
-  font-size:7px;
-  font-weight:950;
-  letter-spacing:1px;
-}
+/* BUTTON */
 
-.predDot{
-  width:43px;
-  height:43px;
-  margin:12px auto;
-  border:3px solid rgba(255,255,255,.14);
-  box-shadow:5px 5px 0 rgba(0,0,0,.4);
+.roll-button {
+    display: block;
+    width: 100%;
+    max-width: 430px;
+    margin: auto;
+    padding: 18px;
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(135deg,#ffffff,#cbd4e8);
+    color: #080b12;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: .2s;
 }
 
-.predName{
-  font-size:11px;
-  font-weight:950;
+.roll-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255,255,255,.12);
 }
 
-.predScore{
-  margin-top:6px;
-  color:#a9b2bf;
-  font-size:8px;
-  font-weight:900;
+.roll-button:active {
+    transform: scale(.97);
 }
 
-.scoreTrack{
-  height:6px;
-  margin-top:9px;
-  background:#252c35;
-  border:1px solid #333c47;
-}
+/* INFO */
 
-.scoreFill{
-  height:100%;
-  width:0;
-  transition:1s;
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-top: 25px;
 }
 
-.predReason{
-  min-height:20px;
-  margin-top:9px;
-  color:#626d7b;
-  font-size:7px;
-  line-height:1.4;
+.info {
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 14px;
+    padding: 15px;
 }
-
-/* DASHBOARD */
 
-.dashboard{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
+.info small {
+    display: block;
+    color: #717d98;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
 }
 
-.statGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:7px;
-  margin-top:13px;
+.info strong {
+    font-size: 17px;
 }
 
-.stat{
-  padding:13px;
-  background:#0c1117;
-  border:2px solid #29313b;
-  box-shadow:3px 3px 0 #030405;
-}
+/* COLORS */
 
-.stat small{
-  color:#65707e;
-  font-size:7px;
-  font-weight:900;
+.color-list {
+    display: grid;
+    grid-template-columns: repeat(6,1fr);
+    gap: 9px;
+    margin-top: 25px;
 }
 
-.stat strong{
-  display:block;
-  margin-top:6px;
-  font-size:18px;
+.color-item {
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: .2s;
 }
 
-.chart{
-  margin-top:12px;
+.color-item:hover {
+    transform: translateY(-2px);
 }
 
-.chartRow{
-  display:grid;
-  grid-template-columns:65px 1fr 35px;
-  align-items:center;
-  gap:8px;
-  margin:9px 0;
-  color:#aeb6c1;
-  font-size:8px;
-  font-weight:900;
+.color-item.active {
+    border-color: white;
+    box-shadow: 0 0 15px rgba(255,255,255,.25);
 }
 
-.track{
-  height:7px;
-  background:#252c35;
-}
+/* HISTORY */
 
-.fill{
-  width:0;
-  height:100%;
-  transition:1s;
+.history-section {
+    margin-top: 30px;
 }
 
-.history{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  max-height:330px;
-  overflow:auto;
-  margin-top:12px;
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
 }
 
-.historyRow{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:9px;
-  background:#0c1117;
-  border:2px solid #29313b;
+.history {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.historyID{
-  color:#687382;
-  font-size:7px;
-  font-weight:900;
+.history-item {
+    width: 45px;
+    height: 45px;
+    border-radius: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    font-weight: bold;
 }
 
-.miniColors{
-  display:flex;
-  gap:5px;
-}
+/* DETAILS */
 
-.mini{
-  width:16px;
-  height:16px;
-  border:2px solid rgba(255,255,255,.12);
+.details {
+    margin-top: 25px;
+    padding: 18px;
+    border-radius: 15px;
+    background: rgba(255,255,255,.035);
+    border-left: 3px solid #fff;
 }
 
-.empty{
-  padding:27px 10px;
-  color:#596575;
-  text-align:center;
-  font-size:8px;
-  line-height:1.7;
+.details-title {
+    font-weight: bold;
+    margin-bottom: 7px;
 }
 
-.note{
-  margin:14px auto 0;
-  max-width:700px;
-  color:#535e6e;
-  text-align:center;
-  font-size:7px;
-  line-height:1.7;
+.details-text {
+    color: #8b96ad;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 /* MOBILE */
 
-@media(max-width:800px){
+@media(max-width:650px) {
 
-  .colorGrid{
-    grid-template-columns:repeat(3,1fr);
-  }
+    .container {
+        padding-top: 20px;
+    }
 
-  .predictionGrid{
-    grid-template-columns:repeat(2,1fr);
-  }
+    .top {
+        align-items: center;
+    }
 
-  .dashboard{
-    grid-template-columns:1fr;
-  }
-}
+    .logo h1 {
+        font-size: 27px;
+    }
 
-@media(max-width:500px){
+    .color-box {
+        min-width: 125px;
+        padding: 10px;
+    }
 
-  .app{
-    width:92%;
-  }
+    .main-card {
+        padding: 18px;
+    }
 
-  .hero{
-    padding:22px;
-  }
+    .dice {
+        width: 155px;
+        height: 155px;
+        font-size: 55px;
+    }
 
-  .pastSlots{
-    gap:5px;
-  }
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
 
-  .pastSlot{
-    height:78px;
-  }
-
-  .colorGrid{
-    gap:5px;
-  }
-
-  .color{
-    min-height:55px;
-  }
-
-  .smallButtons{
-    flex-wrap:wrap;
-  }
-
+    .color-list {
+        grid-template-columns: repeat(3,1fr);
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="container">
 
-<!-- HEADER -->
+    <div class="top">
 
-<div class="header">
+        <div class="logo">
+            <h1>ONLINE DICE</h1>
+            <p>COLOR ROLLING SYSTEM</p>
+        </div>
 
-  <div class="logo">
+        <!-- TAP THIS TO CHANGE THE EXCLUDED COLOR -->
+        <div class="color-box" onclick="changeExcludedColor()">
+            <div class="color-label">COLOR</div>
+            <div class="selected-color" id="excludedText">
+                GREEN
+            </div>
+        </div>
 
-    <div class="logoBox">
-      CD
     </div>
 
-    <div>
-      <div class="logoText">
-        COLOR//DICE
-      </div>
+    <div class="main-card">
 
-      <span class="logoSub">
-        BLOCK PREDICTION LAB
-      </span>
+        <div class="dice-area">
+            <div class="dice" id="dice">
+                ?
+            </div>
+        </div>
+
+        <div class="result">
+            <div class="result-title">LATEST RESULT</div>
+            <div class="result-color" id="resultText">
+                READY
+            </div>
+        </div>
+
+        <button class="roll-button" onclick="rollDice()">
+            ROLL DICE
+        </button>
+
+        <div class="info-grid">
+
+            <div class="info">
+                <small>ROLLS</small>
+                <strong id="rollCount">0</strong>
+            </div>
+
+            <div class="info">
+                <small>EXCLUDED</small>
+                <strong id="excludedInfo">GREEN</strong>
+            </div>
+
+            <div class="info">
+                <small>LAST COLOR</small>
+                <strong id="lastColor">—</strong>
+            </div>
+
+        </div>
+
+        <div class="color-list" id="colorList"></div>
+
+        <div class="history-section">
+
+            <div class="section-title">
+                ROLL HISTORY
+            </div>
+
+            <div class="history" id="history">
+                <span style="color:#657089;font-size:12px;">
+                    No rolls yet
+                </span>
+            </div>
+
+        </div>
+
+        <div class="details">
+
+            <div class="details-title" id="detailsTitle">
+                COLOR SETTINGS
+            </div>
+
+            <div class="details-text" id="detailsText">
+                GREEN is currently excluded. Tap the COLOR box in the
+                top-right corner to change the excluded color.
+                The selected color will not appear during the simulated roll.
+            </div>
+
+        </div>
+
     </div>
-
-  </div>
-
-  <div class="online">
-    ● ENGINE READY
-  </div>
 
 </div>
-
-
-<!-- HERO -->
-
-<section class="hero">
-
-  <div class="heroTag">
-    PAST COLORS → PREDICT
-  </div>
-
-  <h1>
-    ENTER THE OLD ROLL.<br>
-    GET 4 SIGNALS.
-  </h1>
-
-  <p>
-    Select the four colors from the roll that just happened.
-    Press PREDICT and the analyzer will rank four historical
-    signals using the rolls you have entered.
-  </p>
-
-</section>
-
-
-<!-- PAST COLORS -->
-
-<section class="block">
-
-  <div class="blockHeader">
-
-    <div class="blockTitle">
-
-      <div class="titleSquare">
-        01
-      </div>
-
-      <h2>
-        PAST COLORS
-      </h2>
-
-    </div>
-
-    <span id="counter">
-      0 / 4
-    </span>
-
-  </div>
-
-  <div class="instruction">
-    Put the four colors from the previous roll here.
-  </div>
-
-
-  <!-- FOUR INPUT BOXES -->
-
-  <div class="pastSlots">
-
-    <div class="pastSlot" id="slot0">
-
-      <div class="slotNum">
-        COLOR 1
-      </div>
-
-      <div
-        class="slotDot"
-        id="dot0">
-      </div>
-
-      <div
-        class="slotName"
-        id="name0">
-        EMPTY
-      </div>
-
-    </div>
-
-
-    <div class="pastSlot" id="slot1">
-
-      <div class="slotNum">
-        COLOR 2
-      </div>
-
-      <div
-        class="slotDot"
-        id="dot1">
-      </div>
-
-      <div
-        class="slotName"
-        id="name1">
-        EMPTY
-      </div>
-
-    </div>
-
-
-    <div class="pastSlot" id="slot2">
-
-      <div class="slotNum">
-        COLOR 3
-      </div>
-
-      <div
-        class="slotDot"
-        id="dot2">
-      </div>
-
-      <div
-        class="slotName"
-        id="name2">
-        EMPTY
-      </div>
-
-    </div>
-
-
-    <div class="pastSlot" id="slot3">
-
-      <div class="slotNum">
-        COLOR 4
-      </div>
-
-      <div
-        class="slotDot"
-        id="dot3">
-      </div>
-
-      <div
-        class="slotName"
-        id="name3">
-        EMPTY
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- COLORS -->
-
-  <div
-    class="colorGrid"
-    id="colorGrid">
-  </div>
-
-
-  <!-- PREDICT -->
-
-  <button
-    class="predictButton"
-    id="predict">
-
-    ⚡ PREDICT NEXT 4 COLORS
-
-  </button>
-
-
-  <div class="smallButtons">
-
-    <button
-      class="smallButton"
-      id="clear">
-
-      CLEAR CURRENT
-
-    </button>
-
-    <button
-      class="smallButton"
-      id="undo">
-
-      REMOVE LAST ROLL
-
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- PREDICTIONS -->
-
-<section class="block">
-
-  <div class="blockHeader">
-
-    <div class="blockTitle">
-
-      <div class="titleSquare">
-        02
-      </div>
-
-      <h2>
-        NEXT COLOR SIGNALS
-      </h2>
-
-    </div>
-
-    <span>
-      TOP 4
-    </span>
-
-  </div>
-
-
-  <div
-    class="predictionGrid"
-    id="predictionGrid">
-
-    <div
-      class="empty"
-      style="grid-column:1/-1">
-
-      Enter a past roll and press
-      PREDICT NEXT 4 COLORS.
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- DASHBOARD -->
-
-<div class="dashboard">
-
-
-<!-- STATS -->
-
-<section class="block">
-
-  <div class="blockHeader">
-
-    <div class="blockTitle">
-
-      <div class="titleSquare">
-        03
-      </div>
-
-      <h2>
-        STATISTICS
-      </h2>
-
-    </div>
-
-    <span>
-      HISTORY
-    </span>
-
-  </div>
-
-
-  <div
-    class="chart"
-    id="chart">
-
-    <div class="empty">
-      Statistics will appear here.
-    </div>
-
-  </div>
-
-
-  <div class="statGrid">
-
-    <div class="stat">
-
-      <small>
-        PAST ROLLS
-      </small>
-
-      <strong id="rollCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <small>
-        COLORS
-      </small>
-
-      <strong id="colorCount">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <small>
-        HOT COLOR
-      </small>
-
-      <strong id="hot">
-        —
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <small>
-        LAST COLOR
-      </small>
-
-      <strong id="last">
-        —
-      </strong>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- HISTORY -->
-
-<section class="block">
-
-  <div class="blockHeader">
-
-    <div class="blockTitle">
-
-      <div class="titleSquare">
-        04
-      </div>
-
-      <h2>
-        PAST ROLLS
-      </h2>
-
-    </div>
-
-    <span>
-      NEWEST
-    </span>
-
-  </div>
-
-
-  <div
-    class="history"
-    id="history">
-
-    <div class="empty">
-      No past rolls entered.
-    </div>
-
-  </div>
-
-</section>
-
-</div>
-
-
-<div class="note">
-
-  The prediction engine analyzes entered history using
-  frequency, recency, transitions, sequences and position
-  patterns. Random outcomes cannot be guaranteed from past
-  results.
-
-</div>
-
-</div>
-
 
 <script>
 
-/* ==========================================
-   COLORS
-========================================== */
-
-const COLORS=[
-
-  {
-    name:"BLUE",
-    hex:"#328cff"
-  },
-
-  {
-    name:"RED",
-    hex:"#ff3d61"
-  },
-
-  {
-    name:"PURPLE",
-    hex:"#9c62ff"
-  },
-
-  {
-    name:"ORANGE",
-    hex:"#ff8a2d"
-  },
-
-  {
-    name:"GREEN",
-    hex:"#20db84"
-  },
-
-  {
-    name:"YELLOW",
-    hex:"#ffd43b"
-  }
-
+const colors = [
+    {
+        name: "GREEN",
+        hex: "#22c55e"
+    },
+    {
+        name: "BLUE",
+        hex: "#3b82f6"
+    },
+    {
+        name: "YELLOW",
+        hex: "#eab308"
+    },
+    {
+        name: "ORANGE",
+        hex: "#f97316"
+    },
+    {
+        name: "PURPLE",
+        hex: "#a855f7"
+    },
+    {
+        name: "RED",
+        hex: "#ef4444"
+    }
 ];
 
+let excludedIndex = 0;
+let rolls = 0;
+let history = [];
+let rolling = false;
 
-/* ==========================================
-   DATA
-========================================== */
+const dice = document.getElementById("dice");
+const resultText = document.getElementById("resultText");
+const excludedText = document.getElementById("excludedText");
+const excludedInfo = document.getElementById("excludedInfo");
+const lastColor = document.getElementById("lastColor");
+const rollCount = document.getElementById("rollCount");
+const historyBox = document.getElementById("history");
+const colorList = document.getElementById("colorList");
 
-let current=[];
-let history=[];
+/* CREATE COLOR BUTTONS */
 
+function createColorButtons() {
 
-/* ==========================================
-   LOAD HISTORY
-========================================== */
+    colorList.innerHTML = "";
 
-try{
+    colors.forEach((color,index) => {
 
-  const saved=
-    localStorage.getItem(
-      "colorDiceBlockHistory"
-    );
+        const item = document.createElement("div");
 
-  if(saved){
+        item.className = "color-item";
 
-    history=
-      JSON.parse(saved)
-      .map(roll=>
-        roll.map(name=>
-          COLORS.find(
-            color=>color.name===name
-          )
-        ).filter(Boolean)
-      );
+        item.innerText = color.name;
 
-  }
+        item.style.background = color.hex;
 
-}catch(e){
+        item.style.color =
+            color.name === "YELLOW"
+            ? "#111"
+            : "white";
 
-  history=[];
+        item.onclick = () => {
+            excludedIndex = index;
+            updateExcluded();
+        };
+
+        colorList.appendChild(item);
+
+    });
+
+    updateColorButtons();
+}
+
+/* UPDATE EXCLUDED COLOR */
+
+function updateExcluded() {
+
+    const color = colors[excludedIndex];
+
+    excludedText.innerText = color.name;
+    excludedInfo.innerText = color.name;
+
+    excludedText.style.color = color.hex;
+
+    updateColorButtons();
+
+    document.getElementById("detailsText").innerText =
+        color.name +
+        " is currently excluded. Tap COLOR or select another color below to change the excluded color.";
 
 }
 
+/* HIGHLIGHT COLOR */
 
-/* ==========================================
-   COLOR BUTTONS
-========================================== */
+function updateColorButtons() {
 
-const grid=
-  document.getElementById(
-    "colorGrid"
-  );
+    [...colorList.children].forEach((item,index) => {
 
+        item.classList.toggle(
+            "active",
+            index === excludedIndex
+        );
 
-COLORS.forEach((color,index)=>{
+    });
 
-  const button=
-    document.createElement(
-      "button"
-    );
+}
 
-  button.className="color";
+/* TAP TOP-RIGHT COLOR */
 
-  button.innerHTML=`
+function changeExcludedColor() {
 
-    <div
-      class="colorCircle"
-      style="
-        background:${color.hex};
-        box-shadow:0 0 12px ${color.hex};
-      ">
-    </div>
+    excludedIndex++;
 
-    ${color.name}
-
-  `;
-
-  button.onclick=()=>{
-
-    if(current.length>=4)
-      return;
-
-    current.push(
-      COLORS[index]
-    );
-
-    updateSlots();
-
-  };
-
-  grid.appendChild(button);
-
-});
-
-
-/* ==========================================
-   UPDATE FOUR PAST COLOR BOXES
-========================================== */
-
-function updateSlots(){
-
-  document.getElementById(
-    "counter"
-  ).textContent=
-    current.length+" / 4";
-
-
-  for(let i=0;i<4;i++){
-
-    const slot=
-      document.getElementById(
-        "slot"+i
-      );
-
-    const dot=
-      document.getElementById(
-        "dot"+i
-      );
-
-    const name=
-      document.getElementById(
-        "name"+i
-      );
-
-
-    if(current[i]){
-
-      slot.classList.add(
-        "filled"
-      );
-
-      slot.style.borderColor=
-        current[i].hex;
-
-
-      dot.style.display=
-        "block";
-
-      dot.style.background=
-        current[i].hex;
-
-      dot.style.color=
-        current[i].hex;
-
-      dot.style.boxShadow=
-        "0 0 20px "+current[i].hex;
-
-
-      name.textContent=
-        current[i].name;
-
-      name.style.color=
-        current[i].hex;
-
-    }else{
-
-      slot.classList.remove(
-        "filled"
-      );
-
-      slot.style.borderColor=
-        "";
-
-      dot.style.display=
-        "none";
-
-      name.textContent=
-        "EMPTY";
-
-      name.style.color=
-        "#687381";
-
+    if(excludedIndex >= colors.length) {
+        excludedIndex = 0;
     }
 
-  }
+    updateExcluded();
 
 }
 
+/* ROLL */
 
-/* ==========================================
-   PREDICT BUTTON
-========================================== */
+function rollDice() {
 
-document
-.getElementById("predict")
-.onclick=()=>{
+    if(rolling) return;
 
-  if(current.length!==4){
+    rolling = true;
 
-    document.getElementById(
-      "counter"
-    ).textContent=
-      "ENTER 4 COLORS FIRST";
+    dice.classList.add("rolling");
 
-    return;
+    resultText.innerText = "ROLLING...";
+    resultText.style.color = "white";
 
-  }
+    /*
+       Build a list WITHOUT the excluded color.
+    */
 
+    const availableColors =
+        colors.filter((_,index) => index !== excludedIndex);
 
-  /*
-    Save the OLD roll.
-  */
+    let animationTime = 0;
 
-  history.unshift(
-    [...current]
-  );
+    const animation = setInterval(() => {
 
+        const random =
+            availableColors[
+                Math.floor(
+                    Math.random() *
+                    availableColors.length
+                )
+            ];
 
-  if(history.length>300){
+        dice.style.background = random.hex;
+        dice.innerText =
+            Math.floor(Math.random() * 6) + 1;
 
-    history.pop();
+        animationTime += 100;
 
-  }
+        if(animationTime >= 900) {
 
+            clearInterval(animation);
 
-  /*
-    Clear the input so the next
-    old roll can be entered.
-  */
+            finishRoll();
 
-  current=[];
+        }
 
-  updateSlots();
+    },100);
 
-  save();
+}
 
-  renderHistory();
+/* FINISH ROLL */
 
-  analyze();
+function finishRoll() {
 
-};
+    const availableColors =
+        colors.filter((_,index) => index !== excludedIndex);
 
-
-/* ==========================================
-   CLEAR
-========================================== */
-
-document
-.getElementById("clear")
-.onclick=()=>{
-
-  current=[];
-
-  updateSlots();
-
-};
-
-
-/* ==========================================
-   REMOVE LAST
-========================================== */
-
-document
-.getElementById("undo")
-.onclick=()=>{
-
-  if(!history.length)
-    return;
-
-  history.shift();
-
-  save();
-
-  renderHistory();
-
-  analyze();
-
-};
-
-
-/* ==========================================
-   SAVE
-========================================== */
-
-function save(){
-
-  try{
-
-    localStorage.setItem(
-
-      "colorDiceBlockHistory",
-
-      JSON.stringify(
-
-        history.map(
-          roll=>
-            roll.map(
-              color=>color.name
+    const selected =
+        availableColors[
+            Math.floor(
+                Math.random() *
+                availableColors.length
             )
-        )
+        ];
 
-      )
+    rolls++;
 
-    );
+    history.unshift(selected);
 
-  }catch(e){}
+    if(history.length > 12) {
+        history.pop();
+    }
+
+    dice.classList.remove("rolling");
+
+    dice.style.background = selected.hex;
+
+    dice.innerText =
+        Math.floor(Math.random() * 6) + 1;
+
+    resultText.innerText =
+        selected.name;
+
+    resultText.style.color =
+        selected.hex;
+
+    rollCount.innerText =
+        rolls;
+
+    lastColor.innerText =
+        selected.name;
+
+    updateHistory();
+
+    rolling = false;
 
 }
 
+/* HISTORY */
 
-/* ==========================================
-   RENDER HISTORY
-========================================== */
+function updateHistory() {
 
-function renderHistory(){
+    historyBox.innerHTML = "";
 
-  const box=
-    document.getElementById(
-      "history"
-    );
+    history.forEach(color => {
 
-  box.innerHTML="";
+        const item =
+            document.createElement("div");
 
+        item.className =
+            "history-item";
 
-  if(!history.length){
+        item.innerText =
+            color.name;
 
-    box.innerHTML=`
+        item.style.background =
+            color.hex;
 
-      <div class="empty">
-        No past rolls entered.
-      </div>
+        item.style.color =
+            color.name === "YELLOW"
+            ? "#111"
+            : "white";
 
-    `;
+        historyBox.appendChild(item);
 
-    return;
-
-  }
-
-
-  history.forEach(
-    (roll,index)=>{
-
-      const row=
-        document.createElement(
-          "div"
-        );
-
-      row.className=
-        "historyRow";
-
-
-      row.innerHTML=`
-
-        <span class="historyID">
-
-          ROLL
-          ${history.length-index}
-
-        </span>
-
-
-        <div class="miniColors">
-
-          ${roll.map(color=>`
-
-            <div
-              class="mini"
-              style="
-                background:${color.hex};
-              "
-              title="${color.name}">
-            </div>
-
-          `).join("")}
-
-        </div>
-
-      `;
-
-
-      box.appendChild(row);
-
-    }
-  );
+    });
 
 }
 
+/* INITIALIZE */
 
-/* ==========================================
-   PREDICTION ENGINE
-========================================== */
-
-function calculatePredictions(){
-
-  const scores={};
-
-
-  COLORS.forEach(color=>{
-
-    scores[color.name]={
-
-      color:color,
-
-      frequency:0,
-
-      recent:0,
-
-      transition:0,
-
-      position:0,
-
-      sequence:0,
-
-      repeat:0,
-
-      score:0
-
-    };
-
-  });
-
-
-  const observations=
-    history.flat();
-
-
-  if(!observations.length)
-    return [];
-
-
-  /* ----------------------------------
-     FREQUENCY
-  ---------------------------------- */
-
-  observations.forEach(color=>{
-
-    scores[color.name]
-      .frequency++;
-
-  });
-
-
-  /* ----------------------------------
-     RECENCY
-  ---------------------------------- */
-
-  history
-    .slice(0,40)
-    .forEach(
-      (roll,index)=>{
-
-        const weight=
-          Math.pow(.91,index);
-
-        roll.forEach(color=>{
-
-          scores[color.name]
-            .recent+=weight;
-
-        });
-
-      }
-    );
-
-
-  /* ----------------------------------
-     TRANSITIONS
-  ---------------------------------- */
-
-  const latest=
-    observations[
-      observations.length-1
-    ];
-
-
-  for(
-    let i=0;
-    i<observations.length-1;
-    i++
-  ){
-
-    if(
-      observations[i].name===
-      latest.name
-    ){
-
-      scores[
-        observations[i+1].name
-      ].transition++;
-
-    }
-
-  }
-
-
-  /* ----------------------------------
-     POSITION 4
-  ---------------------------------- */
-
-  history.forEach(
-    (roll,index)=>{
-
-      if(!roll[3])
-        return;
-
-      scores[
-        roll[3].name
-      ].position+=
-        Math.pow(.94,index);
-
-    }
-  );
-
-
-  /* ----------------------------------
-     LAST TWO SEQUENCE
-  ---------------------------------- */
-
-  if(observations.length>=2){
-
-    const a=
-      observations[
-        observations.length-2
-      ];
-
-    const b=
-      observations[
-        observations.length-1
-      ];
-
-
-    for(
-      let i=0;
-      i<observations.length-2;
-      i++
-    ){
-
-      if(
-
-        observations[i].name===
-        a.name &&
-
-        observations[i+1].name===
-        b.name
-
-      ){
-
-        scores[
-          observations[i+2].name
-        ].sequence+=2;
-
-      }
-
-    }
-
-  }
-
-
-  /* ----------------------------------
-     REPEATED COLORS
-  ---------------------------------- */
-
-  for(
-    let i=0;
-    i<observations.length-1;
-    i++
-  ){
-
-    if(
-      observations[i].name===
-      observations[i+1].name
-    ){
-
-      scores[
-        observations[i].name
-      ].repeat++;
-
-    }
-
-  }
-
-
-  /* ----------------------------------
-     NORMALIZE
-  ---------------------------------- */
-
-  function max(field){
-
-    return Math.max(
-      1,
-      ...COLORS.map(
-        c=>scores[c.name][field]
-      )
-    );
-
-  }
-
-
-  const mf=max("frequency");
-  const mr=max("recent");
-  const mt=max("transition");
-  const mp=max("position");
-  const ms=max("sequence");
-  const mx=max("repeat");
-
-
-  /* ----------------------------------
-     FINAL ENSEMBLE
-  ---------------------------------- */
-
-  COLORS.forEach(color=>{
-
-    const s=
-      scores[color.name];
-
-
-    s.score=
-
-      (s.frequency/mf)*.18 +
-
-      (s.recent/mr)*.25 +
-
-      (s.transition/mt)*.23 +
-
-      (s.position/mp)*.12 +
-
-      (s.sequence/ms)*.17 +
-
-      (s.repeat/mx)*.05;
-
-  });
-
-
-  return COLORS
-    .map(c=>scores[c.name])
-    .sort(
-      (a,b)=>
-        b.score-a.score
-    );
-
-}
-
-
-/* ==========================================
-   ANALYZE
-========================================== */
-
-function analyze(){
-
-  const observations=
-    history.flat();
-
-
-  document.getElementById(
-    "rollCount"
-  ).textContent=
-    history.length;
-
-
-  document.getElementById(
-    "colorCount"
-  ).textContent=
-    observations.length;
-
-
-  if(!observations.length){
-
-    renderPredictions([]);
-
-    renderChart();
-
-    return;
-
-  }
-
-
-  const results=
-    calculatePredictions();
-
-
-  renderPredictions(
-    results
-  );
-
-  renderChart();
-
-
-  /* HOT COLOR */
-
-  const counts={};
-
-
-  COLORS.forEach(color=>{
-
-    counts[color.name]=0;
-
-  });
-
-
-  observations.forEach(color=>{
-
-    counts[color.name]++;
-
-  });
-
-
-  const hot=
-    [...COLORS].sort(
-      (a,b)=>
-        counts[b.name]-
-        counts[a.name]
-    )[0];
-
-
-  const last=
-    observations[
-      observations.length-1
-    ];
-
-
-  document.getElementById(
-    "hot"
-  ).textContent=
-    hot.name;
-
-  document.getElementById(
-    "hot"
-  ).style.color=
-    hot.hex;
-
-
-  document.getElementById(
-    "last"
-  ).textContent=
-    last.name;
-
-  document.getElementById(
-    "last"
-  ).style.color=
-    last.hex;
-
-}
-
-
-/* ==========================================
-   RENDER PREDICTIONS
-========================================== */
-
-function renderPredictions(results){
-
-  const box=
-    document.getElementById(
-      "predictionGrid"
-    );
-
-  box.innerHTML="";
-
-
-  if(!results.length){
-
-    box.innerHTML=`
-
-      <div
-        class="empty"
-        style="grid-column:1/-1">
-
-        Add a past roll above,
-        then press PREDICT.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  const top=
-    results.slice(0,4);
-
-
-  const highest=
-    top[0].score || 1;
-
-
-  top.forEach(
-    (item,index)=>{
-
-      const signal=
-        Math.max(
-          1,
-          Math.round(
-            item.score/
-            highest*
-            100
-          )
-        );
-
-
-      const reasons=[];
-
-
-      if(item.recent>0)
-        reasons.push("RECENT");
-
-      if(item.transition>0)
-        reasons.push("TRANSITION");
-
-      if(item.sequence>0)
-        reasons.push("SEQUENCE");
-
-      if(item.position>0)
-        reasons.push("POSITION");
-
-
-      const card=
-        document.createElement(
-          "div"
-        );
-
-      card.className=
-        "prediction";
-
-
-      card.innerHTML=`
-
-        <div class="rank">
-          #${index+1} SIGNAL
-        </div>
-
-
-        <div
-          class="predDot"
-          style="
-            background:${item.color.hex};
-          ">
-        </div>
-
-
-        <div
-          class="predName"
-          style="
-            color:${item.color.hex};
-          ">
-
-          ${item.color.name}
-
-        </div>
-
-
-        <div class="predScore">
-
-          ${signal}% SIGNAL
-
-        </div>
-
-
-        <div class="scoreTrack">
-
-          <div
-            class="scoreFill"
-            style="
-              width:${signal}%;
-              background:${item.color.hex};
-            ">
-          </div>
-
-        </div>
-
-
-        <div class="predReason">
-
-          ${reasons.join(" • ")}
-
-        </div>
-
-      `;
-
-
-      box.appendChild(card);
-
-    }
-  );
-
-}
-
-
-/* ==========================================
-   CHART
-========================================== */
-
-function renderChart(){
-
-  const box=
-    document.getElementById(
-      "chart"
-    );
-
-  box.innerHTML="";
-
-
-  const observations=
-    history.flat();
-
-
-  if(!observations.length){
-
-    box.innerHTML=`
-
-      <div class="empty">
-        No statistics yet.
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  const counts={};
-
-
-  COLORS.forEach(color=>{
-
-    counts[color.name]=0;
-
-  });
-
-
-  observations.forEach(color=>{
-
-    counts[color.name]++;
-
-  });
-
-
-  COLORS.forEach(color=>{
-
-    const percent=
-      Math.round(
-        counts[color.name]/
-        observations.length*
-        100
-      );
-
-
-    const row=
-      document.createElement(
-        "div"
-      );
-
-    row.className=
-      "chartRow";
-
-
-    row.innerHTML=`
-
-      <span>
-        ${color.name}
-      </span>
-
-      <div class="track">
-
-        <div
-          class="fill"
-          style="
-            width:${percent}%;
-            background:${color.hex};
-          ">
-        </div>
-
-      </div>
-
-      <span>
-        ${percent}%
-      </span>
-
-    `;
-
-
-    box.appendChild(row);
-
-  });
-
-}
-
-
-/* ==========================================
-   START
-========================================== */
-
-updateSlots();
-renderHistory();
-analyze();
+createColorButtons();
+updateExcluded();
 
 </script>
 
