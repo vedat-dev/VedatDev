@@ -12,12 +12,6 @@ html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
 body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:white;background:radial-gradient(ellipse at 15% 20%,#102b55,transparent 40%),radial-gradient(ellipse at 85% 70%,#20134c,transparent 40%),#020817;overflow-x:hidden}
 .app{width:min(760px,97vw);min-height:calc(100vh - 16px)}
 .panel{width:100%;min-height:calc(100vh - 16px);display:flex;flex-direction:column;padding:20px;position:relative;overflow:hidden;background:rgba(4,15,35,.97);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 12px 36px #0007}
-.top-controls{position:absolute;top:15px;right:15px;display:flex;gap:10px;z-index:5}
-.dot-control{width:12px;height:12px;padding:0;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
-.secret-dot,.toggle-dot{width:7px;height:7px;border-radius:50%;display:block}
-.secret-dot{background:#22c55e}
-.toggle-dot{background:#000;border:1px solid #64748b}
-.toggle-dot.enabled{background:#fff;border-color:#fff;box-shadow:0 0 7px #ffffff99}
 .top{text-align:center;padding-top:4px}
 .title{margin:0;font-size:31px;font-weight:1000;letter-spacing:3px;text-shadow:0 0 15px #3b82f655}
 .subtitle{margin-top:5px;font-size:9px;font-weight:900;letter-spacing:2px;color:var(--muted)}
@@ -68,39 +62,52 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .history-status{color:#86efac;font-size:6px;font-weight:900}
 .footer{margin-top:auto;padding-top:18px;text-align:center;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
 
-/* Simulated LIVE widget */
+/* Floating LIVE widget */
 .live-widget{position:fixed;bottom:12px;left:12px;z-index:20;width:300px;max-width:calc(100vw - 24px);background:#080a10f7;border:1px solid #ffffff20;border-radius:15px;overflow:hidden;box-shadow:0 8px 32px #000b}
-.live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12}
+.live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.live-top.dragging{cursor:grabbing}
 .live-brand{font-size:11px;font-weight:1000;letter-spacing:.5px}
 .live-badge{background:#fe2c55;color:white;border-radius:4px;padding:4px 6px;font-size:8px;font-weight:1000;margin-right:5px}
 .live-viewers{font-size:10px;color:#eee;background:#ffffff12;border-radius:12px;padding:5px 8px}
 .live-main{padding:9px}
-.stream-title{font-size:10px;font-weight:900;color:#e5e7eb;margin-bottom:7px}
+.stream-title{font-size:10px;font-weight:900;color:#fff;margin-bottom:7px}
 .stream-screen{position:relative;padding:12px 6px 10px;border:1px solid #ffffff16;border-radius:9px;background:radial-gradient(ellipse at top,#1d3560,#070b16 75%);overflow:hidden}
 .stream-screen:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#ffffff04,transparent 35%,#0003)}
 .stream-dice{display:flex;align-items:center;justify-content:center;gap:7px;position:relative;z-index:1}
 .stream-die{width:42px;height:42px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
 .stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
-.stream-label{margin-top:8px;text-align:center;font-size:8px;color:#cbd5e1;font-weight:900;letter-spacing:1px}
-.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fca5a5;font-weight:900}
+.stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
+.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fff;font-weight:900}
 .live-metrics{display:flex;gap:6px;margin:8px 0}
 .live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
-.live-metric strong{display:block;font-size:13px}
-.live-metric small{font-size:7px;color:#9ca3af;font-weight:900}
+.live-metric strong{display:block;font-size:13px;color:#fff}
+.live-metric small{font-size:7px;color:#fff;font-weight:900}
 .chat-log{height:135px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 1px 8px;scrollbar-width:thin;scrollbar-color:#374151 transparent}
-.chat-message{font-size:10px;line-height:1.45;overflow-wrap:anywhere;color:#f3f4f6}
-.chat-message .username{font-weight:1000;color:#c4b5fd;margin-right:4px}
-.chat-message.system{color:#f9a8d4}
+.chat-message,.chat-message .username,.chat-message .body{font-size:10px;line-height:1.45;overflow-wrap:anywhere;color:#fff!important}
+.chat-message .username{font-weight:1000;margin-right:4px}
+.chat-message.system{color:#fff!important}
 .chat-controls{border-top:1px solid #ffffff15;padding-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.chat-controls button{width:100%;min-width:0;height:32px;border:1px solid #ffffff1c;border-radius:7px;background:#171c2a;color:#e5efff;font-size:10px;padding:0 6px;font-weight:900;cursor:pointer}
+.chat-controls button{width:100%;min-width:0;height:32px;border:1px solid #ffffff1c;border-radius:7px;background:#171c2a;color:#fff;font-size:10px;padding:0 6px;font-weight:900;cursor:pointer}
 .send-btn{background:#263c67!important}
 .spam-btn{background:#fe2c55!important;border-color:#fe2c55!important}
 .spam-btn.active{background:#6b7280!important;border-color:#6b7280!important}
-.like-btn{color:#fda4af!important}
-.chat-note{text-align:center;color:#6b7280;font-size:7px;margin-top:7px}
+.like-btn{color:#fff!important}
+.chat-note{text-align:center;color:#fff;font-size:7px;margin-top:7px}
 .live-widget.collapsed .live-main{display:none}
 .live-widget.collapsed{width:210px}
 
+/* Floating coin flip panel */
+.coin-panel{position:fixed;left:12px;bottom:440px;z-index:21;width:300px;max-width:calc(100vw - 24px);padding:12px;background:linear-gradient(145deg,#101a30f7,#080a10f7);border:1px solid #ffffff28;border-radius:14px;box-shadow:0 8px 32px #0009;text-align:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
+.coin-panel.dragging{cursor:grabbing}
+.coin-heading{font-size:10px;letter-spacing:2px;font-weight:1000;color:#fff}
+.coin-stage{height:76px;display:flex;align-items:center;justify-content:center;perspective:500px}
+.coin{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff2a8;background:radial-gradient(circle at 30% 25%,#fff4b0,#eab308 60%,#92400e);color:#422006;font-size:10px;font-weight:1000;box-shadow:0 0 18px #facc1555,inset 0 0 0 3px #b77912;transform-style:preserve-3d}
+.coin.flipping{animation:coinFlip .8s ease-in-out}
+@keyframes coinFlip{0%{transform:rotateY(0) rotateX(0) scale(1)}50%{transform:rotateY(900deg) rotateX(18deg) scale(1.13)}100%{transform:rotateY(1800deg) rotateX(0) scale(1)}}
+.coin-result{font-size:12px;font-weight:1000;color:#fff;margin-bottom:9px}
+.coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer;touch-action:manipulation}
+.coin-button:disabled{opacity:.65;cursor:wait}
+.coin-history{margin-top:7px;color:#fff;font-size:8px}
 @media(max-width:600px){
  .panel{padding:17px 12px}
  .title{font-size:26px}
@@ -109,6 +116,7 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  .stats{gap:7px}
  .stat{width:135px}
  .live-widget{bottom:8px;left:8px;width:270px}
+ .coin-panel{left:8px;bottom:calc(8px + 410px);width:270px}
  .chat-log{height:105px}
 }
 @media(max-width:430px){
@@ -126,21 +134,12 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  .dice-box{width:56px;height:56px}
  .stream-die{width:34px;height:34px}
 }
-@media(prefers-reduced-motion:reduce){.dice-box.rolling{animation:none}}
+@media(prefers-reduced-motion:reduce){.dice-box.rolling,.coin.flipping{animation:none}}
 </style>
 </head>
 <body>
 <div class="app">
 <div class="panel">
-
-<div class="top-controls">
- <button class="dot-control" id="secretColor" aria-label="Change secret color" title="Change secret color">
-  <span class="secret-dot" id="secretDot"></span>
- </button>
- <button class="dot-control" id="blockToggle" aria-label="Toggle secret blocker" aria-pressed="true" title="Secret blocker ON">
-  <span class="toggle-dot enabled" id="toggleDot"></span>
- </button>
-</div>
 
 <div class="top">
  <h1 class="title">ONLINE DICE</h1>
@@ -152,10 +151,8 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  <div class="info-box">ENGINE READY</div>
 </div>
 <div class="details">
- <div class="detail">6 COLORS</div>
- <div class="detail">4 CHAMBERS</div>
- <div class="detail">LIVE ROLL</div>
- <div class="detail">RANDOMIZED</div>
+ <div class="detail">6 COLORS</div><div class="detail">4 CHAMBERS</div>
+ <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
  <div class="detail">ACTIVE ENGINE</div>
 </div>
 
@@ -167,9 +164,7 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   <div class="dice-box"><div class="dice-dot"></div></div>
   <div class="dice-box"><div class="dice-dot"></div></div>
  </div>
- <div class="dice-details">
-  <span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span>
- </div>
+ <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
  <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
 </div>
 
@@ -197,24 +192,27 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 </div>
 
 <div class="history-section">
- <div class="history-title">
-  <div class="history-title-left">REROLL HISTORY</div>
-  <div class="history-title-right">NEWEST FIRST</div>
- </div>
- <div class="history" id="history">
-  <div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div>
- </div>
+ <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
+ <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
 </div>
 <div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
 </div>
 </div>
 
+<div class="coin-panel" id="coinPanel">
+ <div class="coin-heading">🪙 LIVE COIN FLIP</div>
+ <div class="coin-stage"><div class="coin" id="coin">FLIP</div></div>
+ <div class="coin-result" id="coinResult">HEADS OR TAILS?</div>
+ <button class="coin-button" id="flipCoin">↻ FLIP COIN</button>
+ <div class="coin-history" id="coinHistory">FLIPS: 0</div>
+</div>
+
 <div class="live-widget" id="liveWidget">
- <div class="live-top">
+ <div class="live-top" id="liveDragHandle">
   <div class="live-brand"><span class="live-badge">LIVE</span>Online Dice</div>
   <div style="display:flex;align-items:center;gap:7px">
    <span class="live-viewers">◉ <span id="viewerCount">128</span></span>
-   <button id="chatMin" aria-label="Minimize live" style="background:transparent;color:white;border:0;font-size:17px;cursor:pointer">−</button>
+   <button id="chatMin" aria-label="Minimize live" style="background:transparent;color:white;border:0;font-size:17px;cursor:pointer;touch-action:manipulation">−</button>
   </div>
  </div>
  <div class="live-main">
@@ -229,12 +227,10 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
    </div>
    <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
   </div>
-
   <div class="live-metrics">
    <div class="live-metric"><strong id="liveViewerMetric">128</strong><small>WATCHING</small></div>
    <div class="live-metric"><strong id="likeCount">2.4K</strong><small>LIKES ♥</small></div>
   </div>
-
   <div class="chat-log" id="chatLog" aria-live="polite"></div>
   <div class="chat-controls">
    <button id="spamButton" class="spam-btn">▶ BOT CHAT</button>
@@ -246,324 +242,216 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 
 <script>
 const colors=[
- {name:"GREEN",hex:"#22c55e"},
- {name:"BLUE",hex:"#3b82f6"},
- {name:"YELLOW",hex:"#fde047"},
- {name:"ORANGE",hex:"#f97316"},
- {name:"PURPLE",hex:"#a855f7"},
- {name:"RED",hex:"#ef4444"}
+ {name:"GREEN",hex:"#22c55e"},{name:"BLUE",hex:"#3b82f6"},
+ {name:"YELLOW",hex:"#fde047"},{name:"ORANGE",hex:"#f97316"},
+ {name:"PURPLE",hex:"#a855f7"},{name:"RED",hex:"#ef4444"}
 ];
-
 const dice=[...document.querySelectorAll(".dice-box")];
 const streamDice=[...document.querySelectorAll(".stream-die")];
 const rerollBtn=document.getElementById("reroll");
 const slowBtn=document.getElementById("slowReveal");
 const historyEl=document.getElementById("history");
-const secretBtn=document.getElementById("secretColor");
-const secretDot=document.getElementById("secretDot");
-const toggleBtn=document.getElementById("blockToggle");
-const toggleDot=document.getElementById("toggleDot");
 const readyStatus=document.getElementById("readyStatus");
 const systemStatus=document.getElementById("systemStatus");
 const chatLog=document.getElementById("chatLog");
 
-let totalRolls=0;
-let secretIndex=0;
-let blockerEnabled=true;
-let busy=false;
-let netPoints=0;
-let spamTimer=null;
-let likes=2400;
-let viewers=128;
-let liveMessageQueue=Promise.resolve();
+let totalRolls=0,busy=false,netPoints=0,spamTimer=null;
+let likes=2400,viewers=128,liveMessageQueue=Promise.resolve();
+let coinFlips=0,coinBusy=false;
 
-function randomColor(){
- const pool=blockerEnabled
-  ?colors.filter((c,i)=>i!==secretIndex)
-  :colors;
- return pool[Math.floor(Math.random()*pool.length)];
-}
-
-function updateDots(){
- secretDot.style.background=colors[secretIndex].hex;
- secretDot.style.boxShadow=`0 0 6px ${colors[secretIndex].hex}`;
- toggleDot.classList.toggle("enabled",blockerEnabled);
- toggleBtn.setAttribute("aria-pressed",String(blockerEnabled));
- toggleBtn.title=blockerEnabled?"Secret blocker ON":"Secret blocker OFF";
-}
-
+function randomColor(){return colors[Math.floor(Math.random()*colors.length)]}
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 function setBusy(value,message){
- busy=value;
- rerollBtn.disabled=slowBtn.disabled=secretBtn.disabled=toggleBtn.disabled=value;
+ busy=value;rerollBtn.disabled=slowBtn.disabled=value;
  readyStatus.textContent=message||(value?"ROLLING":"READY");
  systemStatus.textContent=value?"WORKING":"ONLINE";
 }
-
-function wait(ms){
- return new Promise(resolve=>setTimeout(resolve,ms));
+function randomName(){
+ const names=["PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube","ShadowBot","ColorWave","MiaLive","AlexPlays","Starry","TurboTom"];
+ return names[Math.floor(Math.random()*names.length)];
 }
-
-/* Each roll reaches the simulated stream after a 2-second delay. */
+function addLiveMessage(name,text){
+ const msg=document.createElement("div");msg.className="chat-message";
+ const user=document.createElement("span");user.className="username";user.textContent=name;
+ const body=document.createElement("span");body.className="body";body.textContent=" "+text;
+ msg.append(user,body);chatLog.appendChild(msg);
+ while(chatLog.children.length>45)chatLog.firstElementChild.remove();
+ chatLog.scrollTop=chatLog.scrollHeight;
+}
 function queueLiveRoll(results,rollNumber){
  const snapshot=results.map(c=>({...c}));
-
  liveMessageQueue=liveMessageQueue.then(async()=>{
   await wait(2000);
-
   streamDice.forEach((die,i)=>die.style.background=snapshot[i].hex);
-  document.getElementById("streamLabel").textContent=
-   "ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
-
-  addLiveMessage("System","🎲 New roll appeared on stream","#f9a8d4");
-
+  document.getElementById("streamLabel").textContent="ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
+  addLiveMessage("System","🎲 New roll appeared on stream!");
   if(Math.random()<.75){
    const c=snapshot[Math.floor(Math.random()*snapshot.length)];
-   const comments=[
-    "Did anyone see that roll? 👀",
-    "What color is coming next?",
-    "That combo looks good!",
-    "I'm picking "+c.name+" next",
-    "The colors are looking crazy 🔥"
-   ];
-   addLiveMessage(randomName(),comments[Math.floor(Math.random()*comments.length)],c.hex);
+   const comments=["Did anyone see that roll? 👀","What color is coming next?","That combo looks good!","I'm picking "+c.name+" next","The colors are looking crazy 🔥"];
+   addLiveMessage(randomName(),comments[Math.floor(Math.random()*comments.length)]);
   }
  });
 }
-
 function addHistory(results){
- const empty=document.getElementById("historyEmpty");
- if(empty)empty.remove();
-
- const row=document.createElement("div");
- row.className="history-row";
-
- const num=document.createElement("div");
- num.className="history-number";
- num.textContent="#"+totalRolls;
-
- const squares=document.createElement("div");
- squares.className="history-colors";
-
- results.forEach(c=>{
-  const s=document.createElement("div");
-  s.className="history-color";
-  s.style.background=c.hex;
-  s.title=c.name;
-  squares.appendChild(s);
- });
-
- const status=document.createElement("div");
- status.className="history-status";
- status.textContent="COMPLETE";
-
- row.append(num,squares,status);
- historyEl.prepend(row);
-
- while(historyEl.children.length>51){
-  historyEl.lastElementChild.remove();
- }
+ const empty=document.getElementById("historyEmpty");if(empty)empty.remove();
+ const row=document.createElement("div");row.className="history-row";
+ const num=document.createElement("div");num.className="history-number";num.textContent="#"+totalRolls;
+ const squares=document.createElement("div");squares.className="history-colors";
+ results.forEach(c=>{const s=document.createElement("div");s.className="history-color";s.style.background=c.hex;s.title=c.name;squares.appendChild(s)});
+ const status=document.createElement("div");status.className="history-status";status.textContent="COMPLETE";
+ row.append(num,squares,status);historyEl.prepend(row);
+ while(historyEl.children.length>51)historyEl.lastElementChild.remove();
 }
-
 function finish(results){
- totalRolls++;
- document.getElementById("totalRolls").textContent=totalRolls;
- addHistory(results);
- queueLiveRoll(results,totalRolls);
- setBusy(false);
+ totalRolls++;document.getElementById("totalRolls").textContent=totalRolls;
+ addHistory(results);queueLiveRoll(results,totalRolls);setBusy(false);
 }
-
 async function roll(slow){
  if(busy)return;
-
  setBusy(true,slow?"REVEALING":"ROLLING");
  const results=dice.map(()=>randomColor());
-
- dice.forEach(d=>{
-  d.classList.remove("rolling");
-  d.style.background="#fff";
- });
-
+ dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
  if(!slow){
-  dice.forEach(d=>d.classList.add("rolling"));
-  await wait(350);
-
-  dice.forEach((d,i)=>{
-   d.classList.remove("rolling");
-   d.style.background=results[i].hex;
-  });
+  dice.forEach(d=>d.classList.add("rolling"));await wait(350);
+  dice.forEach((d,i)=>{d.classList.remove("rolling");d.style.background=results[i].hex});
  }else{
   for(let i=0;i<dice.length;i++){
    readyStatus.textContent=`REVEAL ${i+1}/4`;
-   dice[i].classList.add("rolling");
-   await wait(350);
-   dice[i].classList.remove("rolling");
-   dice[i].style.background=results[i].hex;
-   await wait(300);
+   dice[i].classList.add("rolling");await wait(350);
+   dice[i].classList.remove("rolling");dice[i].style.background=results[i].hex;await wait(300);
   }
  }
-
  finish(results);
 }
-
 rerollBtn.addEventListener("click",()=>roll(false));
 slowBtn.addEventListener("click",()=>roll(true));
 
-secretBtn.addEventListener("click",()=>{
- if(!busy){
-  secretIndex=(secretIndex+1)%colors.length;
-  updateDots();
- }
+/* Coin flip */
+const coin=document.getElementById("coin");
+const coinResult=document.getElementById("coinResult");
+const flipCoinBtn=document.getElementById("flipCoin");
+const coinHistory=document.getElementById("coinHistory");
+flipCoinBtn.addEventListener("click",async()=>{
+ if(coinBusy)return;
+ coinBusy=true;flipCoinBtn.disabled=true;
+ coin.classList.remove("flipping");void coin.offsetWidth;coin.classList.add("flipping");
+ coinResult.textContent="FLIPPING...";coin.textContent="🪙";
+ await wait(850);
+ const result=Math.random()<.5?"HEADS":"TAILS";
+ coin.textContent=result==="HEADS"?"H":"T";coinResult.textContent=result;
+ coinFlips++;coinHistory.textContent="FLIPS: "+coinFlips+" • LAST: "+result;
+ coin.classList.remove("flipping");flipCoinBtn.disabled=false;coinBusy=false;
+ addLiveMessage("System","🪙 Coin flip result: "+result+"!");
 });
 
-toggleBtn.addEventListener("click",()=>{
- if(!busy){
-  blockerEnabled=!blockerEnabled;
-  updateDots();
- }
-});
-
-/* Points counter */
+/* Counter */
 const counterTotal=document.getElementById("counterTotal");
 const counterStatus=document.getElementById("counterStatus");
-
 function updateCounter(){
  counterTotal.textContent=netPoints>0?"+"+netPoints:String(netPoints);
-
- if(netPoints>0){
-  counterStatus.textContent="WON "+netPoints+" POINTS";
-  counterTotal.style.color=counterStatus.style.color="#86efac";
- }else if(netPoints<0){
-  counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";
-  counterTotal.style.color=counterStatus.style.color="#fca5a5";
- }else{
-  counterStatus.textContent="NO POINTS YET";
-  counterTotal.style.color="#fff";
-  counterStatus.style.color="#8aa8d0";
- }
+ if(netPoints>0){counterStatus.textContent="WON "+netPoints+" POINTS";counterTotal.style.color=counterStatus.style.color="#86efac"}
+ else if(netPoints<0){counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";counterTotal.style.color=counterStatus.style.color="#fca5a5"}
+ else{counterStatus.textContent="NO POINTS YET";counterTotal.style.color="#fff";counterStatus.style.color="#8aa8d0"}
 }
+document.querySelectorAll(".counter-btn").forEach(b=>b.addEventListener("click",()=>{netPoints+=Number(b.dataset.change);updateCounter()}));
+document.getElementById("counterReset").addEventListener("click",()=>{netPoints=0;updateCounter()});
 
-document.querySelectorAll(".counter-btn").forEach(b=>{
- b.addEventListener("click",()=>{
-  netPoints+=Number(b.dataset.change);
-  updateCounter();
- });
-});
-
-document.getElementById("counterReset").addEventListener("click",()=>{
- netPoints=0;
- updateCounter();
-});
-
-/* Simulated LIVE chat: bots choose their own random colors. */
-const names=[
- "PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube",
- "ShadowBot","ColorWave","MiaLive","AlexPlays","xXGamerXx","Starry",
- "Kiki","NoahGaming","LunaVibes","TurboTom"
-];
-
+/* Simulated chat */
 const reactions=[
  "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
- "Need {COLOR} to win 😭","{COLOR} looks lucky",
- "Anyone else picked {COLOR}?","GO {COLOR}!!","{COLOR} all the way 💚",
- "I have a feeling about {COLOR}","Nahh {COLOR} is the one",
- "PLEASE BE {COLOR} 👀","{COLOR} gang where you at?",
- "That roll was wild","No way 😭","one more roll!!",
- "chat choose your color!","I missed the last one 😭",
- "W roll 🔥","let's gooooo","this live is fun"
+ "Need {COLOR} to win 😭","{COLOR} looks lucky","Anyone else picked {COLOR}?",
+ "GO {COLOR}!!","{COLOR} all the way!","I have a feeling about {COLOR}",
+ "Nahh {COLOR} is the one","PLEASE BE {COLOR} 👀","{COLOR} gang where you at?",
+ "That roll was wild","No way 😭","one more roll!!","chat choose your color!",
+ "I missed the last one 😭","W roll 🔥","let's gooooo","this live is fun"
 ];
-
-function randomName(){
- return names[Math.floor(Math.random()*names.length)];
-}
-
-function addLiveMessage(name,text,color){
- const msg=document.createElement("div");
- msg.className="chat-message"+(name==="System"?" system":"");
-
- const user=document.createElement("span");
- user.className="username";
- user.textContent=name;
-
- const body=document.createElement("span");
- body.textContent=" "+text;
- if(color)body.style.color=color;
-
- msg.append(user,body);
- chatLog.appendChild(msg);
-
- while(chatLog.children.length>45){
-  chatLog.firstElementChild.remove();
- }
- chatLog.scrollTop=chatLog.scrollHeight;
-}
-
 function botMessage(){
- const c=colors[Math.floor(Math.random()*colors.length)];
- const template=reactions[Math.floor(Math.random()*reactions.length)];
- const text=template.replaceAll("{COLOR}",c.name);
-
- addLiveMessage(randomName(),text,c.hex);
-
+ const c=randomColor(),template=reactions[Math.floor(Math.random()*reactions.length)];
+ addLiveMessage(randomName(),template.replaceAll("{COLOR}",c.name));
  viewers=Math.max(84,Math.min(420,viewers+Math.floor(Math.random()*7)-3));
  document.getElementById("viewerCount").textContent=viewers;
  document.getElementById("liveViewerMetric").textContent=viewers;
 }
-
-function scheduleBotMessage(){
- setTimeout(botMessage,2000);
-}
-
 document.getElementById("spamButton").addEventListener("click",()=>{
  const btn=document.getElementById("spamButton");
-
- if(spamTimer!==null){
-  clearTimeout(spamTimer);
-  spamTimer=null;
-  btn.textContent="▶ BOT CHAT";
-  btn.classList.remove("active");
- }else{
-  btn.textContent="■ STOP CHAT";
-  btn.classList.add("active");
-
-  const runBot=()=>{
-   botMessage();
-   if(spamTimer!==null){
-    spamTimer=setTimeout(runBot,1100+Math.random()*2100);
-   }
-  };
-
+ if(spamTimer!==null){clearTimeout(spamTimer);spamTimer=null;btn.textContent="▶ BOT CHAT";btn.classList.remove("active")}
+ else{
+  btn.textContent="■ STOP CHAT";btn.classList.add("active");
+  const runBot=()=>{botMessage();if(spamTimer!==null)spamTimer=setTimeout(runBot,1100+Math.random()*2100)};
   spamTimer=setTimeout(runBot,700);
  }
 });
-
 document.getElementById("likeButton").addEventListener("click",()=>{
- likes++;
- document.getElementById("likeCount").textContent=
-  likes>=1000?(likes/1000).toFixed(1)+"K":likes;
+ likes++;document.getElementById("likeCount").textContent=likes>=1000?(likes/1000).toFixed(1)+"K":likes;
 });
 
+/* Minimize LIVE without hiding coin panel */
 document.getElementById("chatMin").addEventListener("click",()=>{
  const w=document.getElementById("liveWidget");
  w.classList.toggle("collapsed");
- document.getElementById("chatMin").textContent=
-  w.classList.contains("collapsed")?"+":"−";
+ document.getElementById("chatMin").textContent=w.classList.contains("collapsed")?"+":"−";
 });
+
+/* Dragging works with mouse and touch */
+function makeDraggable(panel,handle){
+ let dragging=false,pointerId=null,startX=0,startY=0,startLeft=0,startTop=0;
+
+ handle.addEventListener("pointerdown",event=>{
+  if(event.target.closest("button"))return;
+  if(event.button!==undefined&&event.button!==0)return;
+
+  const rect=panel.getBoundingClientRect();
+  panel.style.left=rect.left+"px";
+  panel.style.top=rect.top+"px";
+  panel.style.right="auto";
+  panel.style.bottom="auto";
+
+  dragging=true;pointerId=event.pointerId;
+  startX=event.clientX;startY=event.clientY;
+  startLeft=rect.left;startTop=rect.top;
+  handle.classList.add("dragging");
+
+  try{handle.setPointerCapture(event.pointerId)}catch(_){}
+  event.preventDefault();
+ });
+
+ handle.addEventListener("pointermove",event=>{
+  if(!dragging||event.pointerId!==pointerId)return;
+  const maxLeft=Math.max(0,window.innerWidth-panel.offsetWidth);
+  const maxTop=Math.max(0,window.innerHeight-panel.offsetHeight);
+  const left=Math.max(0,Math.min(maxLeft,startLeft+event.clientX-startX));
+  const top=Math.max(0,Math.min(maxTop,startTop+event.clientY-startY));
+  panel.style.left=left+"px";
+  panel.style.top=top+"px";
+ });
+
+ function stop(event){
+  if(!dragging)return;
+  if(event&&event.pointerId!==undefined&&event.pointerId!==pointerId)return;
+  dragging=false;pointerId=null;handle.classList.remove("dragging");
+ }
+ handle.addEventListener("pointerup",stop);
+ handle.addEventListener("pointercancel",stop);
+ handle.addEventListener("lostpointercapture",()=>{dragging=false;pointerId=null;handle.classList.remove("dragging")});
+
+ window.addEventListener("resize",()=>{
+  if(dragging)return;
+  const rect=panel.getBoundingClientRect();
+  panel.style.left=Math.max(0,Math.min(window.innerWidth-panel.offsetWidth,rect.left))+"px";
+  panel.style.top=Math.max(0,Math.min(window.innerHeight-panel.offsetHeight,rect.top))+"px";
+  panel.style.right="auto";panel.style.bottom="auto";
+ });
+}
+makeDraggable(document.getElementById("liveWidget"),document.getElementById("liveDragHandle"));
+makeDraggable(document.getElementById("coinPanel"),document.getElementById("coinPanel"));
 
 /* Start */
-updateDots();
 updateCounter();
-
-dice.forEach(d=>{
- d.style.background=randomColor().hex;
-});
-
-addLiveMessage("System","Welcome to the live! 🎲","#f9a8d4");
-addLiveMessage(randomName(),"What color are you picking? 👀","#93c5fd");
-addLiveMessage(randomName(),"I'm going with PURPLE 💜","#c084fc");
-
-setInterval(()=>{
- if(Math.random()<.65)scheduleBotMessage();
-},5000);
+dice.forEach(d=>d.style.background=randomColor().hex);
+addLiveMessage("System","Welcome to the live! 🎲");
+addLiveMessage(randomName(),"What color are you picking? 👀");
+addLiveMessage(randomName(),"I'm going with PURPLE 💜");
+setInterval(()=>{if(Math.random()<.65&&!document.hidden)botMessage()},5000);
 </script>
 </body>
 </html>
