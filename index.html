@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,333 +8,533 @@
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--blue:#3b82f6;--muted:#7893b6}
-html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#07101e;color:#fff}
-body{padding:16px;background:radial-gradient(circle at top,#13294b,#07101e 65%)}
-button{font:inherit;cursor:pointer}
-.app{max-width:1000px;margin:auto}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-h1{font-size:24px;margin:0}
-.subtitle{color:#7893b6;font-size:12px;margin-top:5px}
-.panel{background:#101c2e;border:1px solid #ffffff13;border-radius:15px;padding:16px;box-shadow:0 12px 35px #0003}
-.game-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:16px}
-.dice-area{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px 0 18px}
-.die{aspect-ratio:1;min-height:95px;border-radius:16px;border:3px solid #ffffffb0;display:grid;place-items:center;background:#22c55e;box-shadow:inset 0 0 0 3px #00000012;transition:background .15s,transform .15s}
-.die.rolling{animation:shake .15s infinite alternate}
-@keyframes shake{from{transform:rotate(-4deg) scale(.97)}to{transform:rotate(4deg) scale(1.03)}}
-.die-face{width:100%;height:100%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);gap:7%;padding:15%}
-.pip{border-radius:50%;background:#fff;box-shadow:0 1px 2px #0003;visibility:hidden}
-.die[data-face="1"] .pip:nth-child(5),
-.die[data-face="2"] .pip:nth-child(1),.die[data-face="2"] .pip:nth-child(9),
-.die[data-face="3"] .pip:nth-child(1),.die[data-face="3"] .pip:nth-child(5),.die[data-face="3"] .pip:nth-child(9),
-.die[data-face="4"] .pip:nth-child(1),.die[data-face="4"] .pip:nth-child(3),.die[data-face="4"] .pip:nth-child(7),.die[data-face="4"] .pip:nth-child(9),
-.die[data-face="5"] .pip:nth-child(1),.die[data-face="5"] .pip:nth-child(3),.die[data-face="5"] .pip:nth-child(5),.die[data-face="5"] .pip:nth-child(7),.die[data-face="5"] .pip:nth-child(9),
-.die[data-face="6"] .pip:nth-child(1),.die[data-face="6"] .pip:nth-child(3),.die[data-face="6"] .pip:nth-child(4),.die[data-face="6"] .pip:nth-child(6),.die[data-face="6"] .pip:nth-child(7),.die[data-face="6"] .pip:nth-child(9){visibility:visible}
-.roll-button{width:100%;border:0;border-radius:10px;padding:14px;background:#facc15;color:#111827;font-weight:900;font-size:17px;box-shadow:0 4px 0 #a16207}
-.roll-button:active{transform:translateY(2px);box-shadow:0 2px 0 #a16207}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.stat{background:#ffffff08;border:1px solid #ffffff10;border-radius:10px;padding:10px;text-align:center}
-.stat strong{display:block;font-size:20px}
-.stat small{font-size:11px;color:#7893b6}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;font-size:15px}
-.muted{color:#7893b6;font-size:12px}
-.history{display:flex;flex-wrap:wrap;gap:7px;min-height:30px}
-.history-item{display:flex;gap:4px;padding:6px;background:#ffffff09;border:1px solid #ffffff12;border-radius:8px}
-.history-item span{width:12px;height:12px;border-radius:50%;border:1px solid #ffffff88}
-.live-panel{position:fixed;right:18px;bottom:18px;width:280px;max-width:calc(100vw - 24px);z-index:20;background:#0b1524;border:1px solid #ffffff2b;border-radius:13px;box-shadow:0 14px 45px #0009;overflow:hidden}
-.live-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#15243a;cursor:move;touch-action:none;user-select:none}
-.live-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800}
-.live-badge{font-size:10px;letter-spacing:.7px;background:#ef4444;padding:4px 6px;border-radius:4px}
-.live-viewers{font-size:11px;color:#dbeafe}
-.live-body{padding:12px}
-.chat{height:115px;overflow:auto;display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
-.comment{font-size:12px;line-height:1.35;color:#fff;overflow-wrap:anywhere}
-.comment strong{color:#fff;margin-right:4px}
-.chat-form{display:flex;gap:6px}
-.chat-form input{width:100%;min-width:0;background:#ffffff0b;border:1px solid #ffffff20;border-radius:7px;padding:9px;color:white;outline:none}
-.chat-form button,.small-button{background:#2563eb;border:0;border-radius:7px;color:white;padding:8px 10px;font-weight:700}
-.color-picker-row{display:flex;align-items:center;justify-content:center;margin-top:10px;padding:9px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
-.next-color-dots{display:flex;align-items:center;justify-content:center;gap:10px}
-.next-color-dot{width:14px;height:14px;flex:0 0 14px;border:1px solid #ffffffaa;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #ffffff12}
-.coin-button{width:100%;margin-top:10px;background:#facc15;color:#111827;border:0;border-radius:8px;padding:10px;font-weight:900}
-.coin-result{text-align:center;font-size:13px;margin-top:8px;color:#fff;min-height:17px}
-.live-help{font-size:10px;color:#7893b6;text-align:center;margin-top:8px}
-@media(max-width:700px){body{padding:10px}.game-layout{grid-template-columns:1fr}h1{font-size:20px}.live-panel{right:10px;bottom:10px;width:260px}.dice-area{gap:9px}.die{min-height:85px}}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:white;background:radial-gradient(ellipse at 15% 20%,#102b55,transparent 40%),radial-gradient(ellipse at 85% 70%,#20134c,transparent 40%),#020817;overflow-x:hidden}
+.app{width:min(760px,97vw);min-height:calc(100vh - 16px)}
+.panel{width:100%;min-height:calc(100vh - 16px);display:flex;flex-direction:column;padding:20px;position:relative;overflow:hidden;background:rgba(4,15,35,.97);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 12px 36px #0007}
+.top{text-align:center;padding-top:4px}
+.title{margin:0;font-size:31px;font-weight:1000;letter-spacing:3px;text-shadow:0 0 15px #3b82f655}
+.subtitle{margin-top:5px;font-size:9px;font-weight:900;letter-spacing:2px;color:var(--muted)}
+.top-info,.details{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.top-info{margin-top:18px}
+.details{margin-top:15px;gap:6px}
+.info-box{padding:7px 10px;border:1px solid #ffffff16;border-radius:7px;background:#ffffff06;color:#8ea8c9;font-size:7px;font-weight:900;letter-spacing:1px}
+.info-box.active{color:#60a5fa;border-color:#3b82f644;background:#3b82f610}
+.detail{padding:5px 8px;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px;border:1px solid #ffffff0c;border-radius:5px;background:#0003}
+.dice-section{margin-top:22px;display:flex;flex-direction:column;align-items:center}
+.section-label{margin-bottom:11px;color:#8aa8d0;font-size:8px;font-weight:1000;letter-spacing:2px}
+.dice-row{width:100%;display:flex;justify-content:center;align-items:center;gap:13px}
+.dice-box{width:72px;height:72px;flex:0 0 auto;border:3px solid white;border-radius:10px;background:#22c55e;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px #0005}
+.dice-dot{width:12px;height:12px;border-radius:50%;background:white;box-shadow:0 0 6px #ffffff99}
+.dice-box.rolling{animation:shake .2s ease-in-out infinite alternate}
+@keyframes shake{from{transform:translateX(-2px) rotate(-3deg)}to{transform:translateX(2px) rotate(3deg)}}
+.dice-details{margin-top:13px;display:flex;justify-content:center;flex-wrap:wrap;gap:14px;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
+.dice-details span:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:#3b82f6;margin:0 5px 1px 0}
+.dice-description{margin-top:8px;text-align:center;color:#7893b6;font-size:7px;font-weight:800;letter-spacing:1px}
+.reroll-area{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:19px}
+.action-btn{width:230px;max-width:48%;height:48px;padding:0 8px;border:1px solid transparent;border-radius:9px;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer}
+.reroll{background:#fde047;color:#18230c}
+.slow-reveal{background:#173e76;color:#dbeafe;border-color:#60a5fa55}
+.action-btn:disabled{opacity:.5;cursor:wait}
+.stats{margin-top:18px;display:flex;justify-content:center;gap:10px}
+.stat{width:145px;padding:10px;text-align:center;background:#0003;border:1px solid #ffffff12;border-radius:8px}
+.stat-label{color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
+.stat-value{margin-top:4px;color:#dceaff;font-size:13px;font-weight:1000}
+.counter-section{margin-top:16px;padding:14px;text-align:center;background:#08172b;border:1px solid #ffffff16;border-radius:10px}
+.counter-heading{color:#8aa8d0;font-size:9px;font-weight:900;letter-spacing:2px}
+.counter-total{margin-top:9px;font-size:32px;font-weight:1000;font-variant-numeric:tabular-nums}
+.counter-status{margin-top:4px;color:#8aa8d0;font-size:9px;font-weight:900;letter-spacing:1px}
+.counter-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.counter-btn{height:40px;min-width:0;border:1px solid #ffffff18;border-radius:7px;font-size:15px;font-weight:1000;cursor:pointer}
+.plus{background:#14532d;color:#86efac}
+.minus{background:#3f1721;color:#fca5a5}
+.counter-reset{margin-top:10px;padding:7px 12px;background:transparent;border:1px solid #ffffff20;border-radius:6px;color:#8aa8d0;font-size:8px;font-weight:900;cursor:pointer}
+.history-section{margin-top:19px;padding:13px;flex:1;min-height:120px;background:#0003;border:1px solid #ffffff12;border-radius:10px}
+.history-title{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}
+.history-title-left{color:#a0b9da;font-size:8px;font-weight:1000;letter-spacing:1.5px}
+.history-title-right{color:#7893b6;font-size:7px;font-weight:900}
+.history{display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto}
+.history-empty{padding:15px;text-align:center;color:#7893b6;font-size:7px;font-weight:900}
+.history-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-radius:7px;background:#ffffff06;border:1px solid #ffffff0a}
+.history-number{width:34px;flex-shrink:0;color:#8aa8d0;font-size:7px;font-weight:1000}
+.history-colors{display:flex;gap:6px}
+.history-color{width:21px;height:21px;border:1px solid #ffffff88;border-radius:4px}
+.history-status{color:#86efac;font-size:6px;font-weight:900}
+.footer{margin-top:auto;padding-top:18px;text-align:center;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
+
+/* LIVE panel */
+.live-widget{position:fixed;bottom:12px;left:12px;z-index:20;width:300px;max-width:calc(100vw - 24px);background:#080a10f7;border:1px solid #ffffff20;border-radius:15px;overflow:hidden;box-shadow:0 8px 32px #000b}
+.live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.live-top.dragging{cursor:grabbing}
+.live-brand{font-size:11px;font-weight:1000;letter-spacing:.5px}
+.live-badge{background:#fe2c55;color:white;border-radius:4px;padding:4px 6px;font-size:8px;font-weight:1000;margin-right:5px}
+.live-viewers{font-size:10px;color:#eee;background:#ffffff12;border-radius:12px;padding:5px 8px}
+.live-main{padding:9px}
+.stream-title{font-size:10px;font-weight:900;color:#fff;margin-bottom:7px}
+.stream-screen{position:relative;padding:25px 6px 10px;border:1px solid #ffffff16;border-radius:9px;background:radial-gradient(ellipse at top,#1d3560,#070b16 75%);overflow:hidden}
+.stream-screen:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#ffffff04,transparent 35%,#0003)}
+.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fff;font-weight:900}
+.stream-dice{display:flex;align-items:center;justify-content:center;gap:7px;position:relative;z-index:1}
+.stream-die{width:42px;height:42px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
+.stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
+.stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
+
+/* Four tiny prediction dots only */
+.color-picker-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
+.next-color-dot{display:block;width:8px;height:8px;min-width:8px;border:1px solid #ffffff80;border-radius:50%;background:#22c55e;transition:background-color .15s ease}
+
+.live-metrics{display:flex;gap:6px;margin:8px 0}
+.live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
+.live-metric strong{display:block;font-size:13px;color:#fff}
+.live-metric small{font-size:7px;color:#fff;font-weight:900}
+.chat-log{height:135px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 1px 8px;scrollbar-width:thin;scrollbar-color:#374151 transparent}
+.chat-message,.chat-message .username,.chat-message .body{font-size:10px;line-height:1.45;overflow-wrap:anywhere;color:#fff!important}
+.chat-message .username{font-weight:1000;margin-right:4px}
+.chat-controls{border-top:1px solid #ffffff15;padding-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chat-controls button{width:100%;min-width:0;height:32px;border:1px solid #ffffff1c;border-radius:7px;background:#171c2a;color:#fff;font-size:10px;padding:0 6px;font-weight:900;cursor:pointer}
+.spam-btn{background:#fe2c55!important;border-color:#fe2c55!important}
+.spam-btn.active{background:#6b7280!important;border-color:#6b7280!important}
+.chat-note{text-align:center;color:#fff;font-size:7px;margin-top:7px}
+.live-widget.collapsed .live-main{display:none}
+.live-widget.collapsed{width:210px}
+
+/* Coin flip */
+.coin-panel{position:fixed;left:12px;bottom:440px;z-index:21;width:300px;max-width:calc(100vw - 24px);padding:12px;background:linear-gradient(145deg,#101a30f7,#080a10f7);border:1px solid #ffffff28;border-radius:14px;box-shadow:0 8px 32px #0009;text-align:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
+.coin-panel.dragging{cursor:grabbing}
+.coin-heading{font-size:10px;letter-spacing:2px;font-weight:1000;color:#fff}
+.coin-stage{height:76px;display:flex;align-items:center;justify-content:center;perspective:500px}
+.coin{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff2a8;background:radial-gradient(circle at 30% 25%,#fff4b0,#eab308 60%,#92400e);color:#422006;font-size:10px;font-weight:1000;box-shadow:0 0 18px #facc1555,inset 0 0 0 3px #b77912;transform-style:preserve-3d}
+.coin.flipping{animation:coinFlip .8s ease-in-out}
+@keyframes coinFlip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(900deg) scale(1.13)}100%{transform:rotateY(1800deg) scale(1)}}
+.coin-result{font-size:12px;font-weight:1000;color:#fff;margin-bottom:9px}
+.coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer}
+.coin-button:disabled{opacity:.65;cursor:wait}
+.coin-history{margin-top:7px;color:#fff;font-size:8px}
+
+@media(max-width:600px){
+ .panel{padding:17px 12px}
+ .title{font-size:26px}
+ .dice-row{gap:8px}
+ .dice-box{width:64px;height:64px}
+ .stats{gap:7px}
+ .stat{width:135px}
+ .live-widget{bottom:8px;left:8px;width:270px}
+ .coin-panel{left:8px;bottom:calc(8px + 410px);width:270px}
+ .chat-log{height:105px}
+}
+@media(max-width:430px){
+ .app{width:100%}
+ .dice-row{gap:6px}
+ .dice-box{width:61px;height:61px}
+ .dice-details{gap:9px;font-size:6px}
+ .stat{width:130px}
+ .action-btn{font-size:9px;letter-spacing:.5px}
+ .stream-die{width:39px;height:39px}
+}
+@media(max-width:350px){
+ .panel{padding-left:8px;padding-right:8px}
+ .dice-row{gap:4px}
+ .dice-box{width:56px;height:56px}
+ .stream-die{width:34px;height:34px}
+}
+@media(prefers-reduced-motion:reduce){.dice-box.rolling,.coin.flipping{animation:none}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div>
-      <h1>🎲 Online Dice</h1>
-      <div class="subtitle">ROLL THE COLORS · LIVE</div>
-    </div>
-    <div class="muted">LIVE GAME</div>
-  </header>
-  <div class="game-layout">
-    <section class="panel">
-      <div class="section-title">
-        <span>Your Dice</span>
-        <span class="muted" id="rollLabel">Ready to roll</span>
-      </div>
-  <div class="dice-area" id="diceArea">
-    <div class="die" data-face="1"><div class="die-face"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div></div>
-    <div class="die" data-face="2"><div class="die-face"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div></div>
-    <div class="die" data-face="3"><div class="die-face"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div></div>
-    <div class="die" data-face="4"><div class="die-face"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div></div>
+<div class="panel">
+ <div class="top">
+  <h1 class="title">ONLINE DICE</h1>
+  <div class="subtitle">COLOR RANDOMIZER ENGINE</div>
+ </div>
+ <div class="top-info">
+  <div class="info-box active">SYSTEM ONLINE</div>
+  <div class="info-box">SESSION ACTIVE</div>
+  <div class="info-box">ENGINE READY</div>
+ </div>
+ <div class="details">
+  <div class="detail">6 COLORS</div><div class="detail">4 CHAMBERS</div>
+  <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
+  <div class="detail">ACTIVE ENGINE</div>
+ </div>
+
+ <div class="dice-section">
+  <div class="section-label">FOUR COLOR OUTPUTS</div>
+  <div class="dice-row">
+   <div class="dice-box"><div class="dice-dot"></div></div>
+   <div class="dice-box"><div class="dice-dot"></div></div>
+   <div class="dice-box"><div class="dice-dot"></div></div>
+   <div class="dice-box"><div class="dice-dot"></div></div>
   </div>
-  <button class="roll-button" id="rollButton">🎲 REROLL</button>
-  <div class="stats">
-    <div class="stat"><strong id="totalRolls">0</strong><small>ROLLS</small></div>
-    <div class="stat"><strong id="wins">0</strong><small>WINS</small></div>
-    <div class="stat"><strong id="losses">0</strong><small>LOSSES</small></div>
+  <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
+  <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
+ </div>
+
+ <div class="reroll-area">
+  <button class="action-btn reroll" id="reroll">↻ REROLL</button>
+  <button class="action-btn slow-reveal" id="slowReveal">◷ SLOW REVEAL</button>
+ </div>
+
+ <div class="stats">
+  <div class="stat"><div class="stat-label">TOTAL ROLLS</div><div class="stat-value" id="totalRolls">0</div></div>
+  <div class="stat"><div class="stat-label">SYSTEM</div><div class="stat-value" id="systemStatus">ONLINE</div></div>
+ </div>
+
+ <div class="counter-section">
+  <div class="counter-heading">WIN / LOSS COUNTER</div>
+  <div class="counter-total" id="counterTotal">0</div>
+  <div class="counter-status" id="counterStatus">NO POINTS YET</div>
+  <div class="counter-buttons">
+   <button class="counter-btn plus" data-change="1">+1</button>
+   <button class="counter-btn plus" data-change="10">+10</button>
+   <button class="counter-btn minus" data-change="-1">−1</button>
+   <button class="counter-btn minus" data-change="-10">−10</button>
   </div>
-</section>
-<section class="panel">
-  <div class="section-title">
-    <span>Roll History</span>
-    <button class="small-button" id="clearHistory">Clear</button>
-  </div>
-  <div class="history" id="history"><span class="muted">Your rolls will appear here.</span></div>
-  <div style="height:18px"></div>
-  <div class="section-title"><span>How it works</span></div>
-  <p class="muted">The four dots in the LIVE panel show the exact colors of your next roll.</p>
-  <p class="muted">Press <b>B</b> to change the color that must appear. Press <b>V</b> to change the color that must be excluded. Press R or tap REROLL to roll the four previewed colors.</p>
-  <p class="muted">The preview changes after each completed roll.</p>
-</section>
-  </div>
+  <button class="counter-reset" id="counterReset">RESET COUNTER</button>
+ </div>
+
+ <div class="history-section">
+  <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
+  <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
+ </div>
+ <div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
 </div>
-<aside class="live-panel" id="livePanel">
-  <div class="live-header" id="liveHeader">
-    <div class="live-title"><span class="live-badge">LIVE</span><span>Online Dice Chat</span></div>
-    <div class="live-viewers">● <span id="viewerCount">128</span> watching</div>
-  </div>
-  <div class="live-body">
-    <div class="chat" id="chat">
-      <div class="comment"><strong>DiceKing:</strong> Let's roll 🎲</div>
-      <div class="comment"><strong>BlueMoon:</strong> Good luck everyone!</div>
-      <div class="comment"><strong>LuckyPlayer:</strong> Watching the colors 👀</div>
-    </div>
-    <form class="chat-form" id="chatForm">
-      <input id="chatInput" placeholder="Write a comment..." maxlength="120" autocomplete="off">
-      <button type="submit">Send</button>
-    </form>
-<div class="color-picker-row" aria-label="Next roll color preview">
-  <div class="next-color-dots" id="nextColorDots">
-    <span class="next-color-dot"></span>
-    <span class="next-color-dot"></span>
-    <span class="next-color-dot"></span>
-    <span class="next-color-dot"></span>
-  </div>
 </div>
-<button class="coin-button" id="coinButton">🪙 FLIP COIN</button>
-<div class="coin-result" id="coinResult"></div>
-<div class="live-help">B = color appears · V = color excluded · R = reroll</div>
+
+<div class="coin-panel" id="coinPanel">
+ <div class="coin-heading">🪙 LIVE COIN FLIP</div>
+ <div class="coin-stage"><div class="coin" id="coin">FLIP</div></div>
+ <div class="coin-result" id="coinResult">HEADS OR TAILS?</div>
+ <button class="coin-button" id="flipCoin">↻ FLIP COIN</button>
+ <div class="coin-history" id="coinHistory">FLIPS: 0</div>
+</div>
+
+<div class="live-widget" id="liveWidget">
+ <div class="live-top" id="liveDragHandle">
+  <div class="live-brand"><span class="live-badge">LIVE</span>Online Dice</div>
+  <div style="display:flex;align-items:center;gap:7px">
+   <span class="live-viewers">◉ <span id="viewerCount">128</span></span>
+   <button id="chatMin" aria-label="Minimize live" style="background:transparent;color:white;border:0;font-size:17px;cursor:pointer;touch-action:manipulation">−</button>
   </div>
-</aside>
+ </div>
+ <div class="live-main">
+  <div class="stream-title">🎲 LIVE DICE • COLOR CHALLENGE</div>
+  <div class="stream-screen">
+   <div class="delay-label">● LIVE · 2s DELAY</div>
+   <div class="stream-dice" id="streamDice">
+    <div class="stream-die" style="background:#22c55e"><span></span></div>
+    <div class="stream-die" style="background:#3b82f6"><span></span></div>
+    <div class="stream-die" style="background:#fde047"><span></span></div>
+    <div class="stream-die" style="background:#a855f7"><span></span></div>
+   </div>
+   <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
+  </div>
+
+  <div class="color-picker-row" id="nextColorDots" aria-label="Next roll color preview">
+   <span class="next-color-dot"></span>
+   <span class="next-color-dot"></span>
+   <span class="next-color-dot"></span>
+   <span class="next-color-dot"></span>
+  </div>
+
+  <div class="live-metrics">
+   <div class="live-metric"><strong id="liveViewerMetric">128</strong><small>WATCHING</small></div>
+   <div class="live-metric"><strong id="likeCount">2.4K</strong><small>LIKES ♥</small></div>
+  </div>
+  <div class="chat-log" id="chatLog" aria-live="polite"></div>
+  <div class="chat-controls">
+   <button id="spamButton" class="spam-btn">▶ BOT CHAT</button>
+   <button id="likeButton">♥ LIKE</button>
+  </div>
+  <div class="chat-note">Simulated live • Messages and viewers are not real users</div>
+ </div>
+</div>
+
 <script>
-(() => {
-  const colors = [
-    {name:"Green",hex:"#22c55e"},
-    {name:"Blue",hex:"#3b82f6"},
-    {name:"Yellow",hex:"#facc15"},
-    {name:"Orange",hex:"#f97316"},
-    {name:"Purple",hex:"#a855f7"},
-    {name:"Red",hex:"#ef4444"}
-  ];
-  const dice = [...document.querySelectorAll(".die")];
-  const rollButton = document.getElementById("rollButton");
-  const rollLabel = document.getElementById("rollLabel");
-  const totalRollsEl = document.getElementById("totalRolls");
-  const winsEl = document.getElementById("wins");
-  const lossesEl = document.getElementById("losses");
-  const historyEl = document.getElementById("history");
-  const nextColorDots = [...document.querySelectorAll(".next-color-dot")];
-  const chat = document.getElementById("chat");
-  let hiddenColorIndex = 0;
-  let visibleColorIndex = 1;
-  let nextRollResults = [];
-  let rolling = false;
-  let totalRolls = 0;
-  let wins = 0;
-  let losses = 0;
-  let history = [];
-  function randomColor(excludedIndex) {
-    const available = colors.filter((_, index) => index !== excludedIndex);
-    return available[Math.floor(Math.random() * available.length)];
-  }
-  function makeRollResults() {
-    const results = Array.from({length:4}, () => randomColor(hiddenColorIndex));
-    const forcedPosition = Math.floor(Math.random() * results.length);
-    results[forcedPosition] = colors[visibleColorIndex];
-    return results;
-  }
-  function updateNextColorDots() {
-    nextColorDots.forEach((dot, index) => {
-      const color = nextRollResults[index] || colors[0];
-      dot.style.background = color.hex;
-      dot.title = color.name;
-      dot.setAttribute("aria-label", color.name);
-    });
-  }
-  function prepareNextRoll() {
-    nextRollResults = makeRollResults();
-    updateNextColorDots();
-  }
-  function cycleHiddenColor() {
-    hiddenColorIndex = (hiddenColorIndex + 1) % colors.length;
-    if (hiddenColorIndex === visibleColorIndex) {
-      hiddenColorIndex = (hiddenColorIndex + 1) % colors.length;
-    }
-    prepareNextRoll();
-    addComment("ColorGuide", colors[hiddenColorIndex].name + " will NOT appear");
-  }
-  function cycleVisibleColor() {
-    visibleColorIndex = (visibleColorIndex + 1) % colors.length;
-    if (visibleColorIndex === hiddenColorIndex) {
-      visibleColorIndex = (visibleColorIndex + 1) % colors.length;
-    }
-    prepareNextRoll();
-    addComment("ColorGuide", colors[visibleColorIndex].name + " is the chosen color");
-  }
-  function setDie(die, color, face) {
-    die.style.background = color.hex;
-    die.dataset.face = String(face);
-  }
-  function addHistory(results) {
-    history.unshift(results);
-    history = history.slice(0, 10);
-    renderHistory();
-  }
-  function renderHistory() {
-    historyEl.innerHTML = "";
-    if (!history.length) {
-      historyEl.innerHTML = '<span class="muted">Your rolls will appear here.</span>';
-      return;
-    }
-    history.forEach(results => {
-      const item = document.createElement("div");
-      item.className = "history-item";
-      results.forEach(color => {
-        const dot = document.createElement("span");
-        dot.style.background = color.hex;
-        dot.title = color.name;
-        item.appendChild(dot);
-      });
-      historyEl.appendChild(item);
-    });
-  }
-  function addComment(name, message) {
-    const comment = document.createElement("div");
-    comment.className = "comment";
-    const strong = document.createElement("strong");
-    strong.textContent = name + ":";
-    comment.append(strong, document.createTextNode(" " + message));
-    chat.appendChild(comment);
-    while (chat.children.length > 30) chat.firstElementChild.remove();
-    chat.scrollTop = chat.scrollHeight;
-  }
-  function roll() {
-    if (rolling) return;
-    rolling = true;
-    rollButton.disabled = true;
-    rollButton.style.opacity = ".7";
-    rollLabel.textContent = "Rolling...";
-    dice.forEach(die => die.classList.add("rolling"));
-    // Use the exact colors currently displayed in the four preview dots.
-    const results = nextRollResults.map(color => ({...color}));
-    const faces = dice.map(() => Math.floor(Math.random() * 6) + 1);
-    setTimeout(() => {
-      dice.forEach((die, index) => {
-        setDie(die, results[index], faces[index]);
-        die.classList.remove("rolling");
-      });
-      totalRolls++;
-      const won = results.some(color => color.name === colors[visibleColorIndex].name);
-      if (won) wins++;
-      else losses++;
-      totalRollsEl.textContent = totalRolls;
-      winsEl.textContent = wins;
-      lossesEl.textContent = losses;
-      rollLabel.textContent = won ? "Chosen color appeared!" : "Roll complete";
-      addHistory(results);
-      addComment("DiceBot", "Rolled " + results.map(c => c.name).join(", "));
-      if (won) addComment("DiceBot", "The chosen color appeared!");
-      rolling = false;
-      rollButton.disabled = false;
-      rollButton.style.opacity = "1";
-      // Generate the next preview only after the current roll is complete.
-      prepareNextRoll();
-    }, 1100);
-  }
-  rollButton.addEventListener("click", roll);
-  document.addEventListener("keydown", event => {
-    if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
-    const target = event.target;
-    if (target && ["INPUT","TEXTAREA"].includes(target.tagName)) return;
-    const key = event.key.toLowerCase();
-    if (key === "b") cycleVisibleColor();
-    else if (key === "v") cycleHiddenColor();
-    else if (key === "r" || key === " ") {
-      event.preventDefault();
-      roll();
-    }
+const colors=[
+ {name:"GREEN",hex:"#22c55e"},
+ {name:"BLUE",hex:"#3b82f6"},
+ {name:"RED",hex:"#ef4444"},
+ {name:"YELLOW",hex:"#fde047"},
+ {name:"ORANGE",hex:"#f97316"},
+ {name:"PURPLE",hex:"#a855f7"}
+];
+
+const dice=[...document.querySelectorAll(".dice-box")];
+const streamDice=[...document.querySelectorAll(".stream-die")];
+const rerollBtn=document.getElementById("reroll");
+const slowBtn=document.getElementById("slowReveal");
+const historyEl=document.getElementById("history");
+const readyStatus=document.getElementById("readyStatus");
+const systemStatus=document.getElementById("systemStatus");
+const chatLog=document.getElementById("chatLog");
+
+let predictionOffset=0;
+let pendingResults=[];
+let totalRolls=0,busy=false,netPoints=0,spamTimer=null;
+let likes=2400,viewers=128,liveMessageQueue=Promise.resolve();
+let coinFlips=0,coinBusy=false;
+
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function randomName(){
+ const names=["PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube","ShadowBot","ColorWave","MiaLive","AlexPlays","Starry","TurboTom"];
+ return names[Math.floor(Math.random()*names.length)];
+}
+
+/* Four preview dots show the exact colors queued for the next roll.
+   Press N to cycle through the six color patterns. */
+function makeRollResults(){
+ const offset=predictionOffset%colors.length;
+ return dice.map((_,i)=>colors[(i+offset)%colors.length]);
+}
+function updatePredictionDots(){
+ const dots=[...document.querySelectorAll(".next-color-dot")];
+ dots.forEach((dot,i)=>{
+  dot.style.backgroundColor=pendingResults[i].hex;
+  dot.removeAttribute("title");
+ });
+}
+function refreshPrediction(){
+ pendingResults=makeRollResults();
+ updatePredictionDots();
+}
+document.addEventListener("keydown",event=>{
+ if(event.repeat)return;
+ if(event.ctrlKey||event.metaKey||event.altKey)return;
+ const tag=event.target.tagName;
+ if(tag==="INPUT"||tag==="TEXTAREA"||event.target.isContentEditable)return;
+ if(event.key.toLowerCase()==="n"){
+  predictionOffset=(predictionOffset+1)%colors.length;
+  refreshPrediction();
+ }
+});
+
+function addLiveMessage(name,text){
+ const msg=document.createElement("div");
+ msg.className="chat-message";
+ const user=document.createElement("span");
+ user.className="username";user.textContent=name;
+ const body=document.createElement("span");
+ body.className="body";body.textContent=" "+text;
+ msg.append(user,body);chatLog.appendChild(msg);
+ while(chatLog.children.length>45)chatLog.firstElementChild.remove();
+ chatLog.scrollTop=chatLog.scrollHeight;
+}
+
+function setBusy(value,message){
+ busy=value;rerollBtn.disabled=slowBtn.disabled=value;
+ readyStatus.textContent=message||(value?"ROLLING":"READY");
+ systemStatus.textContent=value?"WORKING":"ONLINE";
+}
+
+function queueLiveRoll(results,rollNumber){
+ const snapshot=results.map(c=>({...c}));
+ liveMessageQueue=liveMessageQueue.then(async()=>{
+  await wait(2000);
+  streamDice.forEach((die,i)=>die.style.background=snapshot[i].hex);
+  document.getElementById("streamLabel").textContent="ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
+  addLiveMessage("System","🎲 New roll appeared on stream!");
+ });
+}
+
+function addHistory(results){
+ const empty=document.getElementById("historyEmpty");
+ if(empty)empty.remove();
+ const row=document.createElement("div");row.className="history-row";
+ const num=document.createElement("div");num.className="history-number";num.textContent="#"+totalRolls;
+ const squares=document.createElement("div");squares.className="history-colors";
+ results.forEach(c=>{
+  const s=document.createElement("div");
+  s.className="history-color";s.style.background=c.hex;s.title=c.name;
+  squares.appendChild(s);
+ });
+ const status=document.createElement("div");status.className="history-status";status.textContent="COMPLETE";
+ row.append(num,squares,status);historyEl.prepend(row);
+ while(historyEl.children.length>51)historyEl.lastElementChild.remove();
+}
+
+function finish(results){
+ totalRolls++;
+ document.getElementById("totalRolls").textContent=totalRolls;
+ addHistory(results);
+ queueLiveRoll(results,totalRolls);
+ refreshPrediction();
+ setBusy(false);
+}
+
+async function roll(slow){
+ if(busy)return;
+ setBusy(true,slow?"REVEALING":"ROLLING");
+ const results=pendingResults.map(c=>({...c}));
+ dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
+
+ if(!slow){
+  dice.forEach(d=>d.classList.add("rolling"));
+  await wait(350);
+  dice.forEach((d,i)=>{
+   d.classList.remove("rolling");
+   d.style.background=results[i].hex;
   });
-  document.getElementById("clearHistory").addEventListener("click", () => {
-    history = [];
-    renderHistory();
-  });
-  document.getElementById("chatForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const input = document.getElementById("chatInput");
-    const message = input.value.trim();
-    if (!message) return;
-    addComment("You", message);
-    input.value = "";
-  });
-  document.getElementById("coinButton").addEventListener("click", () => {
-    const result = Math.random() < .5 ? "HEADS" : "TAILS";
-    document.getElementById("coinResult").textContent = "🪙 " + result;
-    addComment("CoinFlip", "The coin landed on " + result + "!");
-  });
-  // Make the LIVE panel draggable.
-  const livePanel = document.getElementById("livePanel");
-  const liveHeader = document.getElementById("liveHeader");
-  let dragging = false;
-  let startX = 0, startY = 0, panelX = 0, panelY = 0;
-  liveHeader.addEventListener("pointerdown", event => {
-    if (event.target.closest("button")) return;
-    dragging = true;
-    liveHeader.setPointerCapture(event.pointerId);
-    const rect = livePanel.getBoundingClientRect();
-    startX = event.clientX;
-    startY = event.clientY;
-    panelX = rect.left;
-    panelY = rect.top;
-  });
-  liveHeader.addEventListener("pointermove", event => {
-    if (!dragging) return;
-    const x = Math.max(0, Math.min(window.innerWidth - livePanel.offsetWidth, panelX + event.clientX - startX));
-    const y = Math.max(0, Math.min(window.innerHeight - livePanel.offsetHeight, panelY + event.clientY - startY));
-    livePanel.style.left = x + "px";
-    livePanel.style.top = y + "px";
-    livePanel.style.right = "auto";
-    livePanel.style.bottom = "auto";
-  });
-  function stopDragging() {
-    dragging = false;
+ }else{
+  for(let i=0;i<dice.length;i++){
+   readyStatus.textContent=`REVEAL ${i+1}/4`;
+   dice[i].classList.add("rolling");
+   await wait(350);
+   dice[i].classList.remove("rolling");
+   dice[i].style.background=results[i].hex;
+   await wait(300);
   }
-  liveHeader.addEventListener("pointerup", stopDragging);
-  liveHeader.addEventListener("pointercancel", stopDragging);
-  // Simulated live viewer count.
-  setInterval(() => {
-    const viewers = document.getElementById("viewerCount");
-    viewers.textContent = String(120 + Math.floor(Math.random() * 25));
-  }, 2500);
-  prepareNextRoll();
-  dice.forEach((die, index) => {
-    setDie(die, nextRollResults[index], Math.floor(Math.random() * 6) + 1);
-  });
-})();
+ }
+ finish(results);
+}
+
+rerollBtn.addEventListener("click",()=>roll(false));
+slowBtn.addEventListener("click",()=>roll(true));
+
+/* Coin flip */
+const coin=document.getElementById("coin");
+const coinResult=document.getElementById("coinResult");
+const flipCoinBtn=document.getElementById("flipCoin");
+const coinHistory=document.getElementById("coinHistory");
+
+flipCoinBtn.addEventListener("click",async()=>{
+ if(coinBusy)return;
+ coinBusy=true;flipCoinBtn.disabled=true;
+ coin.classList.remove("flipping");void coin.offsetWidth;
+ coin.classList.add("flipping");
+ coinResult.textContent="FLIPPING...";coin.textContent="🪙";
+ await wait(850);
+ const result=Math.random()<.5?"HEADS":"TAILS";
+ coin.textContent=result==="HEADS"?"H":"T";
+ coinResult.textContent=result;
+ coinFlips++;
+ coinHistory.textContent="FLIPS: "+coinFlips+" • LAST: "+result;
+ coin.classList.remove("flipping");
+ flipCoinBtn.disabled=false;coinBusy=false;
+ addLiveMessage("System","🪙 Coin flip result: "+result+"!");
+});
+
+/* Win/loss counter */
+const counterTotal=document.getElementById("counterTotal");
+const counterStatus=document.getElementById("counterStatus");
+
+function updateCounter(){
+ counterTotal.textContent=netPoints>0?"+"+netPoints:String(netPoints);
+ if(netPoints>0){
+  counterStatus.textContent="WON "+netPoints+" POINTS";
+  counterTotal.style.color=counterStatus.style.color="#86efac";
+ }else if(netPoints<0){
+  counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";
+  counterTotal.style.color=counterStatus.style.color="#fca5a5";
+ }else{
+  counterStatus.textContent="NO POINTS YET";
+  counterTotal.style.color="#fff";counterStatus.style.color="#8aa8d0";
+ }
+}
+document.querySelectorAll(".counter-btn").forEach(b=>{
+ b.addEventListener("click",()=>{
+  netPoints+=Number(b.dataset.change);updateCounter();
+ });
+});
+document.getElementById("counterReset").addEventListener("click",()=>{
+ netPoints=0;updateCounter();
+});
+
+/* Simulated bot chat */
+const reactions=[
+ "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
+ "Need {COLOR} to win 😭","{COLOR} looks lucky","Anyone else picked {COLOR}?",
+ "GO {COLOR}!!","{COLOR} all the way!","I have a feeling about {COLOR}",
+ "Nahh {COLOR} is the one","PLEASE BE {COLOR} 👀","{COLOR} gang where you at?",
+ "That roll was wild","No way 😭","one more roll!!","chat choose your color!",
+ "I missed the last one 😭","W roll 🔥","let's gooooo","this live is fun"
+];
+
+function botMessage(){
+ const c=colors[Math.floor(Math.random()*colors.length)];
+ const template=reactions[Math.floor(Math.random()*reactions.length)];
+ addLiveMessage(randomName(),template.replaceAll("{COLOR}",c.name));
+ viewers=Math.max(84,Math.min(420,viewers+Math.floor(Math.random()*7)-3));
+ document.getElementById("viewerCount").textContent=viewers;
+ document.getElementById("liveViewerMetric").textContent=viewers;
+}
+
+document.getElementById("spamButton").addEventListener("click",()=>{
+ const btn=document.getElementById("spamButton");
+ if(spamTimer!==null){
+  clearTimeout(spamTimer);spamTimer=null;
+  btn.textContent="▶ BOT CHAT";btn.classList.remove("active");
+ }else{
+  btn.textContent="■ STOP CHAT";btn.classList.add("active");
+  const runBot=()=>{
+   botMessage();
+   if(spamTimer!==null)spamTimer=setTimeout(runBot,1100+Math.random()*2100);
+  };
+  spamTimer=setTimeout(runBot,700);
+ }
+});
+
+document.getElementById("likeButton").addEventListener("click",()=>{
+ likes++;
+ document.getElementById("likeCount").textContent=likes>=1000?(likes/1000).toFixed(1)+"K":likes;
+});
+
+/* Minimize LIVE */
+document.getElementById("chatMin").addEventListener("click",()=>{
+ const w=document.getElementById("liveWidget");
+ w.classList.toggle("collapsed");
+ document.getElementById("chatMin").textContent=w.classList.contains("collapsed")?"+":"−";
+});
+
+/* Drag panels with mouse or touch */
+function makeDraggable(panel,handle){
+ let dragging=false,pointerId=null,startX=0,startY=0,startLeft=0,startTop=0;
+ handle.addEventListener("pointerdown",event=>{
+  if(event.target.closest("button"))return;
+  if(event.button!==undefined&&event.button!==0)return;
+  const rect=panel.getBoundingClientRect();
+  panel.style.left=rect.left+"px";panel.style.top=rect.top+"px";
+  panel.style.right="auto";panel.style.bottom="auto";
+  dragging=true;pointerId=event.pointerId;
+  startX=event.clientX;startY=event.clientY;
+  startLeft=rect.left;startTop=rect.top;
+  handle.classList.add("dragging");
+  try{handle.setPointerCapture(event.pointerId)}catch(_){}
+  event.preventDefault();
+ });
+ handle.addEventListener("pointermove",event=>{
+  if(!dragging||event.pointerId!==pointerId)return;
+  const maxLeft=Math.max(0,window.innerWidth-panel.offsetWidth);
+  const maxTop=Math.max(0,window.innerHeight-panel.offsetHeight);
+  panel.style.left=Math.max(0,Math.min(maxLeft,startLeft+event.clientX-startX))+"px";
+  panel.style.top=Math.max(0,Math.min(maxTop,startTop+event.clientY-startY))+"px";
+ });
+ function stop(event){
+  if(!dragging)return;
+  if(event&&event.pointerId!==undefined&&event.pointerId!==pointerId)return;
+  dragging=false;pointerId=null;handle.classList.remove("dragging");
+ }
+ handle.addEventListener("pointerup",stop);
+ handle.addEventListener("pointercancel",stop);
+ handle.addEventListener("lostpointercapture",()=>{
+  dragging=false;pointerId=null;handle.classList.remove("dragging");
+ });
+}
+makeDraggable(document.getElementById("liveWidget"),document.getElementById("liveDragHandle"));
+makeDraggable(document.getElementById("coinPanel"),document.getElementById("coinPanel"));
+
+/* Initialize */
+updateCounter();
+refreshPrediction();
+dice.forEach((d,i)=>d.style.background=pendingResults[i].hex);
+streamDice.forEach((d,i)=>d.style.background=pendingResults[i].hex);
+addLiveMessage("System","Welcome to the live! 🎲");
+addLiveMessage(randomName(),"What color are you picking? 👀");
+addLiveMessage(randomName(),"I'm going with PURPLE 💜");
+
+setInterval(()=>{
+ if(Math.random()<.65&&!document.hidden)botMessage();
+},5000);
 </script>
 </body>
 </html>
