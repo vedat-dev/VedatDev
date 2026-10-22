@@ -60,7 +60,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .history-color{width:21px;height:21px;border:1px solid #ffffff88;border-radius:4px}
 .history-status{color:#86efac;font-size:6px;font-weight:900}
 .footer{margin-top:auto;padding-top:18px;text-align:center;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
-
 /* LIVE panel */
 .live-widget{position:fixed;bottom:12px;left:12px;z-index:20;width:300px;max-width:calc(100vw - 24px);background:#080a10f7;border:1px solid #ffffff20;border-radius:15px;overflow:hidden;box-shadow:0 8px 32px #000b}
 .live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -77,14 +76,12 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .stream-die{width:42px;height:42px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
 .stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
 .stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
-
-/* Smaller secret dots with labels directly underneath */
-.color-picker-row{display:flex;align-items:flex-start;justify-content:center;gap:12px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
-.secret-control{display:flex;flex-direction:column;align-items:center;gap:3px}
-.secret-dot{appearance:none;-webkit-appearance:none;width:7px;height:7px;min-width:7px;min-height:7px;padding:0;border:1px solid #ffffffbb;border-radius:50%;background:#22c55e;opacity:.5;cursor:pointer;touch-action:manipulation}
+/* Tiny V/B control dots + four-color preview */
+.color-picker-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
+.secret-dot{appearance:none;-webkit-appearance:none;width:7px;height:7px;min-width:7px;min-height:7px;padding:0;border:1px solid #ffffffbb;border-radius:50%;opacity:.8;cursor:pointer;touch-action:manipulation}
 .secret-dot:focus-visible{outline:2px solid white;outline-offset:3px}
-.color-key{padding:0;border:0;background:transparent;color:#ffffff80;font-size:4px;font-weight:1000;line-height:1}
-
+.next-color-dots{display:flex;align-items:center;gap:5px;margin-left:5px}
+.next-color-dot{display:block;width:7px;height:7px;flex:0 0 7px;border:1px solid #ffffffaa;border-radius:50%;background:#22c55e}
 .live-metrics{display:flex;gap:6px;margin:8px 0}
 .live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
 .live-metric strong{display:block;font-size:13px;color:#fff}
@@ -99,7 +96,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .chat-note{text-align:center;color:#fff;font-size:7px;margin-top:7px}
 .live-widget.collapsed .live-main{display:none}
 .live-widget.collapsed{width:210px}
-
 /* Coin flip */
 .coin-panel{position:fixed;left:12px;bottom:440px;z-index:21;width:300px;max-width:calc(100vw - 24px);padding:12px;background:linear-gradient(145deg,#101a30f7,#080a10f7);border:1px solid #ffffff28;border-radius:14px;box-shadow:0 8px 32px #0009;text-align:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
 .coin-panel.dragging{cursor:grabbing}
@@ -112,7 +108,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer}
 .coin-button:disabled{opacity:.65;cursor:wait}
 .coin-history{margin-top:7px;color:#fff;font-size:8px}
-
 @media(max-width:600px){
  .panel{padding:17px 12px}
  .title{font-size:26px}
@@ -159,7 +154,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
   <div class="detail">ACTIVE ENGINE</div>
  </div>
-
  <div class="dice-section">
   <div class="section-label">FOUR COLOR OUTPUTS</div>
   <div class="dice-row">
@@ -171,17 +165,14 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
   <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
  </div>
-
  <div class="reroll-area">
   <button class="action-btn reroll" id="reroll">↻ REROLL</button>
   <button class="action-btn slow-reveal" id="slowReveal">◷ SLOW REVEAL</button>
  </div>
-
  <div class="stats">
   <div class="stat"><div class="stat-label">TOTAL ROLLS</div><div class="stat-value" id="totalRolls">0</div></div>
   <div class="stat"><div class="stat-label">SYSTEM</div><div class="stat-value" id="systemStatus">ONLINE</div></div>
  </div>
-
  <div class="counter-section">
   <div class="counter-heading">WIN / LOSS COUNTER</div>
   <div class="counter-total" id="counterTotal">0</div>
@@ -194,7 +185,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   </div>
   <button class="counter-reset" id="counterReset">RESET COUNTER</button>
  </div>
-
  <div class="history-section">
   <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
   <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
@@ -202,7 +192,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  <div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
 </div>
 </div>
-
 <div class="coin-panel" id="coinPanel">
  <div class="coin-heading">🪙 LIVE COIN FLIP</div>
  <div class="coin-stage"><div class="coin" id="coin">FLIP</div></div>
@@ -210,7 +199,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  <button class="coin-button" id="flipCoin">↻ FLIP COIN</button>
  <div class="coin-history" id="coinHistory">FLIPS: 0</div>
 </div>
-
 <div class="live-widget" id="liveWidget">
  <div class="live-top" id="liveDragHandle">
   <div class="live-brand"><span class="live-badge">LIVE</span>Online Dice</div>
@@ -231,18 +219,16 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
    </div>
    <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
   </div>
-
-  <div class="color-picker-row">
-   <div class="secret-control">
-    <button class="secret-dot" id="hiddenColorDot" aria-label="Secret color V" title="Secret color V"></button>
-    <span class="color-key">V</span>
-   </div>
-   <div class="secret-control">
-    <button class="secret-dot" id="visibleColorDot" aria-label="Secret color B" title="Secret color B"></button>
-    <span class="color-key">B</span>
+  <div class="color-picker-row" aria-label="Next roll color preview">
+   <button class="secret-dot" id="hiddenColorDot" aria-label="Change V color" title="Change V color"></button>
+   <button class="secret-dot" id="visibleColorDot" aria-label="Change B color" title="Change B color"></button>
+   <div class="next-color-dots" id="nextColorDots" aria-label="Next dice colors">
+    <span class="next-color-dot"></span>
+    <span class="next-color-dot"></span>
+    <span class="next-color-dot"></span>
+    <span class="next-color-dot"></span>
    </div>
   </div>
-
   <div class="live-metrics">
    <div class="live-metric"><strong id="liveViewerMetric">128</strong><small>WATCHING</small></div>
    <div class="live-metric"><strong id="likeCount">2.4K</strong><small>LIKES ♥</small></div>
@@ -255,7 +241,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   <div class="chat-note">Simulated live • Messages and viewers are not real users</div>
  </div>
 </div>
-
 <script>
 const colors=[
  {name:"GREEN",hex:"#22c55e"},
@@ -265,7 +250,6 @@ const colors=[
  {name:"ORANGE",hex:"#f97316"},
  {name:"PURPLE",hex:"#a855f7"}
 ];
-
 const dice=[...document.querySelectorAll(".dice-box")];
 const streamDice=[...document.querySelectorAll(".stream-die")];
 const rerollBtn=document.getElementById("reroll");
@@ -274,59 +258,70 @@ const historyEl=document.getElementById("history");
 const readyStatus=document.getElementById("readyStatus");
 const systemStatus=document.getElementById("systemStatus");
 const chatLog=document.getElementById("chatLog");
-
 let hiddenColorIndex=0;
 let visibleColorIndex=1;
+let nextRollResults=[];
 let totalRolls=0,busy=false,netPoints=0,spamTimer=null;
 let likes=2400,viewers=128,liveMessageQueue=Promise.resolve();
 let coinFlips=0,coinBusy=false;
-
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 function randomName(){
  const names=["PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube","ShadowBot","ColorWave","MiaLive","AlexPlays","Starry","TurboTom"];
  return names[Math.floor(Math.random()*names.length)];
 }
-
-/* V color is excluded from the dice */
+/* V-selected color is excluded from the other three random dice. */
 function randomColor(){
  const available=colors.filter((_,i)=>i!==hiddenColorIndex);
  return available[Math.floor(Math.random()*available.length)];
 }
-
-/* Exactly one die gets the B-selected color each roll */
+/* Generate and save the exact four colors that will appear next. */
 function makeRollResults(){
  const results=dice.map(()=>randomColor());
  const index=Math.floor(Math.random()*results.length);
  results[index]=colors[visibleColorIndex];
  return results;
 }
-
 function updateSecretDots(){
  document.getElementById("hiddenColorDot").style.backgroundColor=colors[hiddenColorIndex].hex;
  document.getElementById("visibleColorDot").style.backgroundColor=colors[visibleColorIndex].hex;
 }
-
+function updateNextColorDots(){
+ const dots=[...document.querySelectorAll(".next-color-dot")];
+ dots.forEach((dot,i)=>{
+  dot.style.backgroundColor=nextRollResults[i].hex;
+ });
+}
+function prepareNextRoll(){
+ nextRollResults=makeRollResults();
+ updateNextColorDots();
+}
 function cycleHiddenColor(){
  hiddenColorIndex=(hiddenColorIndex+1)%colors.length;
  if(visibleColorIndex===hiddenColorIndex)visibleColorIndex=(visibleColorIndex+1)%colors.length;
  updateSecretDots();
+ prepareNextRoll();
 }
 function cycleVisibleColor(){
  visibleColorIndex=(visibleColorIndex+1)%colors.length;
  if(visibleColorIndex===hiddenColorIndex)visibleColorIndex=(visibleColorIndex+1)%colors.length;
  updateSecretDots();
+ prepareNextRoll();
 }
 document.getElementById("hiddenColorDot").addEventListener("click",cycleHiddenColor);
 document.getElementById("visibleColorDot").addEventListener("click",cycleVisibleColor);
-
 document.addEventListener("keydown",event=>{
- if(event.repeat)return;
+ if(event.repeat||event.ctrlKey||event.altKey||event.metaKey)return;
  const tag=event.target.tagName;
  if(tag==="INPUT"||tag==="TEXTAREA"||event.target.isContentEditable)return;
- if(event.key.toLowerCase()==="v")cycleHiddenColor();
- if(event.key.toLowerCase()==="b")cycleVisibleColor();
+ if(event.key.toLowerCase()==="v"){
+  event.preventDefault();
+  cycleHiddenColor();
+ }
+ if(event.key.toLowerCase()==="b"){
+  event.preventDefault();
+  cycleVisibleColor();
+ }
 });
-
 function addLiveMessage(name,text){
  const msg=document.createElement("div");
  msg.className="chat-message";
@@ -338,13 +333,11 @@ function addLiveMessage(name,text){
  while(chatLog.children.length>45)chatLog.firstElementChild.remove();
  chatLog.scrollTop=chatLog.scrollHeight;
 }
-
 function setBusy(value,message){
  busy=value;rerollBtn.disabled=slowBtn.disabled=value;
  readyStatus.textContent=message||(value?"ROLLING":"READY");
  systemStatus.textContent=value?"WORKING":"ONLINE";
 }
-
 function queueLiveRoll(results,rollNumber){
  const snapshot=results.map(c=>({...c}));
  liveMessageQueue=liveMessageQueue.then(async()=>{
@@ -354,7 +347,6 @@ function queueLiveRoll(results,rollNumber){
   addLiveMessage("System","🎲 New roll appeared on stream!");
  });
 }
-
 function addHistory(results){
  const empty=document.getElementById("historyEmpty");
  if(empty)empty.remove();
@@ -370,21 +362,20 @@ function addHistory(results){
  row.append(num,squares,status);historyEl.prepend(row);
  while(historyEl.children.length>51)historyEl.lastElementChild.remove();
 }
-
 function finish(results){
  totalRolls++;
  document.getElementById("totalRolls").textContent=totalRolls;
  addHistory(results);
  queueLiveRoll(results,totalRolls);
+ prepareNextRoll();
  setBusy(false);
 }
-
 async function roll(slow){
  if(busy)return;
  setBusy(true,slow?"REVEALING":"ROLLING");
- const results=makeRollResults();
+ /* Roll precisely the colors shown in the four preview dots. */
+ const results=nextRollResults.map(c=>({...c}));
  dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
-
  if(!slow){
   dice.forEach(d=>d.classList.add("rolling"));
   await wait(350);
@@ -404,16 +395,13 @@ async function roll(slow){
  }
  finish(results);
 }
-
 rerollBtn.addEventListener("click",()=>roll(false));
 slowBtn.addEventListener("click",()=>roll(true));
-
 /* Coin flip */
 const coin=document.getElementById("coin");
 const coinResult=document.getElementById("coinResult");
 const flipCoinBtn=document.getElementById("flipCoin");
 const coinHistory=document.getElementById("coinHistory");
-
 flipCoinBtn.addEventListener("click",async()=>{
  if(coinBusy)return;
  coinBusy=true;flipCoinBtn.disabled=true;
@@ -430,11 +418,9 @@ flipCoinBtn.addEventListener("click",async()=>{
  flipCoinBtn.disabled=false;coinBusy=false;
  addLiveMessage("System","🪙 Coin flip result: "+result+"!");
 });
-
 /* Win/loss counter */
 const counterTotal=document.getElementById("counterTotal");
 const counterStatus=document.getElementById("counterStatus");
-
 function updateCounter(){
  counterTotal.textContent=netPoints>0?"+"+netPoints:String(netPoints);
  if(netPoints>0){
@@ -456,7 +442,6 @@ document.querySelectorAll(".counter-btn").forEach(b=>{
 document.getElementById("counterReset").addEventListener("click",()=>{
  netPoints=0;updateCounter();
 });
-
 /* Simulated bot chat */
 const reactions=[
  "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
@@ -466,7 +451,6 @@ const reactions=[
  "That roll was wild","No way 😭","one more roll!!","chat choose your color!",
  "I missed the last one 😭","W roll 🔥","let's gooooo","this live is fun"
 ];
-
 function botMessage(){
  const c=randomColor();
  const template=reactions[Math.floor(Math.random()*reactions.length)];
@@ -475,7 +459,6 @@ function botMessage(){
  document.getElementById("viewerCount").textContent=viewers;
  document.getElementById("liveViewerMetric").textContent=viewers;
 }
-
 document.getElementById("spamButton").addEventListener("click",()=>{
  const btn=document.getElementById("spamButton");
  if(spamTimer!==null){
@@ -490,19 +473,16 @@ document.getElementById("spamButton").addEventListener("click",()=>{
   spamTimer=setTimeout(runBot,700);
  }
 });
-
 document.getElementById("likeButton").addEventListener("click",()=>{
  likes++;
  document.getElementById("likeCount").textContent=likes>=1000?(likes/1000).toFixed(1)+"K":likes;
 });
-
 /* Minimize LIVE */
 document.getElementById("chatMin").addEventListener("click",()=>{
  const w=document.getElementById("liveWidget");
  w.classList.toggle("collapsed");
  document.getElementById("chatMin").textContent=w.classList.contains("collapsed")?"+":"−";
 });
-
 /* Drag panels with mouse or touch */
 function makeDraggable(panel,handle){
  let dragging=false,pointerId=null,startX=0,startY=0,startLeft=0,startTop=0;
@@ -539,15 +519,14 @@ function makeDraggable(panel,handle){
 }
 makeDraggable(document.getElementById("liveWidget"),document.getElementById("liveDragHandle"));
 makeDraggable(document.getElementById("coinPanel"),document.getElementById("coinPanel"));
-
 /* Initialize */
 updateCounter();
 updateSecretDots();
-dice.forEach(d=>d.style.background=randomColor().hex);
+prepareNextRoll();
+dice.forEach((d,i)=>d.style.background=nextRollResults[i].hex);
 addLiveMessage("System","Welcome to the live! 🎲");
 addLiveMessage(randomName(),"What color are you picking? 👀");
 addLiveMessage(randomName(),"I'm going with PURPLE 💜");
-
 setInterval(()=>{
  if(Math.random()<.65&&!document.hidden)botMessage();
 },5000);
