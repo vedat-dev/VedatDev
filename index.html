@@ -78,11 +78,12 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
 .stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
 
-/* Secret buttons: no text, half-size, 50% transparent */
-.color-picker-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
-.secret-dot{appearance:none;-webkit-appearance:none;width:9px;height:9px;min-width:9px;min-height:9px;padding:0;border:1px solid #ffffffbb;border-radius:50%;background:#22c55e;opacity:.5;cursor:pointer;touch-action:manipulation}
+/* Smaller secret dots with labels directly underneath */
+.color-picker-row{display:flex;align-items:flex-start;justify-content:center;gap:12px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
+.secret-control{display:flex;flex-direction:column;align-items:center;gap:3px}
+.secret-dot{appearance:none;-webkit-appearance:none;width:7px;height:7px;min-width:7px;min-height:7px;padding:0;border:1px solid #ffffffbb;border-radius:50%;background:#22c55e;opacity:.5;cursor:pointer;touch-action:manipulation}
 .secret-dot:focus-visible{outline:2px solid white;outline-offset:3px}
-.color-key{padding:3px 5px;border:1px solid #ffffff25;border-radius:4px;background:#ffffff0c;color:white;font-size:8px;font-weight:1000}
+.color-key{padding:0;border:0;background:transparent;color:#ffffff80;font-size:4px;font-weight:1000;line-height:1}
 
 .live-metrics{display:flex;gap:6px;margin:8px 0}
 .live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
@@ -231,12 +232,15 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
    <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
   </div>
 
-  <!-- Secret dots only: no color names or explanatory text -->
   <div class="color-picker-row">
-   <button class="secret-dot" id="hiddenColorDot" aria-label="Secret color V" title="Secret color V"></button>
-   <button class="secret-dot" id="visibleColorDot" aria-label="Secret color B" title="Secret color B"></button>
-   <span class="color-key">V</span>
-   <span class="color-key">B</span>
+   <div class="secret-control">
+    <button class="secret-dot" id="hiddenColorDot" aria-label="Secret color V" title="Secret color V"></button>
+    <span class="color-key">V</span>
+   </div>
+   <div class="secret-control">
+    <button class="secret-dot" id="visibleColorDot" aria-label="Secret color B" title="Secret color B"></button>
+    <span class="color-key">B</span>
+   </div>
   </div>
 
   <div class="live-metrics">
@@ -289,10 +293,12 @@ function randomColor(){
  return available[Math.floor(Math.random()*available.length)];
 }
 
-/* B color is eligible to appear, and is weighted to appear often */
-function randomDiceColor(){
- if(Math.random()<0.5)return colors[visibleColorIndex];
- return randomColor();
+/* Exactly one die gets the B-selected color each roll */
+function makeRollResults(){
+ const results=dice.map(()=>randomColor());
+ const index=Math.floor(Math.random()*results.length);
+ results[index]=colors[visibleColorIndex];
+ return results;
 }
 
 function updateSecretDots(){
@@ -300,7 +306,6 @@ function updateSecretDots(){
  document.getElementById("visibleColorDot").style.backgroundColor=colors[visibleColorIndex].hex;
 }
 
-/* Secret color controls: no chat messages */
 function cycleHiddenColor(){
  hiddenColorIndex=(hiddenColorIndex+1)%colors.length;
  if(visibleColorIndex===hiddenColorIndex)visibleColorIndex=(visibleColorIndex+1)%colors.length;
@@ -377,7 +382,7 @@ function finish(results){
 async function roll(slow){
  if(busy)return;
  setBusy(true,slow?"REVEALING":"ROLLING");
- const results=dice.map(()=>randomDiceColor());
+ const results=makeRollResults();
  dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
 
  if(!slow){
@@ -452,7 +457,7 @@ document.getElementById("counterReset").addEventListener("click",()=>{
  netPoints=0;updateCounter();
 });
 
-/* Simulated bot chat uses only eligible colors */
+/* Simulated bot chat */
 const reactions=[
  "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
  "Need {COLOR} to win 😭","{COLOR} looks lucky","Anyone else picked {COLOR}?",
@@ -538,7 +543,7 @@ makeDraggable(document.getElementById("coinPanel"),document.getElementById("coin
 /* Initialize */
 updateCounter();
 updateSecretDots();
-dice.forEach(d=>d.style.background=randomDiceColor().hex);
+dice.forEach(d=>d.style.background=randomColor().hex);
 addLiveMessage("System","Welcome to the live! 🎲");
 addLiveMessage(randomName(),"What color are you picking? 👀");
 addLiveMessage(randomName(),"I'm going with PURPLE 💜");
