@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Online Dice LIVE</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -60,7 +61,8 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .history-color{width:21px;height:21px;border:1px solid #ffffff88;border-radius:4px}
 .history-status{color:#86efac;font-size:6px;font-weight:900}
 .footer{margin-top:auto;padding-top:18px;text-align:center;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
-/* LIVE panel */
+
+/* Floating LIVE widget */
 .live-widget{position:fixed;bottom:12px;left:12px;z-index:20;width:300px;max-width:calc(100vw - 24px);background:#080a10f7;border:1px solid #ffffff20;border-radius:15px;overflow:hidden;box-shadow:0 8px 32px #000b}
 .live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .live-top.dragging{cursor:grabbing}
@@ -69,17 +71,13 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .live-viewers{font-size:10px;color:#eee;background:#ffffff12;border-radius:12px;padding:5px 8px}
 .live-main{padding:9px}
 .stream-title{font-size:10px;font-weight:900;color:#fff;margin-bottom:7px}
-.stream-screen{position:relative;padding:25px 6px 10px;border:1px solid #ffffff16;border-radius:9px;background:radial-gradient(ellipse at top,#1d3560,#070b16 75%);overflow:hidden}
+.stream-screen{position:relative;padding:12px 6px 10px;border:1px solid #ffffff16;border-radius:9px;background:radial-gradient(ellipse at top,#1d3560,#070b16 75%);overflow:hidden}
 .stream-screen:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#ffffff04,transparent 35%,#0003)}
-.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fff;font-weight:900}
 .stream-dice{display:flex;align-items:center;justify-content:center;gap:7px;position:relative;z-index:1}
 .stream-die{width:42px;height:42px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
 .stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
 .stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
-/* Four next-prediction dots */
-.color-picker-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;border-radius:8px}
-.next-color-dot{display:block;width:10px;height:10px;min-width:10px;border:1px solid #ffffff80;border-radius:50%;background:#22c55e;transition:background-color .15s ease,transform .15s ease}
-.next-color-dot.changed{transform:scale(1.25)}
+.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fff;font-weight:900}
 .live-metrics{display:flex;gap:6px;margin:8px 0}
 .live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
 .live-metric strong{display:block;font-size:13px;color:#fff}
@@ -87,25 +85,137 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
 .chat-log{height:135px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 1px 8px;scrollbar-width:thin;scrollbar-color:#374151 transparent}
 .chat-message,.chat-message .username,.chat-message .body{font-size:10px;line-height:1.45;overflow-wrap:anywhere;color:#fff!important}
 .chat-message .username{font-weight:1000;margin-right:4px}
+.chat-message.system{color:#fff!important}
 .chat-controls{border-top:1px solid #ffffff15;padding-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .chat-controls button{width:100%;min-width:0;height:32px;border:1px solid #ffffff1c;border-radius:7px;background:#171c2a;color:#fff;font-size:10px;padding:0 6px;font-weight:900;cursor:pointer}
+.send-btn{background:#263c67!important}
 .spam-btn{background:#fe2c55!important;border-color:#fe2c55!important}
 .spam-btn.active{background:#6b7280!important;border-color:#6b7280!important}
+.like-btn{color:#fff!important}
 .chat-note{text-align:center;color:#fff;font-size:7px;margin-top:7px}
 .live-widget.collapsed .live-main{display:none}
 .live-widget.collapsed{width:210px}
-/* Coin flip */
+
+/* Floating coin flip panel */
 .coin-panel{position:fixed;left:12px;bottom:440px;z-index:21;width:300px;max-width:calc(100vw - 24px);padding:12px;background:linear-gradient(145deg,#101a30f7,#080a10f7);border:1px solid #ffffff28;border-radius:14px;box-shadow:0 8px 32px #0009;text-align:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
 .coin-panel.dragging{cursor:grabbing}
 .coin-heading{font-size:10px;letter-spacing:2px;font-weight:1000;color:#fff}
 .coin-stage{height:76px;display:flex;align-items:center;justify-content:center;perspective:500px}
 .coin{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff2a8;background:radial-gradient(circle at 30% 25%,#fff4b0,#eab308 60%,#92400e);color:#422006;font-size:10px;font-weight:1000;box-shadow:0 0 18px #facc1555,inset 0 0 0 3px #b77912;transform-style:preserve-3d}
 .coin.flipping{animation:coinFlip .8s ease-in-out}
-@keyframes coinFlip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(900deg) scale(1.13)}100%{transform:rotateY(1800deg) scale(1)}}
+@keyframes coinFlip{0%{transform:rotateY(0) rotateX(0) scale(1)}50%{transform:rotateY(900deg) rotateX(18deg) scale(1.13)}100%{transform:rotateY(1800deg) rotateX(0) scale(1)}}
 .coin-result{font-size:12px;font-weight:1000;color:#fff;margin-bottom:9px}
-.coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer}
+.coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer;touch-action:manipulation}
 .coin-button:disabled{opacity:.65;cursor:wait}
 .coin-history{margin-top:7px;color:#fff;font-size:8px}
+
+/* NOTES MANAGER */
+.notes-launcher{
+ position:fixed;right:12px;top:50%;transform:translateY(-50%);
+ z-index:1000;display:flex;align-items:center;gap:9px;
+ padding:13px 15px;border:1px solid #60a5fa66;border-radius:13px;
+ color:#dbeafe;background:linear-gradient(145deg,#142c4df5,#071326f7);
+ box-shadow:0 8px 28px #0008,0 0 18px #3b82f622;
+ font-size:11px;font-weight:1000;letter-spacing:1px;cursor:pointer;
+ touch-action:manipulation;transition:border-color .18s,background .18s
+}
+.notes-launcher:hover{border-color:#60a5fa;background:#19365a}
+.notes-launcher-icon{font-size:19px}
+.notes-launcher-label{white-space:nowrap}
+.notes-overlay{
+ position:fixed;inset:0;z-index:1100;display:flex;
+ align-items:center;justify-content:center;padding:14px;
+ background:#020817a8;backdrop-filter:blur(7px);
+ -webkit-backdrop-filter:blur(7px)
+}
+.notes-overlay[hidden]{display:none!important}
+.notes-window{
+ width:min(760px,100%);height:min(610px,88dvh);min-height:330px;
+ display:flex;flex-direction:column;overflow:hidden;color:#eaf2ff;
+ background:linear-gradient(145deg,#0c1b33,#050c19 80%);
+ border:1px solid #60a5fa44;border-radius:17px;
+ box-shadow:0 25px 90px #000c,0 0 35px #3b82f614
+}
+.notes-header{
+ min-height:58px;display:flex;align-items:center;gap:12px;
+ padding:10px 14px;border-bottom:1px solid #ffffff12;background:#ffffff04
+}
+.notes-close{
+ width:35px;height:35px;flex:0 0 auto;border:1px solid #ffffff20;
+ border-radius:9px;background:#ffffff08;color:#dbeafe;
+ font-size:21px;cursor:pointer
+}
+.notes-close:hover{background:#3b82f633}
+.notes-heading{min-width:0;flex:1}
+.notes-heading h2{margin:0;font-size:16px;letter-spacing:1.5px}
+.notes-heading p{margin:4px 0 0;color:#7893b6;font-size:9px;letter-spacing:1px}
+.notes-save-state{color:#86efac;font-size:9px;font-weight:900;white-space:nowrap}
+.notes-body{flex:1;min-height:0;display:grid;grid-template-columns:205px minmax(0,1fr)}
+.notes-sidebar{
+ min-height:0;display:flex;flex-direction:column;gap:9px;padding:12px;
+ background:#0002;border-right:1px solid #ffffff12
+}
+.notes-side-label{color:#7893b6;font-size:9px;font-weight:1000;letter-spacing:1.4px}
+.notes-toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.notes-btn{
+ min-height:34px;padding:7px 9px;border:1px solid #ffffff18;
+ border-radius:8px;color:#dbeafe;background:#ffffff08;
+ font-size:10px;font-weight:900;cursor:pointer
+}
+.notes-btn:hover{background:#ffffff14}
+.notes-btn.primary{background:#1d4ed8;border-color:#60a5fa66;color:white}
+.notes-btn.primary:hover{background:#2563eb}
+.notes-btn.danger{color:#fca5a5;border-color:#ef444433}
+.notes-folder-list,.notes-list{
+ display:flex;flex-direction:column;gap:5px;overflow-y:auto;
+ min-height:0;scrollbar-width:thin;scrollbar-color:#344967 transparent
+}
+.notes-folder-list{max-height:125px}
+.notes-folder-item,.notes-item{
+ width:100%;min-width:0;display:flex;align-items:center;gap:8px;
+ padding:9px;text-align:left;color:#b9cbe5;background:#ffffff04;
+ border:1px solid transparent;border-radius:8px;cursor:pointer
+}
+.notes-folder-item.active,.notes-item.active{
+ color:#eff6ff;background:#3b82f61b;border-color:#3b82f655
+}
+.notes-folder-name,.notes-item-info{flex:1;min-width:0;overflow:hidden}
+.notes-folder-name{font-size:10px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
+.notes-folder-count{color:#7893b6;font-size:9px}
+.notes-list{flex:1}
+.notes-item{align-items:flex-start}
+.notes-item-title{
+ display:block;overflow:hidden;color:#e2edff;font-size:11px;
+ font-weight:900;text-overflow:ellipsis;white-space:nowrap
+}
+.notes-item-preview{
+ display:block;margin-top:4px;overflow:hidden;color:#7893b6;
+ font-size:9px;text-overflow:ellipsis;white-space:nowrap
+}
+.notes-editor{min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding:16px}
+.notes-editor-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.notes-breadcrumb{min-width:0;overflow:hidden;color:#7893b6;font-size:9px;text-overflow:ellipsis;white-space:nowrap}
+.notes-editor-actions{display:flex;gap:6px}
+.notes-title-input,.notes-textarea{
+ width:100%;min-width:0;color:#eaf2ff;background:#0208178c;
+ border:1px solid #ffffff18;border-radius:9px;outline:none;
+ font-family:Arial,Helvetica,sans-serif
+}
+.notes-title-input{height:43px;padding:0 12px;font-size:15px;font-weight:900}
+.notes-textarea{flex:1;min-height:90px;padding:13px;resize:none;font-size:13px;line-height:1.65}
+.notes-title-input:focus,.notes-textarea:focus{border-color:#60a5fa99;box-shadow:0 0 0 2px #3b82f619}
+.notes-title-input::placeholder,.notes-textarea::placeholder{color:#58708f}
+.notes-editor-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;color:#7893b6;font-size:9px}
+.notes-editor-footer .notes-btn{min-width:95px}
+.notes-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;color:#7893b6;font-size:11px;line-height:1.7}
+.notes-empty-icon{font-size:35px}
+.notes-empty strong{color:#dbeafe;font-size:13px}
+.notes-empty button{margin-top:5px}
+.notes-confirm{padding:10px;border:1px solid #ffffff18;border-radius:9px;background:#101e34;color:#eaf2ff;font-size:11px}
+.notes-confirm p{line-height:1.5}
+.notes-confirm-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}
+.notes-footer{padding:8px 13px;border-top:1px solid #ffffff10;color:#58708f;text-align:center;font-size:8px;letter-spacing:.5px}
+
 @media(max-width:600px){
  .panel{padding:17px 12px}
  .title{font-size:26px}
@@ -116,6 +226,28 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  .live-widget{bottom:8px;left:8px;width:270px}
  .coin-panel{left:8px;bottom:calc(8px + 410px);width:270px}
  .chat-log{height:105px}
+}
+@media(max-width:520px){
+ .notes-launcher{right:7px;padding:11px;border-radius:12px}
+ .notes-launcher-label{display:none}
+ .notes-overlay{padding:7px}
+ .notes-window{height:88dvh;min-height:320px;border-radius:13px}
+ .notes-header{min-height:51px;padding:8px}
+ .notes-heading h2{font-size:13px}
+ .notes-heading p{font-size:8px}
+ .notes-save-state{font-size:8px}
+ .notes-body{grid-template-columns:116px minmax(0,1fr)}
+ .notes-sidebar{padding:7px;gap:7px}
+ .notes-toolbar{grid-template-columns:1fr}
+ .notes-btn{font-size:9px;padding:7px 5px}
+ .notes-folder-item,.notes-item{padding:7px 5px;gap:4px}
+ .notes-folder-name,.notes-item-title{font-size:9px}
+ .notes-folder-count{font-size:8px}
+ .notes-editor{padding:10px;gap:8px}
+ .notes-editor-top{align-items:flex-start;flex-direction:column}
+ .notes-title-input{height:38px;font-size:13px}
+ .notes-textarea{padding:9px;font-size:12px}
+ .notes-editor-footer .notes-btn{min-width:0}
 }
 @media(max-width:430px){
  .app{width:100%}
@@ -132,64 +264,74 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  .dice-box{width:56px;height:56px}
  .stream-die{width:34px;height:34px}
 }
-@media(prefers-reduced-motion:reduce){.dice-box.rolling,.coin.flipping{animation:none}}
+@media(prefers-reduced-motion:reduce){
+ .dice-box.rolling,.coin.flipping{animation:none}
+ .notes-launcher{transition:none}
+}
 </style>
 </head>
 <body>
 <div class="app">
 <div class="panel">
- <div class="top">
-  <h1 class="title">ONLINE DICE</h1>
-  <div class="subtitle">COLOR RANDOMIZER ENGINE</div>
+
+<div class="top">
+ <h1 class="title">ONLINE DICE</h1>
+ <div class="subtitle">COLOR RANDOMIZER ENGINE</div>
+</div>
+<div class="top-info">
+ <div class="info-box active">SYSTEM ONLINE</div>
+ <div class="info-box">SESSION ACTIVE</div>
+ <div class="info-box">ENGINE READY</div>
+</div>
+<div class="details">
+ <div class="detail">6 COLORS</div><div class="detail">4 CHAMBERS</div>
+ <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
+ <div class="detail">ACTIVE ENGINE</div>
+</div>
+
+<div class="dice-section">
+ <div class="section-label">FOUR COLOR OUTPUTS</div>
+ <div class="dice-row">
+  <div class="dice-box"><div class="dice-dot"></div></div>
+  <div class="dice-box"><div class="dice-dot"></div></div>
+  <div class="dice-box"><div class="dice-dot"></div></div>
+  <div class="dice-box"><div class="dice-dot"></div></div>
  </div>
- <div class="top-info">
-  <div class="info-box active">SYSTEM ONLINE</div>
-  <div class="info-box">SESSION ACTIVE</div>
-  <div class="info-box">ENGINE READY</div>
+ <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
+ <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
+</div>
+
+<div class="reroll-area">
+ <button class="action-btn reroll" id="reroll">↻ REROLL</button>
+ <button class="action-btn slow-reveal" id="slowReveal">◷ SLOW REVEAL</button>
+</div>
+
+<div class="stats">
+ <div class="stat"><div class="stat-label">TOTAL ROLLS</div><div class="stat-value" id="totalRolls">0</div></div>
+ <div class="stat"><div class="stat-label">SYSTEM</div><div class="stat-value" id="systemStatus">ONLINE</div></div>
+</div>
+
+<div class="counter-section">
+ <div class="counter-heading">WIN / LOSS COUNTER</div>
+ <div class="counter-total" id="counterTotal">0</div>
+ <div class="counter-status" id="counterStatus">NO POINTS YET</div>
+ <div class="counter-buttons">
+  <button class="counter-btn plus" data-change="1">+1</button>
+  <button class="counter-btn plus" data-change="10">+10</button>
+  <button class="counter-btn minus" data-change="-1">−1</button>
+  <button class="counter-btn minus" data-change="-10">−10</button>
  </div>
- <div class="details">
-  <div class="detail">6 COLORS</div><div class="detail">4 CHAMBERS</div>
-  <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
-  <div class="detail">ACTIVE ENGINE</div>
- </div>
- <div class="dice-section">
-  <div class="section-label">FOUR COLOR OUTPUTS</div>
-  <div class="dice-row">
-   <div class="dice-box"><div class="dice-dot"></div></div>
-   <div class="dice-box"><div class="dice-dot"></div></div>
-   <div class="dice-box"><div class="dice-dot"></div></div>
-   <div class="dice-box"><div class="dice-dot"></div></div>
-  </div>
-  <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
-  <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
- </div>
- <div class="reroll-area">
-  <button class="action-btn reroll" id="reroll">↻ REROLL</button>
-  <button class="action-btn slow-reveal" id="slowReveal">◷ SLOW REVEAL</button>
- </div>
- <div class="stats">
-  <div class="stat"><div class="stat-label">TOTAL ROLLS</div><div class="stat-value" id="totalRolls">0</div></div>
-  <div class="stat"><div class="stat-label">SYSTEM</div><div class="stat-value" id="systemStatus">ONLINE</div></div>
- </div>
- <div class="counter-section">
-  <div class="counter-heading">WIN / LOSS COUNTER</div>
-  <div class="counter-total" id="counterTotal">0</div>
-  <div class="counter-status" id="counterStatus">NO POINTS YET</div>
-  <div class="counter-buttons">
-   <button class="counter-btn plus" data-change="1">+1</button>
-   <button class="counter-btn plus" data-change="10">+10</button>
-   <button class="counter-btn minus" data-change="-1">−1</button>
-   <button class="counter-btn minus" data-change="-10">−10</button>
-  </div>
-  <button class="counter-reset" id="counterReset">RESET COUNTER</button>
- </div>
- <div class="history-section">
-  <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
-  <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
- </div>
- <div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
+ <button class="counter-reset" id="counterReset">RESET COUNTER</button>
+</div>
+
+<div class="history-section">
+ <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
+ <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
+</div>
+<div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
 </div>
 </div>
+
 <div class="coin-panel" id="coinPanel">
  <div class="coin-heading">🪙 LIVE COIN FLIP</div>
  <div class="coin-stage"><div class="coin" id="coin">FLIP</div></div>
@@ -197,6 +339,7 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
  <button class="coin-button" id="flipCoin">↻ FLIP COIN</button>
  <div class="coin-history" id="coinHistory">FLIPS: 0</div>
 </div>
+
 <div class="live-widget" id="liveWidget">
  <div class="live-top" id="liveDragHandle">
   <div class="live-brand"><span class="live-badge">LIVE</span>Online Dice</div>
@@ -217,12 +360,6 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
    </div>
    <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
   </div>
-  <div class="color-picker-row" id="nextColorDots" aria-label="Next roll color preview">
-   <span class="next-color-dot"></span>
-   <span class="next-color-dot"></span>
-   <span class="next-color-dot"></span>
-   <span class="next-color-dot"></span>
-  </div>
   <div class="live-metrics">
    <div class="live-metric"><strong id="liveViewerMetric">128</strong><small>WATCHING</small></div>
    <div class="live-metric"><strong id="likeCount">2.4K</strong><small>LIKES ♥</small></div>
@@ -230,19 +367,59 @@ body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:whit
   <div class="chat-log" id="chatLog" aria-live="polite"></div>
   <div class="chat-controls">
    <button id="spamButton" class="spam-btn">▶ BOT CHAT</button>
-   <button id="likeButton">♥ LIKE</button>
+   <button id="likeButton" class="like-btn">♥ LIKE</button>
   </div>
   <div class="chat-note">Simulated live • Messages and viewers are not real users</div>
  </div>
 </div>
+
+<!-- NOTES LAUNCHER -->
+<button class="notes-launcher" id="notesLauncher" aria-label="Open Notes Manager">
+ <span class="notes-launcher-icon">📝</span>
+ <span class="notes-launcher-label">MY NOTES</span>
+</button>
+
+<!-- NOTES WINDOW -->
+<div class="notes-overlay" id="notesOverlay" hidden>
+ <section class="notes-window" role="dialog" aria-modal="true" aria-labelledby="notesHeading">
+  <header class="notes-header">
+   <button class="notes-close" id="notesClose" aria-label="Close notes">×</button>
+   <div class="notes-heading">
+    <h2 id="notesHeading">NOTES MANAGER</h2>
+    <p>PRIVATE WORKSPACE · LOCAL STORAGE</p>
+   </div>
+   <span class="notes-save-state" id="notesSaveState">SAVED</span>
+  </header>
+
+  <div class="notes-body">
+   <aside class="notes-sidebar">
+    <div class="notes-side-label">YOUR FOLDERS</div>
+    <div class="notes-toolbar">
+     <button class="notes-btn primary" id="notesNewFolder">＋ Folder</button>
+     <button class="notes-btn" id="notesNewNote">＋ Note</button>
+    </div>
+    <div class="notes-folder-list" id="notesFolderList"></div>
+    <div class="notes-side-label">NOTES IN FOLDER</div>
+    <div class="notes-list" id="notesList"></div>
+   </aside>
+   <main class="notes-editor" id="notesEditor">
+    <div class="notes-empty">
+     <div class="notes-empty-icon">📝</div>
+     <strong>Your workspace</strong>
+     Choose a note or create a new one.
+     <button class="notes-btn primary" id="notesEmptyCreate">＋ Create a note</button>
+    </div>
+   </main>
+  </div>
+  <footer class="notes-footer">NOTES ARE SAVED IN THIS BROWSER · AVOID CLEARING SITE DATA</footer>
+ </section>
+</div>
+
 <script>
 const colors=[
- {name:"GREEN",hex:"#22c55e"},
- {name:"BLUE",hex:"#3b82f6"},
- {name:"RED",hex:"#ef4444"},
- {name:"YELLOW",hex:"#fde047"},
- {name:"ORANGE",hex:"#f97316"},
- {name:"PURPLE",hex:"#a855f7"}
+ {name:"GREEN",hex:"#22c55e"},{name:"BLUE",hex:"#3b82f6"},
+ {name:"YELLOW",hex:"#fde047"},{name:"ORANGE",hex:"#f97316"},
+ {name:"PURPLE",hex:"#a855f7"},{name:"RED",hex:"#ef4444"}
 ];
 const dice=[...document.querySelectorAll(".dice-box")];
 const streamDice=[...document.querySelectorAll(".stream-die")];
@@ -252,160 +429,78 @@ const historyEl=document.getElementById("history");
 const readyStatus=document.getElementById("readyStatus");
 const systemStatus=document.getElementById("systemStatus");
 const chatLog=document.getElementById("chatLog");
-const predictionDots=[...document.querySelectorAll(".next-color-dot")];
-let pendingResults=[];
+
 let totalRolls=0,busy=false,netPoints=0,spamTimer=null;
 let likes=2400,viewers=128,liveMessageQueue=Promise.resolve();
 let coinFlips=0,coinBusy=false;
-function wait(ms){
- return new Promise(resolve=>setTimeout(resolve,ms));
+
+function randomColor(){return colors[Math.floor(Math.random()*colors.length)]}
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function setBusy(value,message){
+ busy=value;rerollBtn.disabled=slowBtn.disabled=value;
+ readyStatus.textContent=message||(value?"ROLLING":"READY");
+ systemStatus.textContent=value?"WORKING":"ONLINE";
 }
 function randomName(){
  const names=["PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube","ShadowBot","ColorWave","MiaLive","AlexPlays","Starry","TurboTom"];
  return names[Math.floor(Math.random()*names.length)];
 }
-/* Generate four random colors.
-   Adjacent dots won't have the same color. */
-function makeRollResults(){
- const results=[];
- for(let i=0;i<4;i++){
-  let color;
-  do{
-   color=colors[Math.floor(Math.random()*colors.length)];
-  }while(
-   results.length>0 &&
-   color.name===results[results.length-1].name
-  );
-  results.push(color);
- }
- return results;
-}
-/* Update the four prediction dots in the LIVE panel */
-function updatePredictionDots(){
- predictionDots.forEach((dot,i)=>{
-  dot.style.backgroundColor=pendingResults[i].hex;
-  dot.title=pendingResults[i].name;
-  dot.classList.remove("changed");
-  void dot.offsetWidth;
-  dot.classList.add("changed");
- });
-}
-/* Generate a new prediction */
-function refreshPrediction(){
- pendingResults=makeRollResults();
- updatePredictionDots();
-}
-/* Press N to change the next prediction */
-document.addEventListener("keydown",event=>{
- if(event.repeat||event.ctrlKey||event.metaKey||event.altKey)return;
- const tag=event.target.tagName;
- if(tag==="INPUT"||tag==="TEXTAREA"||event.target.isContentEditable)return;
- if(event.key.toLowerCase()==="n"){
-  event.preventDefault();
-  refreshPrediction();
-  addLiveMessage("System","🎨 Next prediction changed!");
- }
-});
 function addLiveMessage(name,text){
- const msg=document.createElement("div");
- msg.className="chat-message";
- const user=document.createElement("span");
- user.className="username";
- user.textContent=name;
- const body=document.createElement("span");
- body.className="body";
- body.textContent=" "+text;
- msg.append(user,body);
- chatLog.appendChild(msg);
- while(chatLog.children.length>45){
-  chatLog.firstElementChild.remove();
- }
+ const msg=document.createElement("div");msg.className="chat-message";
+ const user=document.createElement("span");user.className="username";user.textContent=name;
+ const body=document.createElement("span");body.className="body";body.textContent=" "+text;
+ msg.append(user,body);chatLog.appendChild(msg);
+ while(chatLog.children.length>45)chatLog.firstElementChild.remove();
  chatLog.scrollTop=chatLog.scrollHeight;
 }
-function setBusy(value,message){
- busy=value;
- rerollBtn.disabled=slowBtn.disabled=value;
- readyStatus.textContent=message||(value?"ROLLING":"READY");
- systemStatus.textContent=value?"WORKING":"ONLINE";
-}
-/* Simulated live stream updates after two seconds */
 function queueLiveRoll(results,rollNumber){
  const snapshot=results.map(c=>({...c}));
  liveMessageQueue=liveMessageQueue.then(async()=>{
   await wait(2000);
-  streamDice.forEach((die,i)=>{
-   die.style.background=snapshot[i].hex;
-  });
-  document.getElementById("streamLabel").textContent=
-   "ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
+  streamDice.forEach((die,i)=>die.style.background=snapshot[i].hex);
+  document.getElementById("streamLabel").textContent="ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
   addLiveMessage("System","🎲 New roll appeared on stream!");
+  if(Math.random()<.75){
+   const c=snapshot[Math.floor(Math.random()*snapshot.length)];
+   const comments=["Did anyone see that roll? 👀","What color is coming next?","That combo looks good!","I'm picking "+c.name+" next","The colors are looking crazy 🔥"];
+   addLiveMessage(randomName(),comments[Math.floor(Math.random()*comments.length)]);
+  }
  });
 }
 function addHistory(results){
- const empty=document.getElementById("historyEmpty");
- if(empty)empty.remove();
- const row=document.createElement("div");
- row.className="history-row";
- const num=document.createElement("div");
- num.className="history-number";
- num.textContent="#"+totalRolls;
- const squares=document.createElement("div");
- squares.className="history-colors";
- results.forEach(c=>{
-  const s=document.createElement("div");
-  s.className="history-color";
-  s.style.background=c.hex;
-  s.title=c.name;
-  squares.appendChild(s);
- });
- const status=document.createElement("div");
- status.className="history-status";
- status.textContent="COMPLETE";
- row.append(num,squares,status);
- historyEl.prepend(row);
- while(historyEl.children.length>51){
-  historyEl.lastElementChild.remove();
- }
+ const empty=document.getElementById("historyEmpty");if(empty)empty.remove();
+ const row=document.createElement("div");row.className="history-row";
+ const num=document.createElement("div");num.className="history-number";num.textContent="#"+totalRolls;
+ const squares=document.createElement("div");squares.className="history-colors";
+ results.forEach(c=>{const s=document.createElement("div");s.className="history-color";s.style.background=c.hex;s.title=c.name;squares.appendChild(s)});
+ const status=document.createElement("div");status.className="history-status";status.textContent="COMPLETE";
+ row.append(num,squares,status);historyEl.prepend(row);
+ while(historyEl.children.length>51)historyEl.lastElementChild.remove();
 }
 function finish(results){
- totalRolls++;
- document.getElementById("totalRolls").textContent=totalRolls;
- addHistory(results);
- queueLiveRoll(results,totalRolls);
- /* Automatically generate the following prediction */
- refreshPrediction();
- setBusy(false);
+ totalRolls++;document.getElementById("totalRolls").textContent=totalRolls;
+ addHistory(results);queueLiveRoll(results,totalRolls);setBusy(false);
 }
 async function roll(slow){
  if(busy)return;
  setBusy(true,slow?"REVEALING":"ROLLING");
- /* Use exactly the colors currently shown by the prediction dots */
- const results=pendingResults.map(c=>({...c}));
- dice.forEach(d=>{
-  d.classList.remove("rolling");
-  d.style.background="#fff";
- });
+ const results=dice.map(()=>randomColor());
+ dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
  if(!slow){
-  dice.forEach(d=>d.classList.add("rolling"));
-  await wait(350);
-  dice.forEach((d,i)=>{
-   d.classList.remove("rolling");
-   d.style.background=results[i].hex;
-  });
+  dice.forEach(d=>d.classList.add("rolling"));await wait(350);
+  dice.forEach((d,i)=>{d.classList.remove("rolling");d.style.background=results[i].hex});
  }else{
   for(let i=0;i<dice.length;i++){
    readyStatus.textContent=`REVEAL ${i+1}/4`;
-   dice[i].classList.add("rolling");
-   await wait(350);
-   dice[i].classList.remove("rolling");
-   dice[i].style.background=results[i].hex;
-   await wait(300);
+   dice[i].classList.add("rolling");await wait(350);
+   dice[i].classList.remove("rolling");dice[i].style.background=results[i].hex;await wait(300);
   }
  }
  finish(results);
 }
 rerollBtn.addEventListener("click",()=>roll(false));
 slowBtn.addEventListener("click",()=>roll(true));
+
 /* Coin flip */
 const coin=document.getElementById("coin");
 const coinResult=document.getElementById("coinResult");
@@ -413,52 +508,30 @@ const flipCoinBtn=document.getElementById("flipCoin");
 const coinHistory=document.getElementById("coinHistory");
 flipCoinBtn.addEventListener("click",async()=>{
  if(coinBusy)return;
- coinBusy=true;
- flipCoinBtn.disabled=true;
- coin.classList.remove("flipping");
- void coin.offsetWidth;
- coin.classList.add("flipping");
- coinResult.textContent="FLIPPING...";
- coin.textContent="🪙";
+ coinBusy=true;flipCoinBtn.disabled=true;
+ coin.classList.remove("flipping");void coin.offsetWidth;coin.classList.add("flipping");
+ coinResult.textContent="FLIPPING...";coin.textContent="🪙";
  await wait(850);
  const result=Math.random()<.5?"HEADS":"TAILS";
- coin.textContent=result==="HEADS"?"H":"T";
- coinResult.textContent=result;
- coinFlips++;
- coinHistory.textContent="FLIPS: "+coinFlips+" • LAST: "+result;
- coin.classList.remove("flipping");
- flipCoinBtn.disabled=false;
- coinBusy=false;
+ coin.textContent=result==="HEADS"?"H":"T";coinResult.textContent=result;
+ coinFlips++;coinHistory.textContent="FLIPS: "+coinFlips+" • LAST: "+result;
+ coin.classList.remove("flipping");flipCoinBtn.disabled=false;coinBusy=false;
  addLiveMessage("System","🪙 Coin flip result: "+result+"!");
 });
-/* Win/loss counter */
+
+/* Counter */
 const counterTotal=document.getElementById("counterTotal");
 const counterStatus=document.getElementById("counterStatus");
 function updateCounter(){
  counterTotal.textContent=netPoints>0?"+"+netPoints:String(netPoints);
- if(netPoints>0){
-  counterStatus.textContent="WON "+netPoints+" POINTS";
-  counterTotal.style.color=counterStatus.style.color="#86efac";
- }else if(netPoints<0){
-  counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";
-  counterTotal.style.color=counterStatus.style.color="#fca5a5";
- }else{
-  counterStatus.textContent="NO POINTS YET";
-  counterTotal.style.color="#fff";
-  counterStatus.style.color="#8aa8d0";
- }
+ if(netPoints>0){counterStatus.textContent="WON "+netPoints+" POINTS";counterTotal.style.color=counterStatus.style.color="#86efac"}
+ else if(netPoints<0){counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";counterTotal.style.color=counterStatus.style.color="#fca5a5"}
+ else{counterStatus.textContent="NO POINTS YET";counterTotal.style.color="#fff";counterStatus.style.color="#8aa8d0"}
 }
-document.querySelectorAll(".counter-btn").forEach(b=>{
- b.addEventListener("click",()=>{
-  netPoints+=Number(b.dataset.change);
-  updateCounter();
- });
-});
-document.getElementById("counterReset").addEventListener("click",()=>{
- netPoints=0;
- updateCounter();
-});
-/* Simulated bot chat */
+document.querySelectorAll(".counter-btn").forEach(b=>b.addEventListener("click",()=>{netPoints+=Number(b.dataset.change);updateCounter()}));
+document.getElementById("counterReset").addEventListener("click",()=>{netPoints=0;updateCounter()});
+
+/* Simulated chat */
 const reactions=[
  "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
  "Need {COLOR} to win 😭","{COLOR} looks lucky","Anyone else picked {COLOR}?",
@@ -468,8 +541,7 @@ const reactions=[
  "I missed the last one 😭","W roll 🔥","let's gooooo","this live is fun"
 ];
 function botMessage(){
- const c=colors[Math.floor(Math.random()*colors.length)];
- const template=reactions[Math.floor(Math.random()*reactions.length)];
+ const c=randomColor(),template=reactions[Math.floor(Math.random()*reactions.length)];
  addLiveMessage(randomName(),template.replaceAll("{COLOR}",c.name));
  viewers=Math.max(84,Math.min(420,viewers+Math.floor(Math.random()*7)-3));
  document.getElementById("viewerCount").textContent=viewers;
@@ -477,39 +549,27 @@ function botMessage(){
 }
 document.getElementById("spamButton").addEventListener("click",()=>{
  const btn=document.getElementById("spamButton");
- if(spamTimer!==null){
-  clearTimeout(spamTimer);
-  spamTimer=null;
-  btn.textContent="▶ BOT CHAT";
-  btn.classList.remove("active");
- }else{
-  btn.textContent="■ STOP CHAT";
-  btn.classList.add("active");
-  const runBot=()=>{
-   botMessage();
-   if(spamTimer!==null){
-    spamTimer=setTimeout(runBot,1100+Math.random()*2100);
-   }
-  };
+ if(spamTimer!==null){clearTimeout(spamTimer);spamTimer=null;btn.textContent="▶ BOT CHAT";btn.classList.remove("active")}
+ else{
+  btn.textContent="■ STOP CHAT";btn.classList.add("active");
+  const runBot=()=>{botMessage();if(spamTimer!==null)spamTimer=setTimeout(runBot,1100+Math.random()*2100)};
   spamTimer=setTimeout(runBot,700);
  }
 });
 document.getElementById("likeButton").addEventListener("click",()=>{
- likes++;
- document.getElementById("likeCount").textContent=
-  likes>=1000?(likes/1000).toFixed(1)+"K":likes;
+ likes++;document.getElementById("likeCount").textContent=likes>=1000?(likes/1000).toFixed(1)+"K":likes;
 });
-/* Minimize LIVE */
+
+/* Minimize LIVE without hiding coin panel */
 document.getElementById("chatMin").addEventListener("click",()=>{
  const w=document.getElementById("liveWidget");
  w.classList.toggle("collapsed");
- document.getElementById("chatMin").textContent=
-  w.classList.contains("collapsed")?"+":"−";
+ document.getElementById("chatMin").textContent=w.classList.contains("collapsed")?"+":"−";
 });
-/* Drag panels with mouse or touch */
+
+/* Dragging works with mouse and touch */
 function makeDraggable(panel,handle){
- let dragging=false,pointerId=null;
- let startX=0,startY=0,startLeft=0,startTop=0;
+ let dragging=false,pointerId=null,startX=0,startY=0,startLeft=0,startTop=0;
  handle.addEventListener("pointerdown",event=>{
   if(event.target.closest("button"))return;
   if(event.button!==undefined&&event.button!==0)return;
@@ -518,65 +578,287 @@ function makeDraggable(panel,handle){
   panel.style.top=rect.top+"px";
   panel.style.right="auto";
   panel.style.bottom="auto";
-  dragging=true;
-  pointerId=event.pointerId;
-  startX=event.clientX;
-  startY=event.clientY;
-  startLeft=rect.left;
-  startTop=rect.top;
+  dragging=true;pointerId=event.pointerId;
+  startX=event.clientX;startY=event.clientY;
+  startLeft=rect.left;startTop=rect.top;
   handle.classList.add("dragging");
-  try{
-   handle.setPointerCapture(event.pointerId);
-  }catch(_){}
+  try{handle.setPointerCapture(event.pointerId)}catch(_){}
   event.preventDefault();
  });
  handle.addEventListener("pointermove",event=>{
   if(!dragging||event.pointerId!==pointerId)return;
   const maxLeft=Math.max(0,window.innerWidth-panel.offsetWidth);
   const maxTop=Math.max(0,window.innerHeight-panel.offsetHeight);
-  panel.style.left=Math.max(0,Math.min(maxLeft,startLeft+event.clientX-startX))+"px";
-  panel.style.top=Math.max(0,Math.min(maxTop,startTop+event.clientY-startY))+"px";
+  const left=Math.max(0,Math.min(maxLeft,startLeft+event.clientX-startX));
+  const top=Math.max(0,Math.min(maxTop,startTop+event.clientY-startY));
+  panel.style.left=left+"px";
+  panel.style.top=top+"px";
  });
  function stop(event){
   if(!dragging)return;
   if(event&&event.pointerId!==undefined&&event.pointerId!==pointerId)return;
-  dragging=false;
-  pointerId=null;
-  handle.classList.remove("dragging");
+  dragging=false;pointerId=null;handle.classList.remove("dragging");
  }
  handle.addEventListener("pointerup",stop);
  handle.addEventListener("pointercancel",stop);
- handle.addEventListener("lostpointercapture",()=>{
-  dragging=false;
-  pointerId=null;
-  handle.classList.remove("dragging");
+ handle.addEventListener("lostpointercapture",()=>{dragging=false;pointerId=null;handle.classList.remove("dragging")});
+ window.addEventListener("resize",()=>{
+  if(dragging)return;
+  const rect=panel.getBoundingClientRect();
+  panel.style.left=Math.max(0,Math.min(window.innerWidth-panel.offsetWidth,rect.left))+"px";
+  panel.style.top=Math.max(0,Math.min(window.innerHeight-panel.offsetHeight,rect.top))+"px";
+  panel.style.right="auto";panel.style.bottom="auto";
  });
 }
-makeDraggable(
- document.getElementById("liveWidget"),
- document.getElementById("liveDragHandle")
-);
-makeDraggable(
- document.getElementById("coinPanel"),
- document.getElementById("coinPanel")
-);
-/* Initialize */
+makeDraggable(document.getElementById("liveWidget"),document.getElementById("liveDragHandle"));
+makeDraggable(document.getElementById("coinPanel"),document.getElementById("coinPanel"));
+
+/* NOTES MANAGER */
+(()=>{
+ const $=id=>document.getElementById(id);
+ const overlay=$("notesOverlay");
+ const launcher=$("notesLauncher");
+ const closeBtn=$("notesClose");
+ const folderList=$("notesFolderList");
+ const notesList=$("notesList");
+ const editor=$("notesEditor");
+ const saveState=$("notesSaveState");
+ const STORAGE_KEY="onlineDiceNotes_v1";
+
+ let folders=[],notes=[],activeFolder=null,activeNote=null,saveTimer=null;
+
+ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+
+ function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,char=>({
+   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+ }
+ function setSaveState(message,color){
+  saveState.textContent=message;
+  saveState.style.color=color||"#86efac";
+ }
+ function persist(){
+  try{
+   localStorage.setItem(STORAGE_KEY,JSON.stringify({
+    version:1,folders,notes,activeFolder,activeNote
+   }));
+   setSaveState("SAVED","#86efac");
+   return true;
+  }catch(error){
+   setSaveState("SAVE FAILED","#fca5a5");
+   return false;
+  }
+ }
+ function scheduleSave(){
+  setSaveState("SAVING...","#fde68a");
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+   saveTimer=null;
+   persist();
+   renderLists();
+  },180);
+ }
+ function flushSave(){
+  if(saveTimer!==null){
+   clearTimeout(saveTimer);
+   saveTimer=null;
+  }
+  persist();
+ }
+ function loadData(){
+  try{
+   const raw=localStorage.getItem(STORAGE_KEY);
+   if(!raw)return false;
+   const data=JSON.parse(raw);
+   if(!data||!Array.isArray(data.folders)||!Array.isArray(data.notes))return false;
+   folders=data.folders.filter(f=>f&&typeof f.id==="string"&&typeof f.name==="string");
+   notes=data.notes.filter(n=>n&&typeof n.id==="string"&&typeof n.folderId==="string"&&typeof n.title==="string"&&typeof n.content==="string");
+   activeFolder=data.activeFolder;
+   activeNote=data.activeNote;
+   return true;
+  }catch(error){return false}
+ }
+ function ensureFolder(){
+  if(!folders.length){
+   const id=uid();
+   folders.push({id,name:"My Notes",created:Date.now()});
+   activeFolder=id;
+  }
+  if(!folders.some(f=>f.id===activeFolder))activeFolder=folders[0].id;
+  notes=notes.filter(n=>folders.some(f=>f.id===n.folderId));
+ }
+ function folderName(id){
+  const folder=folders.find(f=>f.id===id);
+  return folder?folder.name:"Unknown folder";
+ }
+ function currentNote(){
+  return notes.find(n=>n.id===activeNote&&n.folderId===activeFolder)||null;
+ }
+ function renderLists(){
+  folderList.innerHTML="";
+  folders.forEach(folder=>{
+   const count=notes.filter(n=>n.folderId===folder.id).length;
+   const button=document.createElement("button");
+   button.className="notes-folder-item"+(folder.id===activeFolder?" active":"");
+   button.innerHTML='<span>📁</span><span class="notes-folder-name">'+escapeHTML(folder.name)+'</span><span class="notes-folder-count">'+count+'</span>';
+   button.addEventListener("click",()=>{
+    flushSave();
+    activeFolder=folder.id;
+    activeNote=null;
+    persist();
+    renderLists();
+    renderEditor();
+   });
+   folderList.appendChild(button);
+  });
+
+  notesList.innerHTML="";
+  const folderNotes=notes.filter(n=>n.folderId===activeFolder).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  if(!folderNotes.length){
+   const empty=document.createElement("div");
+   empty.className="notes-empty";
+   empty.style.fontSize="9px";
+   empty.textContent="No notes here yet.";
+   notesList.appendChild(empty);
+   return;
+  }
+  folderNotes.forEach(note=>{
+   const button=document.createElement("button");
+   button.className="notes-item"+(note.id===activeNote?" active":"");
+   const preview=note.content.replace(/\s+/g," ").trim();
+   button.innerHTML='<span>📄</span><span class="notes-item-info"><span class="notes-item-title">'+escapeHTML(note.title||"Untitled note")+'</span><span class="notes-item-preview">'+escapeHTML(preview||"Empty note")+'</span></span>';
+   button.addEventListener("click",()=>{
+    flushSave();
+    activeNote=note.id;
+    persist();
+    renderLists();
+    renderEditor();
+   });
+   notesList.appendChild(button);
+  });
+ }
+ function renderEditor(){
+  const note=currentNote();
+  if(!note){
+   editor.innerHTML='<div class="notes-empty"><div class="notes-empty-icon">✦</div><strong>Nothing selected</strong>Create a note and write anything you want.<button class="notes-btn primary" id="notesEditorCreate">＋ New note</button></div>';
+   $("notesEditorCreate").addEventListener("click",createNote);
+   return;
+  }
+
+  editor.innerHTML=
+   '<div class="notes-editor-top"><div class="notes-breadcrumb">📁 '+escapeHTML(folderName(activeFolder))+' / EDITING NOTE</div>'+
+   '<div class="notes-editor-actions"><button class="notes-btn danger" id="notesDelete">Delete</button></div></div>'+
+   '<input class="notes-title-input" id="notesTitle" maxlength="120" placeholder="Name your note..." aria-label="Note title">'+
+   '<textarea class="notes-textarea" id="notesContent" placeholder="Start writing your note here..." aria-label="Note content" spellcheck="true"></textarea>'+
+   '<div class="notes-editor-footer"><span id="notesWordCount">0 characters</span><button class="notes-btn primary" id="notesSaveNow">✓ Save note</button></div>';
+
+  const titleInput=$("notesTitle");
+  const contentInput=$("notesContent");
+  titleInput.value=note.title;
+  contentInput.value=note.content;
+
+  function updateNote(){
+   const selected=currentNote();
+   if(!selected)return;
+   selected.title=titleInput.value;
+   selected.content=contentInput.value;
+   selected.updated=Date.now();
+   $("notesWordCount").textContent=selected.content.length.toLocaleString()+" characters";
+   scheduleSave();
+  }
+  $("notesWordCount").textContent=note.content.length.toLocaleString()+" characters";
+  titleInput.addEventListener("input",updateNote);
+  contentInput.addEventListener("input",updateNote);
+
+  $("notesSaveNow").addEventListener("click",()=>{
+   flushSave();
+   renderLists();
+   setSaveState("SAVED","#86efac");
+  });
+
+  $("notesDelete").addEventListener("click",()=>{
+   const confirmBox=document.createElement("div");
+   confirmBox.className="notes-confirm";
+   confirmBox.innerHTML='<strong>Delete this note?</strong><p>This note will be permanently removed from this browser.</p><div class="notes-confirm-actions"><button class="notes-btn" id="notesCancelConfirm">Cancel</button><button class="notes-btn danger" id="notesAcceptConfirm">Delete</button></div>';
+   editor.replaceChildren(confirmBox);
+   $("notesCancelConfirm").addEventListener("click",renderEditor);
+   $("notesAcceptConfirm").addEventListener("click",()=>{
+    flushSave();
+    notes=notes.filter(n=>n.id!==note.id);
+    activeNote=null;
+    persist();
+    renderLists();
+    renderEditor();
+   });
+  });
+ }
+ function createNote(){
+  flushSave();
+  const note={id:uid(),folderId:activeFolder,title:"",content:"",created:Date.now(),updated:Date.now()};
+  notes.unshift(note);
+  activeNote=note.id;
+  persist();
+  renderLists();
+  renderEditor();
+  $("notesTitle").focus();
+ }
+ function createFolder(){
+  flushSave();
+  const name=prompt("Enter a name for your new folder:");
+  if(name===null)return;
+  const cleanName=name.trim();
+  if(!cleanName){alert("Please enter a folder name.");return}
+  if(cleanName.length>60){alert("Folder names must be 60 characters or less.");return}
+  const folder={id:uid(),name:cleanName,created:Date.now()};
+  folders.push(folder);
+  activeFolder=folder.id;
+  activeNote=null;
+  persist();
+  renderLists();
+  renderEditor();
+ }
+ function openNotes(){
+  overlay.hidden=false;
+  document.body.style.overflow="hidden";
+  renderLists();
+  renderEditor();
+ }
+ function closeNotes(){
+  flushSave();
+  overlay.hidden=true;
+  document.body.style.overflow="";
+  launcher.focus({preventScroll:true});
+ }
+
+ launcher.addEventListener("click",openNotes);
+ closeBtn.addEventListener("click",closeNotes);
+ $("notesNewFolder").addEventListener("click",createFolder);
+ $("notesNewNote").addEventListener("click",createNote);
+ $("notesEmptyCreate").addEventListener("click",createNote);
+ overlay.addEventListener("click",event=>{
+  if(event.target===overlay)closeNotes();
+ });
+ document.addEventListener("keydown",event=>{
+  if(!overlay.hidden&&event.key==="Escape")closeNotes();
+ });
+ window.addEventListener("pagehide",flushSave);
+
+ loadData();
+ ensureFolder();
+ if(!activeNote||!notes.some(n=>n.id===activeNote&&n.folderId===activeFolder))activeNote=null;
+ persist();
+ renderLists();
+ renderEditor();
+})();
+
+/* Start */
 updateCounter();
-refreshPrediction();
-dice.forEach((d,i)=>{
- d.style.background=pendingResults[i].hex;
-});
-streamDice.forEach((d,i)=>{
- d.style.background=pendingResults[i].hex;
-});
+dice.forEach(d=>d.style.background=randomColor().hex);
 addLiveMessage("System","Welcome to the live! 🎲");
 addLiveMessage(randomName(),"What color are you picking? 👀");
 addLiveMessage(randomName(),"I'm going with PURPLE 💜");
-setInterval(()=>{
- if(Math.random()<.65&&!document.hidden){
-  botMessage();
- }
-},5000);
+setInterval(()=>{if(Math.random()<.65&&!document.hidden)botMessage()},5000);
 </script>
 </body>
 </html>
