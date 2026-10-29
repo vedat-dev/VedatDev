@@ -4,371 +4,528 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Windows 98 Desktop</title>
+<title>Retro Pixel Desktop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
+:root{--gray:#c0c0c0;--blue:#000080;--teal:#008080}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--gray:#c0c0c0;--blue:#000080;--white:#fff;--dark:#404040}
-body{margin:0;background:#008080;font-family:Tahoma,Arial,sans-serif;font-size:12px;color:#000;overflow:hidden;user-select:none}
-button,input{font:inherit}
-button{cursor:pointer;color:#000;background:var(--gray);border:2px solid;border-color:#fff #555 #555 #fff;border-radius:0;padding:5px 10px}
-button:active{border-color:#555 #fff #fff #555;padding-top:6px;padding-bottom:4px}
-button:focus-visible{outline:1px dotted #000;outline-offset:-5px}
-.desktop{position:fixed;inset:0 0 30px 0;background:#008080;padding:10px;overflow:auto}
-.icons{display:grid;grid-template-columns:74px;grid-auto-rows:85px;gap:4px;width:80px}
-.deskicon{color:white;text-shadow:1px 1px #000;text-align:center;cursor:pointer;padding:5px 2px;border:1px solid transparent}
-.deskicon:active{background:#00008088;border:1px dotted white}
-.deskicon .emoji{font-size:31px;display:block;margin-bottom:5px}
-.deskicon span:last-child{line-height:16px}
-.window{position:absolute;background:var(--gray);border:2px solid;border-color:#fff #555 #555 #fff;box-shadow:2px 2px 0 #222;min-width:280px}
-.window.hidden{display:none}
-.titlebar{height:25px;background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:2px 3px 2px 7px;font-weight:bold;touch-action:none}
-.titlebar .x{font-weight:bold;width:22px;height:20px;padding:0;line-height:14px}
-.winbody{padding:9px}
-.menubar{display:flex;gap:18px;padding:5px 8px;border-bottom:1px solid #888}
-.inset{border:2px solid;border-color:#777 #fff #fff #777}
-.outset{border:2px solid;border-color:#fff #555 #555 #fff}
-.taskbar{position:fixed;bottom:0;left:0;right:0;height:30px;background:var(--gray);border-top:2px solid white;display:flex;align-items:center;gap:5px;padding:3px;z-index:9999}
-.start{font-weight:bold;height:24px;padding:2px 8px}
-.taskbtn{height:23px;min-width:95px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.task-spacer{flex:1}
-.clock{border:2px inset white;padding:4px 7px;min-width:75px;text-align:center}
-.desktop-note{position:absolute;bottom:13px;left:100px;color:white;text-shadow:1px 1px #000}
-.menu{position:fixed;bottom:29px;left:3px;width:210px;background:var(--gray);border:2px solid;border-color:white #555 #555 white;z-index:10000;box-shadow:2px 2px #222}
-.menu.hidden{display:none}
-.menu-head{background:var(--blue);color:white;padding:15px 8px;font-size:20px;font-weight:bold}
-.menu-item{padding:11px;cursor:pointer;display:flex;gap:10px;align-items:center}
-.menu-item:active,.menu-item:hover{background:var(--blue);color:white}
-.menu-item span{font-size:22px}
-#solitaire{width:min(850px,97vw);left:50%;top:50%;transform:translate(-50%,-50%);max-height:90vh;overflow:auto}
-#mines{width:min(540px,97vw);left:50%;top:50%;transform:translate(-50%,-50%);max-height:90vh;overflow:auto}
-#calendar{width:min(380px,97vw);left:50%;top:50%;transform:translate(-50%,-50%)}
-#calc{width:290px;left:50%;top:50%;transform:translate(-50%,-50%)}
-.sol-top{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:12px}
-.pile{height:100px;min-width:0;position:relative;border:1px solid #006b6b;background:#008080}
-.pile.empty:after{content:"";position:absolute;inset:3px;border:1px solid #55aaaa;pointer-events:none}
-.card{position:absolute;width:100%;height:98px;background:#fff;color:#000;border:1px solid #111;border-radius:4px;padding:3px;font-weight:bold;cursor:pointer;touch-action:manipulation}
-.card.red{color:#c00}
-.card.back{background:repeating-linear-gradient(45deg,#000080,#000080 4px,#fff 4px,#fff 5px);border:4px double white}
-.card .rank{font-size:15px;line-height:15px}
-.card .suit{font-size:23px;text-align:center;margin-top:7px}
-.card.selected{outline:3px solid yellow;z-index:100!important}
-.tableau{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.col{height:310px;min-height:180px;position:relative;background:#008080;border:1px solid #006b6b}
-.col .card{height:98px}
-.sol-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.sol-help{font-size:11px;margin-top:7px}
-#mineGrid{display:grid;gap:2px;margin:12px auto;justify-content:center;touch-action:manipulation}
-.minecell{width:clamp(23px,6.2vw,31px);height:clamp(23px,6.2vw,31px);padding:0;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0}
-.minecell.revealed{border:1px solid #888;background:#c0c0c0;box-shadow:none}
-.minecell.flagged{color:red}
-.mine-status{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.mine-display{background:#111;color:#f33;font:bold 22px monospace;padding:3px 6px;min-width:55px;text-align:center;border:2px inset white}
-.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.cal-head strong{font-size:16px}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.dayname{text-align:center;font-weight:bold;padding:5px 0}
-.calday{height:35px;padding:0;min-width:0}
-.calday.today{outline:2px solid navy}
-.calday.chosen{background:navy;color:white}
-.calc-display{width:100%;height:43px;background:white;text-align:right;font-size:24px;padding:5px;margin-bottom:8px;border:2px inset #777}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.calc-grid button{height:42px;font-size:16px}
-.calc-grid .wide{grid-column:span 2}
-.status{margin-top:7px;min-height:17px}
-@media(max-width:520px){
- .desktop{padding:5px}
- .icons{grid-template-columns:65px;grid-auto-rows:78px}
- #solitaire .winbody{padding:5px}
- .pile{height:76px}
- .card,.col .card{height:78px;padding:2px}
- .card .rank{font-size:12px}
- .card .suit{font-size:19px;margin-top:5px}
- .tableau{gap:3px}
- .sol-top{gap:3px}
- .col{height:290px}
- .winbody{padding:7px}
-}
+body{margin:0;background:var(--teal);color:#000;overflow:hidden;font-family:"Press Start 2P",monospace;font-size:8px;user-select:none;image-rendering:pixelated}
+button,select,input{font:inherit;color:#000}
+button{background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;padding:9px 7px;cursor:pointer;line-height:1.6}
+button:active{border-color:#555 #fff #fff #555}
+select{background:#fff;border:2px inset #aaa;padding:5px;max-width:100%}
+.desktop{position:fixed;inset:0 0 37px;overflow:auto;padding:5px}
+.deskicon{width:100px;min-height:85px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:white;text-shadow:2px 2px #000;cursor:pointer;text-align:center;padding:7px;line-height:1.8}
+.deskicon:active{background:#00008088;outline:1px dotted white}
+.pixel-icon{width:40px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pixel-icon svg{width:100%;height:100%;shape-rendering:crispEdges}
+.title-icon{width:19px;height:19px;display:inline-flex;flex-shrink:0}
+.title-icon svg{width:100%;height:100%;shape-rendering:crispEdges}
+.window{position:absolute;background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;box-shadow:3px 3px #222;display:none;min-width:265px;max-width:98vw}
+.titlebar{height:29px;background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:3px 4px;font-weight:bold;touch-action:none;cursor:move;gap:4px}
+.title-name{display:flex;align-items:center;gap:7px;overflow:hidden;line-height:1.7}
+.title-actions{display:flex;gap:3px;flex-shrink:0}
+.title-actions button{padding:0;width:24px;height:22px;font-family:Arial;font-size:15px;font-weight:bold}
+.content{padding:9px}
+.window-menu{padding:7px;border-bottom:2px solid #888;display:flex;gap:13px;flex-wrap:wrap;line-height:1.8}
+.window-menu span{cursor:pointer}
+.window-menu span:active{text-decoration:underline}
+.taskbar{position:fixed;bottom:0;left:0;right:0;height:37px;background:var(--gray);border-top:3px solid #fff;display:flex;align-items:center;gap:5px;padding:3px;z-index:9999}
+.start-btn{height:29px;display:flex;align-items:center;gap:5px;font-weight:bold;white-space:nowrap}
+.start-logo{width:20px;height:20px;display:inline-block}
+.start-logo svg{width:100%;height:100%;shape-rendering:crispEdges}
+.task-buttons{display:flex;gap:4px;flex:1;overflow-x:auto}
+.taskbtn{height:27px;white-space:nowrap;padding:4px;font-size:7px}
+.clock{border:3px inset #ddd;padding:7px 5px;white-space:nowrap;margin-left:auto;font-size:7px}
+.start-menu{display:none;position:fixed;bottom:37px;left:3px;width:235px;background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;z-index:10000;padding:4px;box-shadow:3px 3px #333}
+.start-menu.show{display:block}
+.menu-banner{background:var(--blue);color:white;font-weight:bold;writing-mode:vertical-rl;transform:rotate(180deg);position:absolute;left:4px;top:4px;bottom:4px;width:27px;display:flex;align-items:center;justify-content:flex-end;padding:8px 4px;letter-spacing:1px;font-size:8px}
+.menu-list{margin-left:31px}
+.menu-item{min-height:39px;display:flex;align-items:center;gap:10px;padding:6px;cursor:pointer;line-height:1.8}
+.menu-item .pixel-icon{width:25px;height:25px}
+.menu-item:active{background:var(--blue);color:white}
+.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.center{text-align:center}
+.small{font-size:7px;line-height:1.9}
+hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0}
+#snake,#mines,#calendar,#calc,#helpDialog{left:50%;top:48%;transform:translate(-50%,-50%)}
+#snake{width:min(390px,97vw)}
+#mines{width:min(420px,98vw)}
+#calendar{width:min(355px,97vw)}
+#calc{width:min(290px,96vw)}
+#helpDialog{width:min(350px,96vw);z-index:500}
+#snakeCanvas{width:100%;max-width:320px;aspect-ratio:1;display:block;margin:auto;background:#071707;border:4px inset #aaa;image-rendering:pixelated;touch-action:none}
+.snake-stats{display:flex;justify-content:space-between;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:8px;line-height:1.8}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,43px);gap:4px;justify-content:center;margin:10px auto}
+.dpad button{font-family:Arial;font-size:21px;font-weight:bold;padding:0;touch-action:manipulation}
+.dpad .up{grid-column:2;grid-row:1}.dpad .left{grid-column:1;grid-row:2}.dpad .down{grid-column:2;grid-row:2}.dpad .right{grid-column:3;grid-row:2}
+.mine-head{display:flex;justify-content:space-between;align-items:center;padding:5px;border:3px inset #ddd;margin-bottom:8px}
+.mine-counter{background:#000;color:red;font-family:monospace;font-size:19px;font-weight:bold;padding:5px;min-width:43px;text-align:center}
+.mine-face{padding:0;width:35px;height:32px;display:flex;align-items:center;justify-content:center}
+.mine-face svg{width:23px;height:23px;shape-rendering:crispEdges}
+#mineBoard{display:grid;gap:2px;background:#808080;padding:4px;border:3px inset #ddd;width:max-content;max-width:100%;margin:auto}
+.mine-cell{width:27px;height:27px;min-width:0;padding:0;font-family:"Press Start 2P",monospace;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:3px solid;border-color:#fff #555 #555 #fff;line-height:1}
+.mine-cell.revealed{border:1px solid #888;background:#c0c0c0;padding:0;box-shadow:none}
+.mine-cell.flagged{color:red}
+.mine-cell.n1{color:blue}.mine-cell.n2{color:green}.mine-cell.n3{color:red}.mine-cell.n4{color:navy}.mine-cell.n5{color:maroon}.mine-cell.n6{color:teal}.mine-cell.n7{color:black}.mine-cell.n8{color:#666}
+.bomb-pixel{width:17px;height:17px;display:block;position:relative;background:#222;border:2px solid #000}
+.bomb-pixel:before{content:"";position:absolute;left:4px;top:-5px;width:5px;height:5px;background:#222;border:1px solid #000}
+.bomb-pixel:after{content:"";position:absolute;left:4px;top:4px;width:4px;height:4px;background:#ddd}
+.flag-pixel{width:19px;height:20px;position:relative;display:inline-block}
+.flag-pixel:before{content:"";position:absolute;left:3px;top:1px;width:3px;height:17px;background:#222}
+.flag-pixel:after{content:"";position:absolute;left:6px;top:2px;width:10px;height:8px;background:#f00;clip-path:polygon(0 0,100% 25%,0 100%)}
+.flag-base{position:absolute;left:0;bottom:0;width:13px;height:3px;background:#222}
+#mineStatus{margin-top:8px;min-height:25px;text-align:center;line-height:1.8}
+.help-panel{line-height:2}
+.help-panel h3{font-size:10px;line-height:2}
+.help-row{display:flex;align-items:flex-start;gap:9px;margin:10px 0;line-height:2}
+.help-icon{width:29px;min-width:29px;height:27px;display:flex;align-items:center;justify-content:center}
+.help-icon svg{width:25px;height:25px;shape-rendering:crispEdges}
+.help-footer{border-top:2px solid #888;padding-top:9px;margin-top:10px;text-align:right}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:9px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.calendar-grid div{text-align:center;padding:9px 0;font-size:7px}
+.calendar-grid .dayname{font-weight:bold;background:#ddd}
+.calendar-grid .today{background:var(--blue);color:white;font-weight:bold}
+.calendar-grid .other{color:#888}
+.calc-display{width:100%;height:42px;text-align:right;font-size:12px;background:white;border:3px inset #aaa;padding:5px;margin-bottom:8px}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.calc-grid button{height:42px;font-size:10px}
+.calc-grid .equals{background:#b8caff}
+@media(max-width:450px){body{font-size:7px}.mine-cell{width:24px;height:25px;font-size:9px}#mines .content{padding:5px}.window-menu{gap:8px}.deskicon{width:86px}.taskbtn{font-size:6px}}
 </style>
 </head>
 <body>
-<div class="desktop" id="desktop">
- <div class="icons">
-  <div class="deskicon" onclick="openApp('solitaire')"><span class="emoji">🃏</span><span>Solitaire</span></div>
-  <div class="deskicon" onclick="openApp('mines')"><span class="emoji">💣</span><span>Minesweeper</span></div>
-  <div class="deskicon" onclick="openApp('calendar')"><span class="emoji">📅</span><span>Calendar</span></div>
-  <div class="deskicon" onclick="openApp('calc')"><span class="emoji">🧮</span><span>Calculator</span></div>
- </div>
- <div class="desktop-note">Windows 98 Desktop</div>
+
+<!-- Pixel icon templates -->
+<template id="iconSnake">
+<svg viewBox="0 0 40 36" aria-hidden="true">
+<rect x="7" y="4" width="8" height="8" fill="#72e83c"/>
+<rect x="15" y="4" width="8" height="8" fill="#72e83c"/>
+<rect x="23" y="4" width="8" height="8" fill="#72e83c"/>
+<rect x="23" y="12" width="8" height="8" fill="#72e83c"/>
+<rect x="15" y="12" width="8" height="8" fill="#72e83c"/>
+<rect x="7" y="20" width="8" height="8" fill="#72e83c"/>
+<rect x="15" y="20" width="8" height="8" fill="#72e83c"/>
+<rect x="7" y="20" width="8" height="8" fill="#72e83c"/>
+<rect x="26" y="6" width="2" height="2" fill="#000"/>
+<rect x="4" y="28" width="9" height="3" fill="#247c18"/>
+</svg>
+</template>
+<template id="iconBomb">
+<svg viewBox="0 0 40 36" aria-hidden="true">
+<rect x="17" y="2" width="6" height="5" fill="#222"/>
+<rect x="22" y="3" width="6" height="3" fill="#f00"/>
+<rect x="11" y="7" width="18" height="18" fill="#111"/>
+<rect x="14" y="4" width="12" height="5" fill="#222"/>
+<rect x="8" y="11" width="6" height="12" fill="#111"/>
+<rect x="26" y="11" width="6" height="12" fill="#111"/>
+<rect x="11" y="23" width="18" height="5" fill="#111"/>
+<rect x="14" y="10" width="5" height="5" fill="#fff"/>
+<rect x="21" y="18" width="5" height="5" fill="#888"/>
+</svg>
+</template>
+<template id="iconCalendar">
+<svg viewBox="0 0 40 36" aria-hidden="true">
+<rect x="4" y="5" width="32" height="28" fill="#fff"/>
+<rect x="4" y="5" width="32" height="8" fill="#d22"/>
+<rect x="10" y="2" width="4" height="9" fill="#333"/>
+<rect x="26" y="2" width="4" height="9" fill="#333"/>
+<g fill="#000080">
+<rect x="9" y="17" width="4" height="3"/><rect x="17" y="17" width="4" height="3"/><rect x="25" y="17" width="4" height="3"/>
+<rect x="9" y="23" width="4" height="3"/><rect x="17" y="23" width="4" height="3"/><rect x="25" y="23" width="4" height="3"/>
+</g>
+</svg>
+</template>
+<template id="iconCalc">
+<svg viewBox="0 0 40 36" aria-hidden="true">
+<rect x="6" y="1" width="28" height="34" fill="#333"/>
+<rect x="10" y="5" width="20" height="7" fill="#a6c9a0"/>
+<g fill="#ddd">
+<rect x="10" y="16" width="5" height="5"/><rect x="18" y="16" width="5" height="5"/><rect x="26" y="16" width="5" height="5"/>
+<rect x="10" y="24" width="5" height="5"/><rect x="18" y="24" width="5" height="5"/><rect x="26" y="24" width="5" height="5"/>
+</g>
+</svg>
+</template>
+<template id="iconSound">
+<svg viewBox="0 0 32 32" aria-hidden="true">
+<rect x="3" y="12" width="7" height="9" fill="#000080"/>
+<path d="M10 12 L20 4 L20 28 L10 21 Z" fill="#000080"/>
+<path d="M23 10 Q30 16 23 22" fill="none" stroke="#000080" stroke-width="3"/>
+</svg>
+</template>
+<template id="iconWindows">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M1 3 L10 2 L10 11 L1 11 Z" fill="#f33"/>
+<path d="M12 2 L22 1 L22 11 L12 11 Z" fill="#36d"/>
+<path d="M1 13 L10 13 L10 22 L1 21 Z" fill="#3b5"/>
+<path d="M12 13 L22 13 L22 23 L12 22 Z" fill="#fd3"/>
+</svg>
+</template>
+
+<div class="desktop">
+ <div class="deskicon" onclick="openApp('snake')"><span class="pixel-icon" data-icon="iconSnake"></span><span>SNAKE</span></div>
+ <div class="deskicon" onclick="openApp('mines')"><span class="pixel-icon" data-icon="iconBomb"></span><span>MINESWEEPER</span></div>
+ <div class="deskicon" onclick="openApp('calendar')"><span class="pixel-icon" data-icon="iconCalendar"></span><span>CALENDAR</span></div>
+ <div class="deskicon" onclick="openApp('calc')"><span class="pixel-icon" data-icon="iconCalc"></span><span>CALCULATOR</span></div>
 </div>
 
-<div class="window hidden" id="solitaire">
- <div class="titlebar" onpointerdown="startDrag(event,'solitaire')"><span>🃏 Solitaire</span><button class="x" onclick="closeApp('solitaire')">×</button></div>
- <div class="menubar"><span onclick="newSolitaire()" style="cursor:pointer">Game</span><span onclick="toggleSound()" style="cursor:pointer">Sound</span><span onclick="solHelp()" style="cursor:pointer">Help</span></div>
- <div class="winbody">
-  <div class="sol-actions"><button onclick="newSolitaire()">New Game</button><button onclick="undoSol()">Undo</button><button onclick="drawStock()">Draw Card</button><span id="solScore">Moves: 0</span></div>
-  <div class="sol-top">
-   <div class="pile empty" id="stock"><div id="stockCard" class="card back" style="display:none"></div></div>
-   <div class="pile empty" id="waste"></div>
-   <div></div>
-   <div class="pile empty" id="foundation0" data-pile="0"></div>
-   <div class="pile empty" id="foundation1" data-pile="1"></div>
-   <div class="pile empty" id="foundation2" data-pile="2"></div>
-   <div class="pile empty" id="foundation3" data-pile="3"></div>
+<div class="window" id="snake">
+ <div class="titlebar" onpointerdown="startDrag(event,'snake')">
+  <div class="title-name"><span class="title-icon" data-icon="iconSnake"></span>SNAKE.EXE</div>
+  <div class="title-actions"><button onclick="minimizeApp('snake')">_</button><button onclick="closeApp('snake')">×</button></div>
+ </div>
+ <div class="window-menu"><span onclick="newSnake()">GAME</span><span onclick="toggleSnakePause()">PAUSE</span><span onclick="snakeHelp()">HELP</span></div>
+ <div class="content">
+  <div class="snake-stats"><span>SCORE: <b id="snakeScore">0</b></span><span id="snakeStatus">READY!</span><button onclick="newSnake()">NEW GAME</button></div>
+  <canvas id="snakeCanvas" width="320" height="320"></canvas>
+  <div class="dpad">
+   <button class="up" onclick="setSnakeDir(0,-1)">▲</button>
+   <button class="left" onclick="setSnakeDir(-1,0)">◀</button>
+   <button class="down" onclick="setSnakeDir(0,1)">▼</button>
+   <button class="right" onclick="setSnakeDir(1,0)">▶</button>
   </div>
-  <div class="tableau" id="tableau"></div>
-  <div class="sol-help">Tap a card, then tap where you want to move it. Build alternating colors from King to Ace. Put Aces on the four top piles.</div>
-  <div class="status" id="solStatus">Welcome to Solitaire.</div>
+  <div class="center small">EAT APPLES. DON'T HIT YOURSELF!</div>
  </div>
 </div>
 
-<div class="window hidden" id="mines">
- <div class="titlebar" onpointerdown="startDrag(event,'mines')"><span>💣 Minesweeper</span><button class="x" onclick="closeApp('mines')">×</button></div>
- <div class="menubar"><span onclick="newMines()" style="cursor:pointer">Game</span><span onclick="mineHelp()" style="cursor:pointer">Help</span></div>
- <div class="winbody">
-  <div class="mine-status"><div class="mine-display" id="mineCount">010</div><button style="font-size:23px;padding:2px 10px" onclick="newMines()" id="mineFace">🙂</button><div class="mine-display" id="mineTimer">000</div></div>
-  <div style="display:flex;gap:6px;margin-top:8px;align-items:center"><label for="mineDifficulty">Difficulty:</label><select id="mineDifficulty" onchange="newMines()" style="padding:4px"><option value="easy">Beginner 9×9</option><option value="medium">Intermediate 12×12</option><option value="hard">Expert 16×16</option></select><button onclick="toggleFlagMode()" id="flagMode">🚩 Flag mode: Off</button></div>
-  <div id="mineGrid"></div>
-  <div id="mineStatus" class="status">Tap a square to start. Find every safe square!</div>
+<div class="window" id="mines">
+ <div class="titlebar" onpointerdown="startDrag(event,'mines')">
+  <div class="title-name"><span class="title-icon" data-icon="iconBomb"></span>MINESWEEPER.EXE</div>
+  <div class="title-actions"><button onclick="minimizeApp('mines')">_</button><button onclick="closeApp('mines')">×</button></div>
+ </div>
+ <div class="window-menu"><span onclick="newMines()">GAME</span><span onclick="toggleFlagMode()">FLAG MODE</span><span onclick="openMineHelp()">HELP</span></div>
+ <div class="content">
+  <div class="row" style="justify-content:space-between;margin-bottom:8px">
+   <label>LEVEL: <select id="mineDifficulty" onchange="newMines()"><option value="easy">BEGINNER</option><option value="medium">MEDIUM</option><option value="hard">EXPERT</option></select></label>
+   <button onclick="openMineHelp()">? HELP</button>
+  </div>
+  <div class="mine-head">
+   <div class="mine-counter" id="mineCount">010</div>
+   <button class="mine-face" id="mineFace" onclick="newMines()"></button>
+   <div class="mine-counter" id="mineTime">000</div>
+  </div>
+  <div id="mineBoard"></div>
+  <div class="row" style="justify-content:center;margin-top:9px">
+   <button id="flagButton" onclick="toggleFlagMode"><span class="flag-pixel"><i class="flag-base"></i></span> FLAG: OFF</button>
+   <button onclick="newMines()">RESTART</button>
+  </div>
+  <div id="mineStatus">REVEAL ALL SAFE SQUARES!</div>
  </div>
 </div>
 
-<div class="window hidden" id="calendar">
- <div class="titlebar" onpointerdown="startDrag(event,'calendar')"><span>📅 Calendar</span><button class="x" onclick="closeApp('calendar')">×</button></div>
- <div class="winbody">
-  <div class="cal-head"><button onclick="changeMonth(-1)">◀</button><strong id="monthTitle"></strong><button onclick="changeMonth(1)">▶</button></div>
-  <div class="calendar-grid" id="calendarGrid"></div>
-  <div class="status" id="calendarStatus"></div>
-  <button onclick="goToday()">Today</button>
+<div class="window" id="helpDialog">
+ <div class="titlebar" onpointerdown="startDrag(event,'helpDialog')">
+  <div class="title-name"><span class="title-icon" data-icon="iconBomb"></span>MINESWEEPER HELP</div>
+  <div class="title-actions"><button onclick="closeApp('helpDialog')">×</button></div>
+ </div>
+ <div class="content help-panel">
+  <h3>HOW TO PLAY</h3><hr>
+  <div class="help-row"><div class="help-icon" data-icon="iconBomb"></div><div><b>AVOID BOMBS</b><br>Some squares hide bombs. Reveal one and you lose.</div></div>
+  <div class="help-row"><div class="help-icon"><svg viewBox="0 0 24 24"><g fill="#000080"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="5" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="5" height="5"/><rect x="3" y="17" width="5" height="5"/><rect x="10" y="17" width="5" height="5"/><rect x="17" y="17" width="5" height="5"/></g></svg></div><div><b>READ NUMBERS</b><br>A number tells you how many bombs touch that square. A 1 means one nearby bomb.</div></div>
+  <div class="help-row"><div class="help-icon"><span class="flag-pixel"><i class="flag-base"></i></span></div><div><b>PLACE FLAGS</b><br>Turn FLAG MODE on, then tap a square you think contains a bomb. Tap again to remove the flag.</div></div>
+  <div class="help-row"><div class="help-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="#228b22"/><rect x="5" y="5" width="14" height="14" fill="#75d34c"/><rect x="8" y="8" width="3" height="3" fill="#000"/><rect x="14" y="8" width="3" height="3" fill="#000"/><rect x="8" y="14" width="9" height="2" fill="#000"/></svg></div><div><b>WIN</b><br>Reveal every square without a bomb to win.</div></div>
+  <hr><div class="small">TIP: START WITH A CORNER OR AN OPEN AREA.</div>
+  <div class="help-footer"><button onclick="closeApp('helpDialog')">OK!</button></div>
  </div>
 </div>
 
-<div class="window hidden" id="calc">
- <div class="titlebar" onpointerdown="startDrag(event,'calc')"><span>🧮 Calculator</span><button class="x" onclick="closeApp('calc')">×</button></div>
- <div class="winbody">
-  <input id="calcDisplay" class="calc-display" value="0" readonly>
+<div class="window" id="calendar">
+ <div class="titlebar" onpointerdown="startDrag(event,'calendar')">
+  <div class="title-name"><span class="title-icon" data-icon="iconCalendar"></span>CALENDAR.EXE</div>
+  <div class="title-actions"><button onclick="minimizeApp('calendar')">_</button><button onclick="closeApp('calendar')">×</button></div>
+ </div>
+ <div class="content">
+  <div class="calendar-head"><button onclick="changeMonth(-1)">◀</button><strong id="calTitle"></strong><button onclick="changeMonth(1)">▶</button></div>
+  <div id="calGrid" class="calendar-grid"></div><hr>
+  <div class="row" style="justify-content:space-between"><span id="calToday"></span><button onclick="goToday()">TODAY</button></div>
+ </div>
+</div>
+
+<div class="window" id="calc">
+ <div class="titlebar" onpointerdown="startDrag(event,'calc')">
+  <div class="title-name"><span class="title-icon" data-icon="iconCalc"></span>CALCULATOR.EXE</div>
+  <div class="title-actions"><button onclick="minimizeApp('calc')">_</button><button onclick="closeApp('calc')">×</button></div>
+ </div>
+ <div class="window-menu"><span onclick="calcClear()">EDIT</span><span onclick="alert('RETRO PIXEL CALCULATOR')">HELP</span></div>
+ <div class="content">
+  <input class="calc-display" id="calcDisplay" value="0" readonly>
   <div class="calc-grid">
-   <button onclick="calcClear()">C</button><button onclick="calcBack()">←</button><button onclick="calcOp('%')">%</button><button onclick="calcOp('/')">÷</button>
+   <button onclick="calcClear()">C</button><button onclick="calcBack()">DEL</button><button onclick="calcOp('%')">%</button><button onclick="calcOp('/')">÷</button>
    <button onclick="calcDigit('7')">7</button><button onclick="calcDigit('8')">8</button><button onclick="calcDigit('9')">9</button><button onclick="calcOp('*')">×</button>
    <button onclick="calcDigit('4')">4</button><button onclick="calcDigit('5')">5</button><button onclick="calcDigit('6')">6</button><button onclick="calcOp('-')">−</button>
    <button onclick="calcDigit('1')">1</button><button onclick="calcDigit('2')">2</button><button onclick="calcDigit('3')">3</button><button onclick="calcOp('+')">+</button>
-   <button onclick="calcDigit('0')" class="wide">0</button><button onclick="calcDigit('.')">.</button><button onclick="calcEquals()">=</button>
+   <button onclick="calcDigit('0')">0</button><button onclick="calcDigit('.')">.</button><button onclick="calcSign()">±</button><button class="equals" onclick="calcEquals()">=</button>
   </div>
-  <div class="status">A classic four-function calculator.</div>
  </div>
 </div>
 
-<div class="menu hidden" id="startMenu">
- <div class="menu-head">Windows <span style="font-weight:normal">98</span></div>
- <div class="menu-item" onclick="openApp('solitaire');toggleMenu()"><span>🃏</span>Solitaire</div>
- <div class="menu-item" onclick="openApp('mines');toggleMenu()"><span>💣</span>Minesweeper</div>
- <div class="menu-item" onclick="openApp('calendar');toggleMenu()"><span>📅</span>Calendar</div>
- <div class="menu-item" onclick="openApp('calc');toggleMenu()"><span>🧮</span>Calculator</div>
- <div class="menu-item" onclick="toggleSound();toggleMenu()"><span>🔊</span>Toggle sound</div>
+<div class="start-menu" id="startMenu">
+ <div class="menu-banner">WINDOWS 98</div>
+ <div class="menu-list">
+  <div class="menu-item" onclick="openApp('snake');toggleMenu()"><span class="pixel-icon" data-icon="iconSnake"></span>SNAKE</div>
+  <div class="menu-item" onclick="openApp('mines');toggleMenu()"><span class="pixel-icon" data-icon="iconBomb"></span>MINESWEEPER</div>
+  <div class="menu-item" onclick="openApp('calendar');toggleMenu()"><span class="pixel-icon" data-icon="iconCalendar"></span>CALENDAR</div>
+  <div class="menu-item" onclick="openApp('calc');toggleMenu()"><span class="pixel-icon" data-icon="iconCalc"></span>CALCULATOR</div>
+  <hr><div class="menu-item" onclick="toggleSound();toggleMenu()"><span class="pixel-icon" data-icon="iconSound"></span>SOUND ON/OFF</div>
+ </div>
 </div>
+
 <div class="taskbar">
- <button class="start" onclick="toggleMenu()">🪟 Start</button>
- <button class="taskbtn" onclick="openApp('solitaire')">🃏 Solitaire</button>
- <button class="taskbtn" onclick="openApp('mines')">💣 Mines</button>
- <button class="taskbtn" onclick="openApp('calendar')">📅 Calendar</button>
- <button class="taskbtn" onclick="openApp('calc')">🧮 Calc</button>
- <div class="task-spacer"></div><div class="clock" id="clock">12:00 PM</div>
+ <button class="start-btn" onclick="toggleMenu()"><span class="start-logo" data-icon="iconWindows"></span>START</button>
+ <div class="task-buttons">
+  <button class="taskbtn" onclick="openApp('snake')">SNAKE</button>
+  <button class="taskbtn" onclick="openApp('mines')">MINES</button>
+  <button class="taskbtn" onclick="openApp('calendar')">CALENDAR</button>
+  <button class="taskbtn" onclick="openApp('calc')">CALC</button>
+ </div>
+ <div class="clock" id="clock">00:00</div>
 </div>
 
 <script>
-const $=id=>document.getElementById(id);
-let zTop=20;
-function openApp(id){const w=$(id);w.classList.remove('hidden');w.style.zIndex=++zTop;if(id==='calendar')renderCalendar();if(id==='mines'&&!mineBoard.length)newMines();if(id==='solitaire'&&!deck.length)newSolitaire();}
-function closeApp(id){$(id).classList.add('hidden')}
-function toggleMenu(){$('startMenu').classList.toggle('hidden')}
-function toggleSound(){soundOn=!soundOn;playTone(650,.07);if($('solStatus'))$('solStatus').textContent='Sound '+(soundOn?'enabled':'muted')+'.'}
-let soundOn=true,audioCtx=null;
-function playTone(freq=500,duration=.07,type='square'){
- if(!soundOn)return;
- try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.055,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+document.querySelectorAll('[data-icon]').forEach(el=>{
+ const t=document.getElementById(el.dataset.icon);
+ if(t)el.appendChild(t.content.cloneNode(true));
+});
+function faceSVG(kind='normal'){
+ const mouths={normal:'<rect x="8" y="17" width="8" height="2" fill="#000"/>',sad:'<path d="M7 19 L9 17 L15 17 L17 19" fill="#000"/>',cool:'<rect x="3" y="8" width="7" height="5" fill="#000"/><rect x="14" y="8" width="7" height="5" fill="#000"/><rect x="10" y="9" width="4" height="2" fill="#000"/><rect x="8" y="17" width="8" height="2" fill="#000"/>'};
+ return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" fill="#ffdf35" stroke="#000" stroke-width="2"/><rect x="6" y="7" width="3" height="4" fill="#000"/><rect x="15" y="7" width="3" height="4" fill="#000"/>'+(mouths[kind]||mouths.normal)+'</svg>';
 }
-document.addEventListener('pointerdown',()=>{if(soundOn&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume()},{once:false});
+let zIndex=20,soundOn=true,audioCtx=null;
+function playTone(freq=440,duration=.08,type='square'){
+ if(!soundOn)return;
+ try{
+  audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(.04,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration);
+ }catch(e){}
+}
+function toggleSound(){soundOn=!soundOn;playTone(soundOn?660:220,.08)}
+function openApp(id){
+ const w=document.getElementById(id);if(!w)return;
+ w.style.display='block';w.style.zIndex=++zIndex;
+ document.getElementById('startMenu').classList.remove('show');
+ if(id==='calendar')renderCalendar();
+ if(id==='mines'&&!mineBoard.length)newMines();
+ if(id==='snake'&&!snakeInitialized)newSnake();
+}
+function closeApp(id){
+ const w=document.getElementById(id);if(w)w.style.display='none';
+ if(id==='snake')stopSnakeLoop();
+}
+function minimizeApp(id){const w=document.getElementById(id);if(w)w.style.display='none'}
+function toggleMenu(){document.getElementById('startMenu').classList.toggle('show')}
 function startDrag(e,id){
  if(e.target.closest('button'))return;
- const w=$(id);w.style.zIndex=++zTop;
- const r=w.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;
- const left=r.left,top=r.top;
- function move(ev){w.style.left=(left+ev.clientX-sx)+'px';w.style.top=(top+ev.clientY-sy)+'px';w.style.transform='none'}
- function up(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up)}
- document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);
+ const w=document.getElementById(id);if(!w)return;
+ w.style.zIndex=++zIndex;
+ const r=w.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,ox=r.left,oy=r.top;
+ w.style.transform='none';w.style.left=ox+'px';w.style.top=oy+'px';
+ function move(ev){
+  w.style.left=Math.max(0,Math.min(innerWidth-w.offsetWidth,ox+ev.clientX-sx))+'px';
+  w.style.top=Math.max(0,Math.min(innerHeight-45,oy+ev.clientY-sy))+'px';
+ }
+ function end(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',end)}
+ document.addEventListener('pointermove',move);document.addEventListener('pointerup',end);e.preventDefault();
 }
-function updateClock(){let d=new Date();$('clock').textContent=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
-updateClock();setInterval(updateClock,10000);
+document.addEventListener('pointerdown',e=>{const w=e.target.closest('.window');if(w)w.style.zIndex=++zIndex});
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+updateClock();setInterval(updateClock,1000);
 
 /* CALCULATOR */
-let calcValue='0',calcStored=null,calcOperator=null,calcFresh=false;
-function calcShow(){$('calcDisplay').value=calcValue}
-function calcDigit(d){playTone(520,.035);if(d==='.'&&calcValue.includes('.'))return;if(calcFresh){calcValue=d==='.'?'0.':d;calcFresh=false}else if(calcValue==='0'&&d!=='.')calcValue=d;else if(calcValue.length<16)calcValue+=d;calcShow()}
-function calcOp(op){playTone(420,.04);if(calcOperator&&!calcFresh)calcEquals(false);calcStored=Number(calcValue);calcOperator=op;calcFresh=true}
-function calcEquals(play=true){if(calcStored===null||!calcOperator)return;let a=calcStored,b=Number(calcValue),r=0;switch(calcOperator){case '+':r=a+b;break;case '-':r=a-b;break;case '*':r=a*b;break;case '/':r=b===0?'Error':a/b;break;case '%':r=a%b;break}calcValue=typeof r==='number'?(Number.isFinite(r)?String(Number(r.toPrecision(12))):'Error'):r;calcStored=null;calcOperator=null;calcFresh=true;calcShow();if(play)playTone(720,.1)}
-function calcClear(){calcValue='0';calcStored=null;calcOperator=null;calcFresh=false;calcShow();playTone(300,.06)}
-function calcBack(){calcValue=calcValue.length>1?calcValue.slice(0,-1):'0';calcShow();playTone(350,.03)}
+let calcValue='0',calcFirst=null,calcOperator=null,calcReset=false;
+function calcShow(){document.getElementById('calcDisplay').value=calcValue}
+function calcDigit(d){
+ if(calcReset){calcValue='0';calcReset=false}
+ if(d==='.'&&calcValue.includes('.'))return;
+ if(calcValue==='0'&&d!=='.')calcValue=d;else calcValue+=d;
+ calcShow();playTone(500,.025)
+}
+function calcOp(op){
+ if(calcOperator&&!calcReset)calcEquals();
+ calcFirst=parseFloat(calcValue);calcOperator=op;calcReset=true;playTone(400,.04)
+}
+function calcEquals(){
+ if(calcOperator===null||calcFirst===null)return;
+ const b=parseFloat(calcValue);let r;
+ switch(calcOperator){
+  case '+':r=calcFirst+b;break;case '-':r=calcFirst-b;break;
+  case '*':r=calcFirst*b;break;case '/':r=b===0?'ERROR':calcFirst/b;break;
+  case '%':r=calcFirst%b;break;
+ }
+ calcValue=typeof r==='number'&&Number.isFinite(r)?String(Number(r.toPrecision(10))):String(r);
+ calcOperator=null;calcFirst=null;calcReset=true;calcShow();playTone(700,.1)
+}
+function calcClear(){calcValue='0';calcFirst=null;calcOperator=null;calcReset=false;calcShow()}
+function calcBack(){if(calcReset){calcValue='0';calcReset=false}else calcValue=calcValue.length>1?calcValue.slice(0,-1):'0';calcShow()}
+function calcSign(){if(calcValue!=='0')calcValue=String(-parseFloat(calcValue));calcShow()}
 
 /* CALENDAR */
-let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calChosen=new Date();
+let calDate=new Date();
 function renderCalendar(){
- $('monthTitle').textContent=new Date(calYear,calMonth,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
- const grid=$('calendarGrid');grid.innerHTML='';
- ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{let el=document.createElement('div');el.className='dayname';el.textContent=d;grid.appendChild(el)});
- let first=new Date(calYear,calMonth,1).getDay(),days=new Date(calYear,calMonth+1,0).getDate(),today=new Date();
- for(let i=0;i<first;i++){let e=document.createElement('div');grid.appendChild(e)}
- for(let day=1;day<=days;day++){
-  let b=document.createElement('button');b.className='calday';b.textContent=day;
-  if(day===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear())b.classList.add('today');
-  if(day===calChosen.getDate()&&calMonth===calChosen.getMonth()&&calYear===calChosen.getFullYear())b.classList.add('chosen');
-  b.onclick=()=>{calChosen=new Date(calYear,calMonth,day);renderCalendar();$('calendarStatus').textContent='Selected: '+calChosen.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});playTone(600,.05)};
-  grid.appendChild(b)
+ const y=calDate.getFullYear(),m=calDate.getMonth();
+ document.getElementById('calTitle').textContent=calDate.toLocaleDateString(undefined,{month:'short',year:'numeric'}).toUpperCase();
+ document.getElementById('calToday').textContent='TODAY: '+new Date().toLocaleDateString();
+ const grid=document.getElementById('calGrid');grid.innerHTML='';
+ ['SU','MO','TU','WE','TH','FR','SA'].forEach(d=>{const el=document.createElement('div');el.className='dayname';el.textContent=d;grid.appendChild(el)});
+ const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate();
+ for(let i=0;i<42;i++){
+  const el=document.createElement('div');let n,dt;
+  if(i<first){n=prev-first+i+1;el.className='other';dt=new Date(y,m-1,n)}
+  else if(i>=first+days){n=i-first-days+1;el.className='other';dt=new Date(y,m+1,n)}
+  else{n=i-first+1;dt=new Date(y,m,n)}
+  if(dt.toDateString()===new Date().toDateString())el.className='today';
+  el.textContent=n;grid.appendChild(el)
  }
- $('calendarStatus').textContent='Selected: '+calChosen.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
 }
-function changeMonth(n){calMonth+=n;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar();playTone(450,.04)}
-function goToday(){let d=new Date();calYear=d.getFullYear();calMonth=d.getMonth();calChosen=d;renderCalendar();playTone(650,.05)}
+function changeMonth(n){calDate.setMonth(calDate.getMonth()+n);renderCalendar()}
+function goToday(){calDate=new Date();renderCalendar()}
+
+/* SNAKE */
+const snakeCanvas=document.getElementById('snakeCanvas'),sctx=snakeCanvas.getContext('2d');
+const S=16,GRID=20;
+let snake=[],apple={x:10,y:10},snakeDir={x:1,y:0},snakeNext={x:1,y:0};
+let snakeTimer=null,snakeScore=0,snakeRunning=false,snakeOver=false,snakeInitialized=false;
+function drawSnake(){
+ sctx.fillStyle='#071707';sctx.fillRect(0,0,320,320);
+ sctx.strokeStyle='#143014';sctx.lineWidth=1;
+ for(let i=0;i<=GRID;i++){sctx.beginPath();sctx.moveTo(i*S,0);sctx.lineTo(i*S,320);sctx.stroke();sctx.beginPath();sctx.moveTo(0,i*S);sctx.lineTo(320,i*S);sctx.stroke()}
+ sctx.fillStyle='#f33';sctx.fillRect(apple.x*S+2,apple.y*S+2,S-4,S-4);
+ sctx.fillStyle='#8b4513';sctx.fillRect(apple.x*S+7,apple.y*S,3,4);
+ snake.forEach((p,i)=>{
+  sctx.fillStyle=i===0?'#9cff38':'#38b526';sctx.fillRect(p.x*S+1,p.y*S+1,S-2,S-2);
+  if(i===0){
+   sctx.fillStyle='#071707';
+   if(snakeDir.x!==0){sctx.fillRect(p.x*S+(snakeDir.x>0?11:3),p.y*S+4,3,3);sctx.fillRect(p.x*S+(snakeDir.x>0?11:3),p.y*S+10,3,3)}
+   else{sctx.fillRect(p.x*S+4,p.y*S+(snakeDir.y>0?11:3),3,3);sctx.fillRect(p.x*S+10,p.y*S+(snakeDir.y>0?11:3),3,3)}
+  }
+ });
+ if(snakeOver){
+  sctx.fillStyle='#000b';sctx.fillRect(25,120,270,75);
+  sctx.fillStyle='#fff';sctx.textAlign='center';sctx.font='10px "Press Start 2P",monospace';sctx.fillText('GAME OVER!',160,151);
+  sctx.font='7px "Press Start 2P",monospace';sctx.fillText('PRESS NEW GAME',160,174)
+ }
+}
+function spawnApple(){
+ let p;do{p={x:Math.floor(Math.random()*GRID),y:Math.floor(Math.random()*GRID)}}while(snake.some(s=>s.x===p.x&&s.y===p.y));apple=p
+}
+function stopSnakeLoop(){clearInterval(snakeTimer);snakeTimer=null;snakeRunning=false}
+function startSnakeLoop(){if(snakeOver)return;clearInterval(snakeTimer);snakeRunning=true;document.getElementById('snakeStatus').textContent='PLAYING';snakeTimer=setInterval(snakeStep,125)}
+function newSnake(){
+ stopSnakeLoop();snakeInitialized=true;snakeOver=false;snakeScore=0;
+ snake=[{x:8,y:10},{x:7,y:10},{x:6,y:10}];snakeDir={x:1,y:0};snakeNext={x:1,y:0};spawnApple();
+ document.getElementById('snakeScore').textContent='0';document.getElementById('snakeStatus').textContent='PLAYING';
+ startSnakeLoop();drawSnake();playTone(520,.08)
+}
+function setSnakeDir(x,y){if(x===-snakeDir.x&&y===-snakeDir.y)return;snakeNext={x,y};if(!snakeRunning&&!snakeOver&&snakeInitialized)startSnakeLoop()}
+function snakeStep(){
+ if(!snakeRunning||snakeOver)return;
+ snakeDir=snakeNext;const head={x:snake[0].x+snakeDir.x,y:snake[0].y+snakeDir.y},eating=head.x===apple.x&&head.y===apple.y;
+ if(head.x<0||head.y<0||head.x>=GRID||head.y>=GRID||snake.slice(0,eating?snake.length:snake.length-1).some(p=>p.x===head.x&&p.y===head.y)){
+  snakeOver=true;stopSnakeLoop();document.getElementById('snakeStatus').textContent='GAME OVER';drawSnake();playTone(150,.3);return
+ }
+ snake.unshift(head);
+ if(eating){snakeScore++;document.getElementById('snakeScore').textContent=snakeScore;spawnApple();playTone(740,.07)}else snake.pop();
+ if(snake.length===GRID*GRID){snakeOver=true;stopSnakeLoop();document.getElementById('snakeStatus').textContent='YOU WIN!'}
+ drawSnake()
+}
+function toggleSnakePause(){
+ if(!snakeInitialized){newSnake();return}if(snakeOver)return;
+ if(snakeRunning){stopSnakeLoop();document.getElementById('snakeStatus').textContent='PAUSED'}else startSnakeLoop()
+}
+function snakeHelp(){alert('SNAKE HELP\n\nUse arrow keys or the on-screen buttons.\nEat red apples to earn points.\nDo not hit the walls or your own tail!')}
+document.addEventListener('keydown',e=>{
+ if(document.getElementById('snake').style.display!=='block')return;
+ const keys={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]},k=keys[e.key];
+ if(k){e.preventDefault();setSnakeDir(k[0],k[1])}
+ if(e.code==='Space'){e.preventDefault();toggleSnakePause()}
+});
 
 /* MINESWEEPER */
-let mineBoard=[],mineRows=9,mineCols=9,mineTotal=10,mineFlags=0,mineRevealed=0,mineOver=false,mineStarted=false,mineFlagMode=false,mineSeconds=0,mineInterval=null;
+let mineBoard=[],mineRows=9,mineCols=9,mineTotal=10,mineFlags=0,mineSeconds=0;
+let mineStarted=false,mineOver=false,flagMode=false,mineTimer=null;
 function newMines(){
- clearInterval(mineInterval);mineInterval=null;mineSeconds=0;mineStarted=false;mineOver=false;mineFlags=0;mineRevealed=0;
- const diff=$('mineDifficulty').value;
- if(diff==='medium'){mineRows=12;mineCols=12;mineTotal=20}else if(diff==='hard'){mineRows=16;mineCols=16;mineTotal=40}else{mineRows=9;mineCols=9;mineTotal=10}
- mineBoard=Array.from({length:mineRows*mineCols},()=>({bomb:false,n:0,open:false,flag:false}));
- $('mineFace').textContent='🙂';$('mineCount').textContent=String(mineTotal).padStart(3,'0');$('mineTimer').textContent='000';
- $('mineGrid').style.gridTemplateColumns=`repeat(${mineCols}, minmax(0,1fr))`;
- $('mineGrid').innerHTML='';$('mineGrid').style.maxWidth='max-content';
- mineBoard.forEach((c,i)=>{let b=document.createElement('button');b.className='minecell';b.dataset.i=i;b.textContent='';b.onclick=()=>mineClick(i);b.oncontextmenu=e=>{e.preventDefault();toggleMineFlag(i)};$('mineGrid').appendChild(b)});
- $('mineStatus').textContent='Tap a square to start. Find every safe square!';$('flagMode').textContent='🚩 Flag mode: '+(mineFlagMode?'On':'Off');
+ clearInterval(mineTimer);mineTimer=null;
+ const d=document.getElementById('mineDifficulty').value;
+ if(d==='easy'){mineRows=9;mineCols=9;mineTotal=10}
+ else if(d==='medium'){mineRows=12;mineCols=12;mineTotal=22}
+ else{mineRows=16;mineCols=16;mineTotal=40}
+ mineBoard=Array.from({length:mineRows*mineCols},()=>({bomb:false,open:false,flag:false,n:0}));
+ mineFlags=0;mineSeconds=0;mineStarted=false;mineOver=false;flagMode=false;
+ document.getElementById('mineFace').innerHTML=faceSVG('normal');
+ document.getElementById('mineStatus').textContent='REVEAL ALL SAFE SQUARES!';
+ document.getElementById('mineTime').textContent='000';
+ document.getElementById('flagButton').innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span> FLAG: OFF';
+ document.getElementById('flagButton').classList.remove('pressed');
+ for(let i=0;i<mineTotal;i++){let n;do{n=Math.floor(Math.random()*mineBoard.length)}while(mineBoard[n].bomb);mineBoard[n].bomb=true}
+ for(let i=0;i<mineBoard.length;i++){
+  if(mineBoard[i].bomb)continue;
+  const x=i%mineCols,y=Math.floor(i/mineCols);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<mineCols&&ny<mineRows&&mineBoard[ny*mineCols+nx].bomb)mineBoard[i].n++
+  }
+ }
+ renderMines()
 }
-function mineNeighbors(i){let r=Math.floor(i/mineCols),c=i%mineCols,out=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;let nr=r+dr,nc=c+dc;if(nr>=0&&nr<mineRows&&nc>=0&&nc<mineCols)out.push(nr*mineCols+nc)}return out}
-function setupBombs(first){
- let safe=new Set([first,...mineNeighbors(first)]);
- let pool=mineBoard.map((_,i)=>i).filter(i=>!safe.has(i));
- for(let i=pool.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
- pool.slice(0,mineTotal).forEach(i=>mineBoard[i].bomb=true);
- mineBoard.forEach((c,i)=>{c.n=mineNeighbors(i).filter(j=>mineBoard[j].bomb).length});
+function renderMines(){
+ const board=document.getElementById('mineBoard');board.innerHTML='';board.style.gridTemplateColumns=`repeat(${mineCols}, minmax(0,1fr))`;
+ mineBoard.forEach((c,i)=>{
+  const b=document.createElement('button');b.className='mine-cell';
+  if(c.open){b.classList.add('revealed');if(c.bomb)b.innerHTML='<span class="bomb-pixel"></span>';else if(c.n){b.textContent=c.n;b.classList.add('n'+c.n)}}
+  else if(c.flag){b.innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span>';b.classList.add('flagged')}
+  b.setAttribute('aria-label',c.open?(c.bomb?'Bomb':c.n?'Number '+c.n:'Empty'):c.flag?'Flagged square':'Hidden square');
+  b.addEventListener('click',()=>mineClick(i));b.addEventListener('contextmenu',e=>{e.preventDefault();toggleMineFlag(i)});board.appendChild(b)
+ });
+ document.getElementById('mineCount').textContent=String(Math.max(0,mineTotal-mineFlags)).padStart(3,'0')
 }
-function mineClick(i){
- if(mineOver)return;
- let c=mineBoard[i];if(c.open||c.flag)return;
- if(mineFlagMode){toggleMineFlag(i);return}
- if(!mineStarted){mineStarted=true;setupBombs(i);mineInterval=setInterval(()=>{if(!mineOver){mineSeconds++;$('mineTimer').textContent=String(Math.min(mineSeconds,999)).padStart(3,'0')}},1000)}
- if(c.bomb){c.open=true;renderMineCell(i);mineLose();return}
- revealMine(i);playTone(520,.035);checkMineWin()
-}
-function revealMine(i){
- let c=mineBoard[i];if(c.open||c.flag||c.bomb)return;
- c.open=true;mineRevealed++;renderMineCell(i);
- if(c.n===0)mineNeighbors(i).forEach(j=>{if(!mineBoard[j].open)revealMine(j)});
-}
-function renderMineCell(i){
- let c=mineBoard[i],b=$('mineGrid').children[i];b.className='minecell';b.textContent='';
- if(c.flag){b.classList.add('flagged');b.textContent='🚩';return}
- if(c.open){b.classList.add('revealed');if(c.bomb){b.textContent='💣';b.style.background='#ff5555'}else if(c.n){b.textContent=c.n;b.style.color=({1:'#0000ff',2:'#008000',3:'#ff0000',4:'#000080',5:'#800000',6:'#008080',7:'#000',8:'#777'})[c.n]}}
+function toggleFlagMode(){
+ flagMode=!flagMode;const b=document.getElementById('flagButton');
+ b.innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span> FLAG: '+(flagMode?'ON':'OFF');
+ b.classList.toggle('pressed',flagMode)
 }
 function toggleMineFlag(i){
  if(mineOver||mineBoard[i].open)return;
- let c=mineBoard[i];c.flag=!c.flag;mineFlags+=c.flag?1:-1;
- $('mineCount').textContent=String(mineTotal-mineFlags).padStart(3,'0');renderMineCell(i);playTone(c.flag?700:350,.04)
+ mineBoard[i].flag=!mineBoard[i].flag;mineFlags+=mineBoard[i].flag?1:-1;renderMines();playTone(350,.04)
 }
-function toggleFlagMode(){mineFlagMode=!mineFlagMode;$('flagMode').textContent='🚩 Flag mode: '+(mineFlagMode?'On':'Off');playTone(450,.04)}
-function mineLose(){
- mineOver=true;clearInterval(mineInterval);$('mineFace').textContent='😵';mineBoard.forEach((c,i)=>{if(c.bomb){c.open=true;renderMineCell(i)}});$('mineStatus').textContent='Boom! You hit a bomb. Press the smiley to try again.';playTone(130,.3,'sawtooth')
-}
-function checkMineWin(){
- if(mineRevealed===mineRows*mineCols-mineTotal){mineOver=true;clearInterval(mineInterval);$('mineFace').textContent='😎';$('mineStatus').textContent='You win! Every safe square is clear!';playTone(700,.12);setTimeout(()=>playTone(900,.15),130)}
-}
-function mineHelp(){alert('Minesweeper: tap squares to reveal them. Numbers show how many bombs touch that square. Turn Flag mode on, then tap a square to mark a suspected bomb. Reveal every safe square to win. Your first tap is always safe.')}
-
-/* SOLITAIRE: Klondike draw-one */
-const suits=['♠','♥','♦','♣'],ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-let deck=[],stock=[],waste=[],foundations=[[],[],[],[]],columns=Array.from({length:7},()=>[]),selected=null,moves=0,solUndo=[];
-function makeDeck(){let d=[];for(let s=0;s<4;s++)for(let r=1;r<=13;r++)d.push({s,r,faceUp:false,id:s*13+r});return d}
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function newSolitaire(){
- deck=shuffle(makeDeck());stock=[];waste=[];foundations=[[],[],[],[]];columns=Array.from({length:7},()=>[]);selected=null;moves=0;solUndo=[];
- for(let c=0;c<7;c++)for(let j=0;j<=c;j++){let card=deck.pop();card.faceUp=j===c;columns[c].push(card)}
- stock=deck;deck=[];$('solStatus').textContent='New game started.';renderSol();playTone(500,.05)
-}
-function rankName(r){return ranks[r-1]}
-function redCard(c){return c.s===1||c.s===2}
-function saveSol(){solUndo.push(JSON.stringify({stock,waste,foundations,columns,moves}));if(solUndo.length>40)solUndo.shift()}
-function undoSol(){if(!solUndo.length)return;let d=JSON.parse(solUndo.pop());stock=d.stock;waste=d.waste;foundations=d.foundations;columns=d.columns;moves=d.moves;selected=null;renderSol();playTone(350,.06)}
-function drawStock(){
- if(!stock.length){if(!waste.length)return;saveSol();stock=waste.reverse().map(c=>({...c,faceUp:false}));waste=[];$('solStatus').textContent='Stock recycled.';moves++;renderSol();playTone(380,.06);return}
- saveSol();let c=stock.pop();c.faceUp=true;waste.push(c);selected=null;moves++;renderSol();playTone(580,.045)
-}
-function cardHTML(c,extra=''){
- let el=document.createElement('div');el.className='card'+(c.faceUp?'':' back')+(c.faceUp&&redCard(c)?' red':'')+extra;
- el.dataset.card=c.id;
- if(c.faceUp){el.innerHTML='<div class="rank">'+rankName(c.r)+'<br>'+suits[c.s]+'</div><div class="suit">'+suits[c.s]+'</div>'}
- return el
-}
-function renderSol(){
- $('solScore').textContent='Moves: '+moves;
- const st=$('stock');st.innerHTML='';
- if(stock.length){let back=document.createElement('div');back.className='card back';back.style.inset='0';back.style.width='100%';back.style.height='100%';st.appendChild(back)}else{st.classList.add('empty')}
- const w=$('waste');w.innerHTML='';
- if(waste.length){let c=waste[waste.length-1],el=cardHTML(c);el.style.inset='0';el.style.width='100%';el.style.height='100%';if(selected&&selected.type==='waste')el.classList.add('selected');w.appendChild(el)}
- for(let i=0;i<4;i++){let f=$('foundation'+i);f.innerHTML='';let a=foundations[i];if(a.length){let el=cardHTML(a[a.length-1]);el.style.inset='0';el.style.width='100%';el.style.height='100%';f.appendChild(el)}f.classList.toggle('empty',!a.length)}
- $('tableau').innerHTML='';
- columns.forEach((col,ci)=>{
-  let pile=document.createElement('div');pile.className='col';pile.dataset.col=ci;
-  col.forEach((c,idx)=>{
-   let el=cardHTML(c);
-   el.style.top=(idx*(c.faceUp?22:13))+'px';
-   el.style.zIndex=idx+1;
-   if(selected&&selected.type==='col'&&selected.col===ci&&idx>=selected.index)el.classList.add('selected');
-   el.onclick=e=>{e.stopPropagation();selectTableau(ci,idx)};
-   pile.appendChild(el)
-  });
-  pile.onclick=()=>{if(!col.length&&selected)moveTableau(ci)};
-  $('tableau').appendChild(pile)
- });
- $('stock').onclick=drawStock;
- $('waste').onclick=()=>{if(waste.length)selectWaste()};
- $('solStatus').textContent=$('solStatus').textContent||'Tap cards to play.';
- if(foundations.every(f=>f.length===13)){$('solStatus').textContent='You won! All cards are sorted!';playTone(750,.15);setTimeout(()=>playTone(950,.2),180)}
-}
-function selectWaste(){if(!waste.length)return;selected={type:'waste'};renderSol()}
-function selectTableau(ci,idx){
- let c=columns[ci][idx];if(!c.faceUp){if(idx===columns[ci].length-1){saveSol();c.faceUp=true;moves++;selected=null;renderSol();playTone(500,.05)}return}
- if(selected){if(selected.type==='col'&&selected.col===ci&&selected.index===idx){selected=null;renderSol();return}
-  if(selected.type==='col'&&selected.col===ci&&idx>selected.index){selected={type:'col',col:ci,index:idx};renderSol();return}
-  if(moveToColumn(ci))return;
+function mineClick(i){
+ if(mineOver)return;const c=mineBoard[i];if(c.open)return;
+ if(flagMode){toggleMineFlag(i);return}if(c.flag)return;
+ if(!mineStarted){
+  mineStarted=true;mineTimer=setInterval(()=>{if(!mineOver){mineSeconds++;document.getElementById('mineTime').textContent=String(Math.min(999,mineSeconds)).padStart(3,'0')}},1000)
  }
- selected={type:'col',col:ci,index:idx};renderSol()
-}
-function moveToColumn(target){
- if(!selected)return false;
- let srcCards=selected.type==='waste'?[waste[waste.length-1]]:columns[selected.col].slice(selected.index);
- if(!srcCards.length)return false;
- let moving=srcCards[0],dest=columns[target],top=dest[dest.length-1];
- if(top){if(!top.faceUp||top.r!==moving.r+1||redCard(top)===redCard(moving))return false}
- else if(moving.r!==13)return false;
- saveSol();
- if(selected.type==='waste')waste.pop();else{columns[selected.col].splice(selected.index);let old=columns[selected.col];if(old.length&&!old[old.length-1].faceUp)old[old.length-1].faceUp=true}
- columns[target].push(...srcCards);moves++;selected=null;$('solStatus').textContent='Card moved.';renderSol();playTone(620,.05);return true
-}
-function moveTableau(target){if(moveToColumn(target))return}
-function tryFoundation(card,source,ci,idx){
- let pile=foundations[card.s],top=pile[pile.length-1];
- if(top?card.r!==top.r+1:card.r!==1)return false;
- saveSol();
- if(source==='waste')waste.pop();else{columns[ci].splice(idx);let col=columns[ci];if(col.length&&!col[col.length-1].faceUp)col[col.length-1].faceUp=true}
- pile.push(card);selected=null;moves++;$('solStatus').textContent='Card sent to foundation.';renderSol();playTone(800,.07);return true
-}
-document.addEventListener('click',e=>{
- let f=e.target.closest('[data-pile]');if(f){
-  if(!selected)return;
-  let card=selected.type==='waste'?waste[waste.length-1]:columns[selected.col][selected.index];
-  if(card&&tryFoundation(card,selected.type==='waste'?'waste':'col',selected.col,selected.index))return;
+ if(c.bomb){
+  c.open=true;mineOver=true;clearInterval(mineTimer);mineBoard.forEach(q=>{if(q.bomb)q.open=true});
+  document.getElementById('mineFace').innerHTML=faceSVG('sad');document.getElementById('mineStatus').textContent='BOOM! GAME OVER!';
+  renderMines();playTone(120,.3);return
  }
-});
-function solHelp(){alert('Tap a face-up card, then tap another column to move it. You can move a whole face-up sequence. Build descending alternating colors. Aces go to the top foundation piles, then build up by suit. Tap the stock to draw; tap an empty stock to recycle the waste. Tap Undo to reverse a move.')}
+ revealMine(i);
+ if(mineBoard.every(q=>q.bomb||q.open)){
+  mineOver=true;clearInterval(mineTimer);document.getElementById('mineFace').innerHTML=faceSVG('cool');
+  document.getElementById('mineStatus').textContent='YOU WIN! NICE WORK!';playTone(850,.15)
+ }else playTone(500,.025);
+ renderMines()
+}
+function revealMine(i){
+ const c=mineBoard[i];if(!c||c.open||c.flag||c.bomb)return;c.open=true;
+ if(c.n===0){
+  const x=i%mineCols,y=Math.floor(i/mineCols);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<mineCols&&ny<mineRows)revealMine(ny*mineCols+nx)}
+ }
+}
+function openMineHelp(){openApp('helpDialog')}
+document.getElementById('mineBoard').addEventListener('touchstart',()=>{}, {passive:true});
 
-newSolitaire();newMines();renderCalendar();calcShow();
+/* INITIALIZE */
+newSnake();
+newMines();
+renderCalendar();
+calcShow();
 </script>
 </body>
 </html>
