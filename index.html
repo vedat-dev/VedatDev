@@ -3,862 +3,823 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Online Dice LIVE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Classic Solitaire</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--blue:#3b82f6;--muted:#7893b6}
-html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh;padding:8px;display:flex;justify-content:center;color:white;background:radial-gradient(ellipse at 15% 20%,#102b55,transparent 40%),radial-gradient(ellipse at 85% 70%,#20134c,transparent 40%),#020817;overflow-x:hidden}
-.app{width:min(760px,97vw);min-height:calc(100vh - 16px)}
-.panel{width:100%;min-height:calc(100vh - 16px);display:flex;flex-direction:column;padding:20px;position:relative;overflow:hidden;background:rgba(4,15,35,.97);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 12px 36px #0007}
-.top{text-align:center;padding-top:4px}
-.title{margin:0;font-size:31px;font-weight:1000;letter-spacing:3px;text-shadow:0 0 15px #3b82f655}
-.subtitle{margin-top:5px;font-size:9px;font-weight:900;letter-spacing:2px;color:var(--muted)}
-.top-info,.details{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
-.top-info{margin-top:18px}
-.details{margin-top:15px;gap:6px}
-.info-box{padding:7px 10px;border:1px solid #ffffff16;border-radius:7px;background:#ffffff06;color:#8ea8c9;font-size:7px;font-weight:900;letter-spacing:1px}
-.info-box.active{color:#60a5fa;border-color:#3b82f644;background:#3b82f610}
-.detail{padding:5px 8px;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px;border:1px solid #ffffff0c;border-radius:5px;background:#0003}
-.dice-section{margin-top:22px;display:flex;flex-direction:column;align-items:center}
-.section-label{margin-bottom:11px;color:#8aa8d0;font-size:8px;font-weight:1000;letter-spacing:2px}
-.dice-row{width:100%;display:flex;justify-content:center;align-items:center;gap:13px}
-.dice-box{width:72px;height:72px;flex:0 0 auto;border:3px solid white;border-radius:10px;background:#22c55e;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px #0005}
-.dice-dot{width:12px;height:12px;border-radius:50%;background:white;box-shadow:0 0 6px #ffffff99}
-.dice-box.rolling{animation:shake .2s ease-in-out infinite alternate}
-@keyframes shake{from{transform:translateX(-2px) rotate(-3deg)}to{transform:translateX(2px) rotate(3deg)}}
-.dice-details{margin-top:13px;display:flex;justify-content:center;flex-wrap:wrap;gap:14px;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
-.dice-details span:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:#3b82f6;margin:0 5px 1px 0}
-.dice-description{margin-top:8px;text-align:center;color:#7893b6;font-size:7px;font-weight:800;letter-spacing:1px}
-.reroll-area{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:19px}
-.action-btn{width:230px;max-width:48%;height:48px;padding:0 8px;border:1px solid transparent;border-radius:9px;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer}
-.reroll{background:#fde047;color:#18230c}
-.slow-reveal{background:#173e76;color:#dbeafe;border-color:#60a5fa55}
-.action-btn:disabled{opacity:.5;cursor:wait}
-.stats{margin-top:18px;display:flex;justify-content:center;gap:10px}
-.stat{width:145px;padding:10px;text-align:center;background:#0003;border:1px solid #ffffff12;border-radius:8px}
-.stat-label{color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
-.stat-value{margin-top:4px;color:#dceaff;font-size:13px;font-weight:1000}
-.counter-section{margin-top:16px;padding:14px;text-align:center;background:#08172b;border:1px solid #ffffff16;border-radius:10px}
-.counter-heading{color:#8aa8d0;font-size:9px;font-weight:900;letter-spacing:2px}
-.counter-total{margin-top:9px;font-size:32px;font-weight:1000;font-variant-numeric:tabular-nums}
-.counter-status{margin-top:4px;color:#8aa8d0;font-size:9px;font-weight:900;letter-spacing:1px}
-.counter-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
-.counter-btn{height:40px;min-width:0;border:1px solid #ffffff18;border-radius:7px;font-size:15px;font-weight:1000;cursor:pointer}
-.plus{background:#14532d;color:#86efac}
-.minus{background:#3f1721;color:#fca5a5}
-.counter-reset{margin-top:10px;padding:7px 12px;background:transparent;border:1px solid #ffffff20;border-radius:6px;color:#8aa8d0;font-size:8px;font-weight:900;cursor:pointer}
-.history-section{margin-top:19px;padding:13px;flex:1;min-height:120px;background:#0003;border:1px solid #ffffff12;border-radius:10px}
-.history-title{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}
-.history-title-left{color:#a0b9da;font-size:8px;font-weight:1000;letter-spacing:1.5px}
-.history-title-right{color:#7893b6;font-size:7px;font-weight:900}
-.history{display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto}
-.history-empty{padding:15px;text-align:center;color:#7893b6;font-size:7px;font-weight:900}
-.history-row{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-radius:7px;background:#ffffff06;border:1px solid #ffffff0a}
-.history-number{width:34px;flex-shrink:0;color:#8aa8d0;font-size:7px;font-weight:1000}
-.history-colors{display:flex;gap:6px}
-.history-color{width:21px;height:21px;border:1px solid #ffffff88;border-radius:4px}
-.history-status{color:#86efac;font-size:6px;font-weight:900}
-.footer{margin-top:auto;padding-top:18px;text-align:center;color:#7893b6;font-size:7px;font-weight:900;letter-spacing:1px}
-
-/* Floating LIVE widget */
-.live-widget{position:fixed;bottom:12px;left:12px;z-index:20;width:300px;max-width:calc(100vw - 24px);background:#080a10f7;border:1px solid #ffffff20;border-radius:15px;overflow:hidden;box-shadow:0 8px 32px #000b}
-.live-top{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(90deg,#1b1530,#101522);border-bottom:1px solid #ffffff12;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-.live-top.dragging{cursor:grabbing}
-.live-brand{font-size:11px;font-weight:1000;letter-spacing:.5px}
-.live-badge{background:#fe2c55;color:white;border-radius:4px;padding:4px 6px;font-size:8px;font-weight:1000;margin-right:5px}
-.live-viewers{font-size:10px;color:#eee;background:#ffffff12;border-radius:12px;padding:5px 8px}
-.live-main{padding:9px}
-.stream-title{font-size:10px;font-weight:900;color:#fff;margin-bottom:7px}
-.stream-screen{position:relative;padding:12px 6px 10px;border:1px solid #ffffff16;border-radius:9px;background:radial-gradient(ellipse at top,#1d3560,#070b16 75%);overflow:hidden}
-.stream-screen:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#ffffff04,transparent 35%,#0003)}
-.stream-dice{display:flex;align-items:center;justify-content:center;gap:7px;position:relative;z-index:1}
-.stream-die{width:42px;height:42px;border:2px solid #fff;border-radius:7px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0008}
-.stream-die span{width:7px;height:7px;border-radius:50%;background:white;box-shadow:0 0 5px #fff}
-.stream-label{margin-top:8px;text-align:center;font-size:8px;color:#fff;font-weight:900;letter-spacing:1px}
-.delay-label{position:absolute;left:7px;top:7px;z-index:2;background:#0009;padding:4px 5px;border-radius:4px;font-size:7px;color:#fff;font-weight:900}
-.live-metrics{display:flex;gap:6px;margin:8px 0}
-.live-metric{flex:1;padding:6px;background:#ffffff0a;border-radius:6px;text-align:center}
-.live-metric strong{display:block;font-size:13px;color:#fff}
-.live-metric small{font-size:7px;color:#fff;font-weight:900}
-.chat-log{height:135px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 1px 8px;scrollbar-width:thin;scrollbar-color:#374151 transparent}
-.chat-message,.chat-message .username,.chat-message .body{font-size:10px;line-height:1.45;overflow-wrap:anywhere;color:#fff!important}
-.chat-message .username{font-weight:1000;margin-right:4px}
-.chat-message.system{color:#fff!important}
-.chat-controls{border-top:1px solid #ffffff15;padding-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.chat-controls button{width:100%;min-width:0;height:32px;border:1px solid #ffffff1c;border-radius:7px;background:#171c2a;color:#fff;font-size:10px;padding:0 6px;font-weight:900;cursor:pointer}
-.send-btn{background:#263c67!important}
-.spam-btn{background:#fe2c55!important;border-color:#fe2c55!important}
-.spam-btn.active{background:#6b7280!important;border-color:#6b7280!important}
-.like-btn{color:#fff!important}
-.chat-note{text-align:center;color:#fff;font-size:7px;margin-top:7px}
-.live-widget.collapsed .live-main{display:none}
-.live-widget.collapsed{width:210px}
-
-/* Floating coin flip panel */
-.coin-panel{position:fixed;left:12px;bottom:440px;z-index:21;width:300px;max-width:calc(100vw - 24px);padding:12px;background:linear-gradient(145deg,#101a30f7,#080a10f7);border:1px solid #ffffff28;border-radius:14px;box-shadow:0 8px 32px #0009;text-align:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
-.coin-panel.dragging{cursor:grabbing}
-.coin-heading{font-size:10px;letter-spacing:2px;font-weight:1000;color:#fff}
-.coin-stage{height:76px;display:flex;align-items:center;justify-content:center;perspective:500px}
-.coin{width:55px;height:55px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid #fff2a8;background:radial-gradient(circle at 30% 25%,#fff4b0,#eab308 60%,#92400e);color:#422006;font-size:10px;font-weight:1000;box-shadow:0 0 18px #facc1555,inset 0 0 0 3px #b77912;transform-style:preserve-3d}
-.coin.flipping{animation:coinFlip .8s ease-in-out}
-@keyframes coinFlip{0%{transform:rotateY(0) rotateX(0) scale(1)}50%{transform:rotateY(900deg) rotateX(18deg) scale(1.13)}100%{transform:rotateY(1800deg) rotateX(0) scale(1)}}
-.coin-result{font-size:12px;font-weight:1000;color:#fff;margin-bottom:9px}
-.coin-button{width:100%;height:35px;border:1px solid #facc15;border-radius:8px;background:linear-gradient(90deg,#fde047,#f59e0b);color:#241700;font-size:10px;font-weight:1000;letter-spacing:1px;cursor:pointer;touch-action:manipulation}
-.coin-button:disabled{opacity:.65;cursor:wait}
-.coin-history{margin-top:7px;color:#fff;font-size:8px}
-
-/* NOTES MANAGER */
-.notes-launcher{
- position:fixed;right:12px;top:50%;transform:translateY(-50%);
- z-index:1000;display:flex;align-items:center;gap:9px;
- padding:13px 15px;border:1px solid #60a5fa66;border-radius:13px;
- color:#dbeafe;background:linear-gradient(145deg,#142c4df5,#071326f7);
- box-shadow:0 8px 28px #0008,0 0 18px #3b82f622;
- font-size:11px;font-weight:1000;letter-spacing:1px;cursor:pointer;
- touch-action:manipulation;transition:border-color .18s,background .18s
+:root{
+  --felt:#087342;
+  --felt-dark:#055832;
+  --gold:#ffd76a;
+  --card-w:clamp(43px,9.2vw,94px);
+  --card-h:calc(var(--card-w)*1.43);
+  --gap:clamp(5px,1.3vw,13px);
 }
-.notes-launcher:hover{border-color:#60a5fa;background:#19365a}
-.notes-launcher-icon{font-size:19px}
-.notes-launcher-label{white-space:nowrap}
-.notes-overlay{
- position:fixed;inset:0;z-index:1100;display:flex;
- align-items:center;justify-content:center;padding:14px;
- background:#020817a8;backdrop-filter:blur(7px);
- -webkit-backdrop-filter:blur(7px)
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:#073e2a;
+  color:#fff;
+  font-family:Georgia,"Times New Roman",serif;
+  overflow-x:hidden;
 }
-.notes-overlay[hidden]{display:none!important}
-.notes-window{
- width:min(760px,100%);height:min(610px,88dvh);min-height:330px;
- display:flex;flex-direction:column;overflow:hidden;color:#eaf2ff;
- background:linear-gradient(145deg,#0c1b33,#050c19 80%);
- border:1px solid #60a5fa44;border-radius:17px;
- box-shadow:0 25px 90px #000c,0 0 35px #3b82f614
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 15px;background:#10251d;
+  border-bottom:2px solid #c6a65a;flex-wrap:wrap;
 }
-.notes-header{
- min-height:58px;display:flex;align-items:center;gap:12px;
- padding:10px 14px;border-bottom:1px solid #ffffff12;background:#ffffff04
+.brand{font-size:clamp(20px,4vw,29px);font-weight:bold;letter-spacing:2px}
+.brand small{display:block;font:10px Arial,sans-serif;letter-spacing:3px;color:#d8c58d;margin-top:3px}
+.stats{display:flex;gap:16px;font:12px Arial,sans-serif;color:#d8e9dc}
+.stats strong{display:block;color:#fff;font-size:17px;margin-top:3px}
+.controls{display:flex;gap:7px;flex-wrap:wrap}
+.btn{
+  border:1px solid #bfa35e;background:#1b392b;color:#fff;
+  padding:9px 12px;border-radius:7px;font:12px Arial,sans-serif;
+  transition:background .2s,transform .2s;
 }
-.notes-close{
- width:35px;height:35px;flex:0 0 auto;border:1px solid #ffffff20;
- border-radius:9px;background:#ffffff08;color:#dbeafe;
- font-size:21px;cursor:pointer
+.btn:hover{background:#31543d}
+.btn:active{transform:scale(.96)}
+.btn.help{background:#e7bd52;color:#18271c;border-color:#ffe5a0;font-weight:bold}
+main{
+  max-width:1200px;margin:auto;padding:15px 10px 35px;
 }
-.notes-close:hover{background:#3b82f633}
-.notes-heading{min-width:0;flex:1}
-.notes-heading h2{margin:0;font-size:16px;letter-spacing:1.5px}
-.notes-heading p{margin:4px 0 0;color:#7893b6;font-size:9px;letter-spacing:1px}
-.notes-save-state{color:#86efac;font-size:9px;font-weight:900;white-space:nowrap}
-.notes-body{flex:1;min-height:0;display:grid;grid-template-columns:205px minmax(0,1fr)}
-.notes-sidebar{
- min-height:0;display:flex;flex-direction:column;gap:9px;padding:12px;
- background:#0002;border-right:1px solid #ffffff12
+.table{
+  min-height:calc(100vh - 135px);
+  position:relative;padding:5px 3px 25px;
 }
-.notes-side-label{color:#7893b6;font-size:9px;font-weight:1000;letter-spacing:1.4px}
-.notes-toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.notes-btn{
- min-height:34px;padding:7px 9px;border:1px solid #ffffff18;
- border-radius:8px;color:#dbeafe;background:#ffffff08;
- font-size:10px;font-weight:900;cursor:pointer
+.top-row{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:var(--gap);margin-bottom:22px;
 }
-.notes-btn:hover{background:#ffffff14}
-.notes-btn.primary{background:#1d4ed8;border-color:#60a5fa66;color:white}
-.notes-btn.primary:hover{background:#2563eb}
-.notes-btn.danger{color:#fca5a5;border-color:#ef444433}
-.notes-folder-list,.notes-list{
- display:flex;flex-direction:column;gap:5px;overflow-y:auto;
- min-height:0;scrollbar-width:thin;scrollbar-color:#344967 transparent
+.top-left{grid-column:span 3;display:flex;gap:var(--gap)}
+.slot{
+  position:relative;width:var(--card-w);height:var(--card-h);
+  flex:0 0 var(--card-w);border:1px solid #ffffff57;
+  border-radius:7px;background:#ffffff0c;
 }
-.notes-folder-list{max-height:125px}
-.notes-folder-item,.notes-item{
- width:100%;min-width:0;display:flex;align-items:center;gap:8px;
- padding:9px;text-align:left;color:#b9cbe5;background:#ffffff04;
- border:1px solid transparent;border-radius:8px;cursor:pointer
+.stock,.waste{width:var(--card-w);height:var(--card-h);position:relative;flex:0 0 var(--card-w)}
+.foundation-area{grid-column:span 4;display:flex;justify-content:flex-end;gap:var(--gap)}
+.slot .suit-mark{
+  position:absolute;inset:0;display:grid;place-items:center;
+  color:#ffffff69;font-size:clamp(20px,5vw,38px);pointer-events:none;
 }
-.notes-folder-item.active,.notes-item.active{
- color:#eff6ff;background:#3b82f61b;border-color:#3b82f655
+.card{
+  position:absolute;width:var(--card-w);height:var(--card-h);
+  border-radius:7px;background:#fffdf5;color:#171717;
+  border:1px solid #e4e0d5;
+  box-shadow:0 2px 4px #001a1070;
+  user-select:none;-webkit-user-select:none;
+  cursor:pointer;touch-action:pan-y;
+  transition:box-shadow .18s,filter .18s;
+  overflow:hidden;
+  animation:card-arrive .22s ease-out both;
 }
-.notes-folder-name,.notes-item-info{flex:1;min-width:0;overflow:hidden}
-.notes-folder-name{font-size:10px;font-weight:900;text-overflow:ellipsis;white-space:nowrap}
-.notes-folder-count{color:#7893b6;font-size:9px}
-.notes-list{flex:1}
-.notes-item{align-items:flex-start}
-.notes-item-title{
- display:block;overflow:hidden;color:#e2edff;font-size:11px;
- font-weight:900;text-overflow:ellipsis;white-space:nowrap
+@keyframes card-arrive{
+  from{opacity:.3;transform:translateY(-10px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
 }
-.notes-item-preview{
- display:block;margin-top:4px;overflow:hidden;color:#7893b6;
- font-size:9px;text-overflow:ellipsis;white-space:nowrap
+.card.red{color:#c62828}
+.card .corner{
+  position:absolute;top:3px;left:4px;
+  font:bold clamp(11px,2.1vw,19px)/.9 Georgia,serif;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
 }
-.notes-editor{min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;padding:16px}
-.notes-editor-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.notes-breadcrumb{min-width:0;overflow:hidden;color:#7893b6;font-size:9px;text-overflow:ellipsis;white-space:nowrap}
-.notes-editor-actions{display:flex;gap:6px}
-.notes-title-input,.notes-textarea{
- width:100%;min-width:0;color:#eaf2ff;background:#0208178c;
- border:1px solid #ffffff18;border-radius:9px;outline:none;
- font-family:Arial,Helvetica,sans-serif
+.card .corner.bottom{
+  top:auto;left:auto;right:4px;bottom:3px;transform:rotate(180deg)
 }
-.notes-title-input{height:43px;padding:0 12px;font-size:15px;font-weight:900}
-.notes-textarea{flex:1;min-height:90px;padding:13px;resize:none;font-size:13px;line-height:1.65}
-.notes-title-input:focus,.notes-textarea:focus{border-color:#60a5fa99;box-shadow:0 0 0 2px #3b82f619}
-.notes-title-input::placeholder,.notes-textarea::placeholder{color:#58708f}
-.notes-editor-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;color:#7893b6;font-size:9px}
-.notes-editor-footer .notes-btn{min-width:95px}
-.notes-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;color:#7893b6;font-size:11px;line-height:1.7}
-.notes-empty-icon{font-size:35px}
-.notes-empty strong{color:#dbeafe;font-size:13px}
-.notes-empty button{margin-top:5px}
-.notes-confirm{padding:10px;border:1px solid #ffffff18;border-radius:9px;background:#101e34;color:#eaf2ff;font-size:11px}
-.notes-confirm p{line-height:1.5}
-.notes-confirm-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}
-.notes-footer{padding:8px 13px;border-top:1px solid #ffffff10;color:#58708f;text-align:center;font-size:8px;letter-spacing:.5px}
-
-@media(max-width:600px){
- .panel{padding:17px 12px}
- .title{font-size:26px}
- .dice-row{gap:8px}
- .dice-box{width:64px;height:64px}
- .stats{gap:7px}
- .stat{width:135px}
- .live-widget{bottom:8px;left:8px;width:270px}
- .coin-panel{left:8px;bottom:calc(8px + 410px);width:270px}
- .chat-log{height:105px}
+.card .corner .suit{font-size:.9em}
+.card .pip{
+  position:absolute;inset:20% 12% 20%;
+  display:grid;place-items:center;font-size:clamp(19px,4.7vw,42px);
 }
-@media(max-width:520px){
- .notes-launcher{right:7px;padding:11px;border-radius:12px}
- .notes-launcher-label{display:none}
- .notes-overlay{padding:7px}
- .notes-window{height:88dvh;min-height:320px;border-radius:13px}
- .notes-header{min-height:51px;padding:8px}
- .notes-heading h2{font-size:13px}
- .notes-heading p{font-size:8px}
- .notes-save-state{font-size:8px}
- .notes-body{grid-template-columns:116px minmax(0,1fr)}
- .notes-sidebar{padding:7px;gap:7px}
- .notes-toolbar{grid-template-columns:1fr}
- .notes-btn{font-size:9px;padding:7px 5px}
- .notes-folder-item,.notes-item{padding:7px 5px;gap:4px}
- .notes-folder-name,.notes-item-title{font-size:9px}
- .notes-folder-count{font-size:8px}
- .notes-editor{padding:10px;gap:8px}
- .notes-editor-top{align-items:flex-start;flex-direction:column}
- .notes-title-input{height:38px;font-size:13px}
- .notes-textarea{padding:9px;font-size:12px}
- .notes-editor-footer .notes-btn{min-width:0}
+.card .face-art{
+  position:absolute;inset:20% 12%;
+  display:grid;place-items:center;
+  font-size:clamp(19px,4vw,39px);
+  border:2px double currentColor;border-radius:35%;
+  background:linear-gradient(145deg,#f7e9c3,#fffdf6 55%,#d9c7a1);
 }
-@media(max-width:430px){
- .app{width:100%}
- .dice-row{gap:6px}
- .dice-box{width:61px;height:61px}
- .dice-details{gap:9px;font-size:6px}
- .stat{width:130px}
- .action-btn{font-size:9px;letter-spacing:.5px}
- .stream-die{width:39px;height:39px}
+.card .face-art span{filter:drop-shadow(0 1px 0 #fff)}
+.card.back{
+  border:3px solid #f5e9c9;
+  background:
+   repeating-linear-gradient(45deg,transparent 0 5px,#ffffff28 5px 7px),
+   repeating-linear-gradient(-45deg,transparent 0 5px,#ffffff22 5px 7px),
+   #183e70;
+  box-shadow:inset 0 0 0 3px #183e70,inset 0 0 0 5px #d9c080,0 2px 4px #001a1070;
 }
-@media(max-width:350px){
- .panel{padding-left:8px;padding-right:8px}
- .dice-row{gap:4px}
- .dice-box{width:56px;height:56px}
- .stream-die{width:34px;height:34px}
+.card.back:after{
+  content:"♠";position:absolute;inset:0;display:grid;place-items:center;
+  color:#f4dfa2;font-size:clamp(24px,6vw,47px);text-shadow:0 1px 2px #001;
+}
+.card.selected{
+  box-shadow:0 0 0 3px #ffe37a,0 0 18px #ffe37a;
+  filter:brightness(1.05);
+  z-index:20;
+  animation:select-bounce .32s ease-out;
+}
+@keyframes select-bounce{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+  100%{transform:translateY(0)}
+}
+.card.hint-source{
+  box-shadow:0 0 0 3px #ffe16a,0 0 22px #ffe16a;
+  animation:hint-pulse .8s ease-in-out infinite alternate;
+  z-index:30;
+}
+@keyframes hint-pulse{
+  from{filter:brightness(1);box-shadow:0 0 0 2px #ffe16a,0 0 9px #ffe16a}
+  to{filter:brightness(1.12);box-shadow:0 0 0 4px #fff4b0,0 0 24px #ffe16a}
+}
+.slot.hint-dest{
+  border:3px solid #ffe16a;
+  box-shadow:0 0 18px #ffe16a;
+  animation:dest-pulse .8s ease-in-out infinite alternate;
+  z-index:4;
+}
+@keyframes dest-pulse{
+  from{background:#ffe16a17}
+  to{background:#ffe16a45}
+}
+.tableau{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:var(--gap);align-items:start;
+}
+.pile{
+  position:relative;min-width:0;min-height:var(--card-h);
+}
+.pile .slot{width:100%;height:var(--card-h)}
+.pile .card{left:0;top:0}
+.pile .card:not(:first-child){margin-top:0}
+.empty-king{font-size:clamp(16px,4vw,30px);color:#ffffff55}
+.status{
+  min-height:37px;text-align:center;padding:12px 6px 5px;
+  color:#e8e2c9;font:12px Arial,sans-serif;
+}
+#help-message{
+  display:none;margin:4px auto 13px;max-width:500px;
+  padding:10px 13px;border:1px solid #e6c45f;border-radius:8px;
+  background:#102b1e;color:#fff0bd;text-align:center;
+  font:13px/1.5 Arial,sans-serif;
+}
+#help-message.show{display:block;animation:message-in .2s ease-out}
+@keyframes message-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+#arrow-layer{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1000;overflow:visible}
+.arrow-line{
+  stroke:#ffe16a;stroke-width:4;fill:none;stroke-linecap:round;
+  stroke-dasharray:10 7;filter:drop-shadow(0 0 5px #ffcf42);
+  animation:arrow-flow .55s linear infinite;
+}
+@keyframes arrow-flow{to{stroke-dashoffset:-34}}
+.arrow-head{fill:#ffe16a;filter:drop-shadow(0 0 5px #ffcf42)}
+#arrow-dot{fill:#fff4b0;filter:drop-shadow(0 0 8px #ffe16a)}
+.overlay{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  padding:20px;background:#0009;z-index:2000;
+}
+.overlay.show{display:flex}
+.dialog{
+  max-width:380px;width:100%;background:#112d20;
+  border:1px solid #d8b75f;border-radius:13px;padding:24px;text-align:center;
+  box-shadow:0 15px 55px #0008;
+}
+.dialog h2{margin-top:0;color:#f6d77e}
+.dialog p{font:14px/1.6 Arial,sans-serif;color:#e0e9df}
+.dialog .btn{margin-top:10px}
+@media(max-width:500px){
+  header{padding:10px;gap:9px}
+  .stats{gap:10px}
+  .btn{padding:8px 9px;font-size:11px}
+  main{padding:12px 6px}
+  .top-row{margin-bottom:18px}
+  .card .corner{left:2px;top:3px}
+  .card .corner.bottom{left:auto;right:2px;top:auto;bottom:3px}
 }
 @media(prefers-reduced-motion:reduce){
- .dice-box.rolling,.coin.flipping{animation:none}
- .notes-launcher{transition:none}
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 </style>
 </head>
 <body>
-<div class="app">
-<div class="panel">
-
-<div class="top">
- <h1 class="title">ONLINE DICE</h1>
- <div class="subtitle">COLOR RANDOMIZER ENGINE</div>
-</div>
-<div class="top-info">
- <div class="info-box active">SYSTEM ONLINE</div>
- <div class="info-box">SESSION ACTIVE</div>
- <div class="info-box">ENGINE READY</div>
-</div>
-<div class="details">
- <div class="detail">6 COLORS</div><div class="detail">4 CHAMBERS</div>
- <div class="detail">LIVE ROLL</div><div class="detail">RANDOMIZED</div>
- <div class="detail">ACTIVE ENGINE</div>
-</div>
-
-<div class="dice-section">
- <div class="section-label">FOUR COLOR OUTPUTS</div>
- <div class="dice-row">
-  <div class="dice-box"><div class="dice-dot"></div></div>
-  <div class="dice-box"><div class="dice-dot"></div></div>
-  <div class="dice-box"><div class="dice-dot"></div></div>
-  <div class="dice-box"><div class="dice-dot"></div></div>
- </div>
- <div class="dice-details"><span>FOUR OUTPUTS</span><span>LIVE STATUS</span><span id="readyStatus">READY</span></div>
- <div class="dice-description">EACH CHAMBER GENERATES AN INDEPENDENT COLOR RESULT</div>
-</div>
-
-<div class="reroll-area">
- <button class="action-btn reroll" id="reroll">↻ REROLL</button>
- <button class="action-btn slow-reveal" id="slowReveal">◷ SLOW REVEAL</button>
-</div>
-
-<div class="stats">
- <div class="stat"><div class="stat-label">TOTAL ROLLS</div><div class="stat-value" id="totalRolls">0</div></div>
- <div class="stat"><div class="stat-label">SYSTEM</div><div class="stat-value" id="systemStatus">ONLINE</div></div>
-</div>
-
-<div class="counter-section">
- <div class="counter-heading">WIN / LOSS COUNTER</div>
- <div class="counter-total" id="counterTotal">0</div>
- <div class="counter-status" id="counterStatus">NO POINTS YET</div>
- <div class="counter-buttons">
-  <button class="counter-btn plus" data-change="1">+1</button>
-  <button class="counter-btn plus" data-change="10">+10</button>
-  <button class="counter-btn minus" data-change="-1">−1</button>
-  <button class="counter-btn minus" data-change="-10">−10</button>
- </div>
- <button class="counter-reset" id="counterReset">RESET COUNTER</button>
-</div>
-
-<div class="history-section">
- <div class="history-title"><div class="history-title-left">REROLL HISTORY</div><div class="history-title-right">NEWEST FIRST</div></div>
- <div class="history" id="history"><div class="history-empty" id="historyEmpty">NO ROLLS RECORDED YET</div></div>
-</div>
-<div class="footer">ONLINE DICE • COLOR ENGINE • READY</div>
-</div>
-</div>
-
-<div class="coin-panel" id="coinPanel">
- <div class="coin-heading">🪙 LIVE COIN FLIP</div>
- <div class="coin-stage"><div class="coin" id="coin">FLIP</div></div>
- <div class="coin-result" id="coinResult">HEADS OR TAILS?</div>
- <button class="coin-button" id="flipCoin">↻ FLIP COIN</button>
- <div class="coin-history" id="coinHistory">FLIPS: 0</div>
-</div>
-
-<div class="live-widget" id="liveWidget">
- <div class="live-top" id="liveDragHandle">
-  <div class="live-brand"><span class="live-badge">LIVE</span>Online Dice</div>
-  <div style="display:flex;align-items:center;gap:7px">
-   <span class="live-viewers">◉ <span id="viewerCount">128</span></span>
-   <button id="chatMin" aria-label="Minimize live" style="background:transparent;color:white;border:0;font-size:17px;cursor:pointer;touch-action:manipulation">−</button>
+<header>
+  <div class="brand">SOLITAIRE<small>CLASSIC KLONDIKE</small></div>
+  <div class="stats">
+    <div>MOVES<strong id="moves">0</strong></div>
+    <div>SCORE<strong id="score">0</strong></div>
+    <div>TIME<strong id="timer">00:00</strong></div>
   </div>
- </div>
- <div class="live-main">
-  <div class="stream-title">🎲 LIVE DICE • COLOR CHALLENGE</div>
-  <div class="stream-screen">
-   <div class="delay-label">● LIVE · 2s DELAY</div>
-   <div class="stream-dice" id="streamDice">
-    <div class="stream-die" style="background:#22c55e"><span></span></div>
-    <div class="stream-die" style="background:#3b82f6"><span></span></div>
-    <div class="stream-die" style="background:#fde047"><span></span></div>
-    <div class="stream-die" style="background:#a855f7"><span></span></div>
-   </div>
-   <div class="stream-label" id="streamLabel">WAITING FOR NEXT ROLL</div>
+  <div class="controls">
+    <button class="btn" id="undo">↶ UNDO</button>
+    <button class="btn" id="new-game">NEW GAME</button>
+    <button class="btn help" id="help">💡 HELP</button>
   </div>
-  <div class="live-metrics">
-   <div class="live-metric"><strong id="liveViewerMetric">128</strong><small>WATCHING</small></div>
-   <div class="live-metric"><strong id="likeCount">2.4K</strong><small>LIKES ♥</small></div>
-  </div>
-  <div class="chat-log" id="chatLog" aria-live="polite"></div>
-  <div class="chat-controls">
-   <button id="spamButton" class="spam-btn">▶ BOT CHAT</button>
-   <button id="likeButton" class="like-btn">♥ LIKE</button>
-  </div>
-  <div class="chat-note">Simulated live • Messages and viewers are not real users</div>
- </div>
-</div>
+</header>
 
-<!-- NOTES LAUNCHER -->
-<button class="notes-launcher" id="notesLauncher" aria-label="Open Notes Manager">
- <span class="notes-launcher-icon">📝</span>
- <span class="notes-launcher-label">MY NOTES</span>
-</button>
-
-<!-- NOTES WINDOW -->
-<div class="notes-overlay" id="notesOverlay" hidden>
- <section class="notes-window" role="dialog" aria-modal="true" aria-labelledby="notesHeading">
-  <header class="notes-header">
-   <button class="notes-close" id="notesClose" aria-label="Close notes">×</button>
-   <div class="notes-heading">
-    <h2 id="notesHeading">NOTES MANAGER</h2>
-    <p>PRIVATE WORKSPACE · LOCAL STORAGE</p>
-   </div>
-   <span class="notes-save-state" id="notesSaveState">SAVED</span>
-  </header>
-
-  <div class="notes-body">
-   <aside class="notes-sidebar">
-    <div class="notes-side-label">YOUR FOLDERS</div>
-    <div class="notes-toolbar">
-     <button class="notes-btn primary" id="notesNewFolder">＋ Folder</button>
-     <button class="notes-btn" id="notesNewNote">＋ Note</button>
+<main>
+  <div class="status" id="status">Move cards in descending order, alternating red and black.</div>
+  <div id="help-message"></div>
+  <section class="table">
+    <div class="top-row">
+      <div class="top-left">
+        <div class="stock" id="stock"></div>
+        <div class="waste" id="waste"></div>
+      </div>
+      <div class="foundation-area">
+        <div class="slot foundation" id="foundation-0" data-foundation="0"><span class="suit-mark">♠</span></div>
+        <div class="slot foundation" id="foundation-1" data-foundation="1"><span class="suit-mark">♥</span></div>
+        <div class="slot foundation" id="foundation-2" data-foundation="2"><span class="suit-mark">♣</span></div>
+        <div class="slot foundation" id="foundation-3" data-foundation="3"><span class="suit-mark">♦</span></div>
+      </div>
     </div>
-    <div class="notes-folder-list" id="notesFolderList"></div>
-    <div class="notes-side-label">NOTES IN FOLDER</div>
-    <div class="notes-list" id="notesList"></div>
-   </aside>
-   <main class="notes-editor" id="notesEditor">
-    <div class="notes-empty">
-     <div class="notes-empty-icon">📝</div>
-     <strong>Your workspace</strong>
-     Choose a note or create a new one.
-     <button class="notes-btn primary" id="notesEmptyCreate">＋ Create a note</button>
-    </div>
-   </main>
+    <div class="tableau" id="tableau"></div>
+  </section>
+</main>
+
+<svg id="arrow-layer" aria-hidden="true">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" class="arrow-head"></path>
+    </marker>
+  </defs>
+  <path id="help-arrow" class="arrow-line" marker-end="url(#arrowhead)" d="" style="display:none"></path>
+  <circle id="arrow-dot" r="5" cx="0" cy="0" style="display:none"></circle>
+</svg>
+
+<div class="overlay" id="win-overlay">
+  <div class="dialog">
+    <h2>♛ You Won!</h2>
+    <p>All 52 cards are home. Excellent game!</p>
+    <button class="btn help" id="play-again">PLAY AGAIN</button>
   </div>
-  <footer class="notes-footer">NOTES ARE SAVED IN THIS BROWSER · AVOID CLEARING SITE DATA</footer>
- </section>
 </div>
 
 <script>
-const colors=[
- {name:"GREEN",hex:"#22c55e"},{name:"BLUE",hex:"#3b82f6"},
- {name:"YELLOW",hex:"#fde047"},{name:"ORANGE",hex:"#f97316"},
- {name:"PURPLE",hex:"#a855f7"},{name:"RED",hex:"#ef4444"}
-];
-const dice=[...document.querySelectorAll(".dice-box")];
-const streamDice=[...document.querySelectorAll(".stream-die")];
-const rerollBtn=document.getElementById("reroll");
-const slowBtn=document.getElementById("slowReveal");
-const historyEl=document.getElementById("history");
-const readyStatus=document.getElementById("readyStatus");
-const systemStatus=document.getElementById("systemStatus");
-const chatLog=document.getElementById("chatLog");
+(() => {
+"use strict";
 
-let totalRolls=0,busy=false,netPoints=0,spamTimer=null;
-let likes=2400,viewers=128,liveMessageQueue=Promise.resolve();
-let coinFlips=0,coinBusy=false;
+const suits = ["♠","♥","♣","♦"];
+const suitNames = ["Spades","Hearts","Clubs","Diamonds"];
+const redSuits = ["♥","♦"];
+const faceSymbols = {11:"♛",12:"♚",13:"♔"};
+const $ = id => document.getElementById(id);
 
-function randomColor(){return colors[Math.floor(Math.random()*colors.length)]}
-function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-function setBusy(value,message){
- busy=value;rerollBtn.disabled=slowBtn.disabled=value;
- readyStatus.textContent=message||(value?"ROLLING":"READY");
- systemStatus.textContent=value?"WORKING":"ONLINE";
-}
-function randomName(){
- const names=["PixelFox","BlueNova","DiceMaster","CloudByte","NeonCat","LuckyCube","ShadowBot","ColorWave","MiaLive","AlexPlays","Starry","TurboTom"];
- return names[Math.floor(Math.random()*names.length)];
-}
-function addLiveMessage(name,text){
- const msg=document.createElement("div");msg.className="chat-message";
- const user=document.createElement("span");user.className="username";user.textContent=name;
- const body=document.createElement("span");body.className="body";body.textContent=" "+text;
- msg.append(user,body);chatLog.appendChild(msg);
- while(chatLog.children.length>45)chatLog.firstElementChild.remove();
- chatLog.scrollTop=chatLog.scrollHeight;
-}
-function queueLiveRoll(results,rollNumber){
- const snapshot=results.map(c=>({...c}));
- liveMessageQueue=liveMessageQueue.then(async()=>{
-  await wait(2000);
-  streamDice.forEach((die,i)=>die.style.background=snapshot[i].hex);
-  document.getElementById("streamLabel").textContent="ROLL #"+rollNumber+" • "+snapshot.map(c=>c.name).join(" / ");
-  addLiveMessage("System","🎲 New roll appeared on stream!");
-  if(Math.random()<.75){
-   const c=snapshot[Math.floor(Math.random()*snapshot.length)];
-   const comments=["Did anyone see that roll? 👀","What color is coming next?","That combo looks good!","I'm picking "+c.name+" next","The colors are looking crazy 🔥"];
-   addLiveMessage(randomName(),comments[Math.floor(Math.random()*comments.length)]);
+let deck = [];
+let stock = [];
+let waste = [];
+let foundations = [[],[],[],[]];
+let tableau = [[],[],[],[],[],[],[]];
+let selected = null;
+let moves = 0;
+let score = 0;
+let seconds = 0;
+let timerInterval = null;
+let history = [];
+let helpOn = false;
+let currentHint = null;
+let nextId = 1;
+
+const tableauEl = $("tableau");
+const stockEl = $("stock");
+const wasteEl = $("waste");
+const statusEl = $("status");
+const helpMessage = $("help-message");
+const arrow = $("help-arrow");
+const arrowDot = $("arrow-dot");
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
   }
- });
+  return arr;
 }
-function addHistory(results){
- const empty=document.getElementById("historyEmpty");if(empty)empty.remove();
- const row=document.createElement("div");row.className="history-row";
- const num=document.createElement("div");num.className="history-number";num.textContent="#"+totalRolls;
- const squares=document.createElement("div");squares.className="history-colors";
- results.forEach(c=>{const s=document.createElement("div");s.className="history-color";s.style.background=c.hex;s.title=c.name;squares.appendChild(s)});
- const status=document.createElement("div");status.className="history-status";status.textContent="COMPLETE";
- row.append(num,squares,status);historyEl.prepend(row);
- while(historyEl.children.length>51)historyEl.lastElementChild.remove();
-}
-function finish(results){
- totalRolls++;document.getElementById("totalRolls").textContent=totalRolls;
- addHistory(results);queueLiveRoll(results,totalRolls);setBusy(false);
-}
-async function roll(slow){
- if(busy)return;
- setBusy(true,slow?"REVEALING":"ROLLING");
- const results=dice.map(()=>randomColor());
- dice.forEach(d=>{d.classList.remove("rolling");d.style.background="#fff"});
- if(!slow){
-  dice.forEach(d=>d.classList.add("rolling"));await wait(350);
-  dice.forEach((d,i)=>{d.classList.remove("rolling");d.style.background=results[i].hex});
- }else{
-  for(let i=0;i<dice.length;i++){
-   readyStatus.textContent=`REVEAL ${i+1}/4`;
-   dice[i].classList.add("rolling");await wait(350);
-   dice[i].classList.remove("rolling");dice[i].style.background=results[i].hex;await wait(300);
+function makeDeck(){
+  const cards=[];
+  for(const suit of suits){
+    for(let rank=1;rank<=13;rank++){
+      cards.push({
+        id:nextId++,suit,rank,faceUp:false
+      });
+    }
   }
- }
- finish(results);
+  return shuffle(cards);
 }
-rerollBtn.addEventListener("click",()=>roll(false));
-slowBtn.addEventListener("click",()=>roll(true));
-
-/* Coin flip */
-const coin=document.getElementById("coin");
-const coinResult=document.getElementById("coinResult");
-const flipCoinBtn=document.getElementById("flipCoin");
-const coinHistory=document.getElementById("coinHistory");
-flipCoinBtn.addEventListener("click",async()=>{
- if(coinBusy)return;
- coinBusy=true;flipCoinBtn.disabled=true;
- coin.classList.remove("flipping");void coin.offsetWidth;coin.classList.add("flipping");
- coinResult.textContent="FLIPPING...";coin.textContent="🪙";
- await wait(850);
- const result=Math.random()<.5?"HEADS":"TAILS";
- coin.textContent=result==="HEADS"?"H":"T";coinResult.textContent=result;
- coinFlips++;coinHistory.textContent="FLIPS: "+coinFlips+" • LAST: "+result;
- coin.classList.remove("flipping");flipCoinBtn.disabled=false;coinBusy=false;
- addLiveMessage("System","🪙 Coin flip result: "+result+"!");
-});
-
-/* Counter */
-const counterTotal=document.getElementById("counterTotal");
-const counterStatus=document.getElementById("counterStatus");
-function updateCounter(){
- counterTotal.textContent=netPoints>0?"+"+netPoints:String(netPoints);
- if(netPoints>0){counterStatus.textContent="WON "+netPoints+" POINTS";counterTotal.style.color=counterStatus.style.color="#86efac"}
- else if(netPoints<0){counterStatus.textContent="LOST "+Math.abs(netPoints)+" POINTS";counterTotal.style.color=counterStatus.style.color="#fca5a5"}
- else{counterStatus.textContent="NO POINTS YET";counterTotal.style.color="#fff";counterStatus.style.color="#8aa8d0"}
+function rankText(rank){
+  if(rank===1)return "A";
+  if(rank===11)return "J";
+  if(rank===12)return "Q";
+  if(rank===13)return "K";
+  return String(rank);
 }
-document.querySelectorAll(".counter-btn").forEach(b=>b.addEventListener("click",()=>{netPoints+=Number(b.dataset.change);updateCounter()}));
-document.getElementById("counterReset").addEventListener("click",()=>{netPoints=0;updateCounter()});
-
-/* Simulated chat */
-const reactions=[
- "I choose {COLOR} 💯","{COLOR} is my pick!","Team {COLOR} 🔥",
- "Need {COLOR} to win 😭","{COLOR} looks lucky","Anyone else picked {COLOR}?",
- "GO {COLOR}!!","{COLOR} all the way!","I have a feeling about {COLOR}",
- "Nahh {COLOR} is the one","PLEASE BE {COLOR} 👀","{COLOR} gang where you at?",
- "That roll was wild","No way 😭","one more roll!!","chat choose your color!",
- "I missed the last one 😭","W roll 🔥","let's gooooo","this live is fun"
-];
-function botMessage(){
- const c=randomColor(),template=reactions[Math.floor(Math.random()*reactions.length)];
- addLiveMessage(randomName(),template.replaceAll("{COLOR}",c.name));
- viewers=Math.max(84,Math.min(420,viewers+Math.floor(Math.random()*7)-3));
- document.getElementById("viewerCount").textContent=viewers;
- document.getElementById("liveViewerMetric").textContent=viewers;
+function isRed(card){return redSuits.includes(card.suit)}
+function sameColor(a,b){return isRed(a)===isRed(b)}
+function topOf(pile){return pile[pile.length-1]}
+function setStatus(text){statusEl.textContent=text}
+function formatTime(){
+  const m=String(Math.floor(seconds/60)).padStart(2,"0");
+  const s=String(seconds%60).padStart(2,"0");
+  $("timer").textContent=m+":"+s;
 }
-document.getElementById("spamButton").addEventListener("click",()=>{
- const btn=document.getElementById("spamButton");
- if(spamTimer!==null){clearTimeout(spamTimer);spamTimer=null;btn.textContent="▶ BOT CHAT";btn.classList.remove("active")}
- else{
-  btn.textContent="■ STOP CHAT";btn.classList.add("active");
-  const runBot=()=>{botMessage();if(spamTimer!==null)spamTimer=setTimeout(runBot,1100+Math.random()*2100)};
-  spamTimer=setTimeout(runBot,700);
- }
-});
-document.getElementById("likeButton").addEventListener("click",()=>{
- likes++;document.getElementById("likeCount").textContent=likes>=1000?(likes/1000).toFixed(1)+"K":likes;
-});
-
-/* Minimize LIVE without hiding coin panel */
-document.getElementById("chatMin").addEventListener("click",()=>{
- const w=document.getElementById("liveWidget");
- w.classList.toggle("collapsed");
- document.getElementById("chatMin").textContent=w.classList.contains("collapsed")?"+":"−";
-});
-
-/* Dragging works with mouse and touch */
-function makeDraggable(panel,handle){
- let dragging=false,pointerId=null,startX=0,startY=0,startLeft=0,startTop=0;
- handle.addEventListener("pointerdown",event=>{
-  if(event.target.closest("button"))return;
-  if(event.button!==undefined&&event.button!==0)return;
-  const rect=panel.getBoundingClientRect();
-  panel.style.left=rect.left+"px";
-  panel.style.top=rect.top+"px";
-  panel.style.right="auto";
-  panel.style.bottom="auto";
-  dragging=true;pointerId=event.pointerId;
-  startX=event.clientX;startY=event.clientY;
-  startLeft=rect.left;startTop=rect.top;
-  handle.classList.add("dragging");
-  try{handle.setPointerCapture(event.pointerId)}catch(_){}
-  event.preventDefault();
- });
- handle.addEventListener("pointermove",event=>{
-  if(!dragging||event.pointerId!==pointerId)return;
-  const maxLeft=Math.max(0,window.innerWidth-panel.offsetWidth);
-  const maxTop=Math.max(0,window.innerHeight-panel.offsetHeight);
-  const left=Math.max(0,Math.min(maxLeft,startLeft+event.clientX-startX));
-  const top=Math.max(0,Math.min(maxTop,startTop+event.clientY-startY));
-  panel.style.left=left+"px";
-  panel.style.top=top+"px";
- });
- function stop(event){
-  if(!dragging)return;
-  if(event&&event.pointerId!==undefined&&event.pointerId!==pointerId)return;
-  dragging=false;pointerId=null;handle.classList.remove("dragging");
- }
- handle.addEventListener("pointerup",stop);
- handle.addEventListener("pointercancel",stop);
- handle.addEventListener("lostpointercapture",()=>{dragging=false;pointerId=null;handle.classList.remove("dragging")});
- window.addEventListener("resize",()=>{
-  if(dragging)return;
-  const rect=panel.getBoundingClientRect();
-  panel.style.left=Math.max(0,Math.min(window.innerWidth-panel.offsetWidth,rect.left))+"px";
-  panel.style.top=Math.max(0,Math.min(window.innerHeight-panel.offsetHeight,rect.top))+"px";
-  panel.style.right="auto";panel.style.bottom="auto";
- });
+function updateStats(){
+  $("moves").textContent=moves;
+  $("score").textContent=score;
+  formatTime();
 }
-makeDraggable(document.getElementById("liveWidget"),document.getElementById("liveDragHandle"));
-makeDraggable(document.getElementById("coinPanel"),document.getElementById("coinPanel"));
-
-/* NOTES MANAGER */
-(()=>{
- const $=id=>document.getElementById(id);
- const overlay=$("notesOverlay");
- const launcher=$("notesLauncher");
- const closeBtn=$("notesClose");
- const folderList=$("notesFolderList");
- const notesList=$("notesList");
- const editor=$("notesEditor");
- const saveState=$("notesSaveState");
- const STORAGE_KEY="onlineDiceNotes_v1";
-
- let folders=[],notes=[],activeFolder=null,activeNote=null,saveTimer=null;
-
- const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,10);
-
- function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g,char=>({
-   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
- }
- function setSaveState(message,color){
-  saveState.textContent=message;
-  saveState.style.color=color||"#86efac";
- }
- function persist(){
-  try{
-   localStorage.setItem(STORAGE_KEY,JSON.stringify({
-    version:1,folders,notes,activeFolder,activeNote
-   }));
-   setSaveState("SAVED","#86efac");
-   return true;
-  }catch(error){
-   setSaveState("SAVE FAILED","#fca5a5");
-   return false;
+function cloneState(){
+  return {
+    stock:stock.map(c=>({...c})),
+    waste:waste.map(c=>({...c})),
+    foundations:foundations.map(p=>p.map(c=>({...c}))),
+    tableau:tableau.map(p=>p.map(c=>({...c}))),
+    moves,score,seconds
+  };
+}
+function saveHistory(){
+  history.push(cloneState());
+  if(history.length>80)history.shift();
+}
+function restoreState(s){
+  stock=s.stock.map(c=>({...c}));
+  waste=s.waste.map(c=>({...c}));
+  foundations=s.foundations.map(p=>p.map(c=>({...c})));
+  tableau=s.tableau.map(p=>p.map(c=>({...c})));
+  moves=s.moves;score=s.score;seconds=s.seconds;
+  selected=null;
+  clearHelp();
+  render();
+  updateStats();
+  setStatus("Move undone.");
+}
+function undo(){
+  if(!history.length){setStatus("Nothing to undo yet.");return}
+  restoreState(history.pop());
+}
+function newGame(){
+  clearInterval(timerInterval);
+  nextId=1;
+  deck=makeDeck();
+  stock=[];waste=[];foundations=[[],[],[],[]];
+  tableau=[[],[],[],[],[],[],[]];
+  selected=null;moves=0;score=0;seconds=0;history=[];
+  clearHelp();
+  for(let col=0;col<7;col++){
+    for(let i=0;i<=col;i++){
+      const card=deck.pop();
+      card.faceUp=(i===col);
+      tableau[col].push(card);
+    }
   }
- }
- function scheduleSave(){
-  setSaveState("SAVING...","#fde68a");
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-   saveTimer=null;
-   persist();
-   renderLists();
-  },180);
- }
- function flushSave(){
-  if(saveTimer!==null){
-   clearTimeout(saveTimer);
-   saveTimer=null;
+  stock=deck;
+  render();
+  updateStats();
+  setStatus("Game started. Build down in alternating colors; build foundations from Ace to King.");
+  $("win-overlay").classList.remove("show");
+  timerInterval=setInterval(()=>{
+    seconds++;
+    formatTime();
+  },1000);
+}
+function createCard(card,location,index){
+  const el=document.createElement("div");
+  el.className="card"+(card.faceUp?(isRed(card)?" red":""):" back");
+  el.id="card-"+card.id;
+  el.dataset.cardId=card.id;
+  el.dataset.location=location;
+  el.dataset.index=index;
+  if(card.faceUp){
+    const corner=document.createElement("div");
+    corner.className="corner";
+    corner.innerHTML=`${rankText(card.rank)}<span class="suit">${card.suit}</span>`;
+    const pip=document.createElement("div");
+    if(card.rank>=11){
+      pip.className="face-art";
+      pip.innerHTML=`<span>${faceSymbols[card.rank]}<br>${card.suit}</span>`;
+    }else{
+      pip.className="pip";
+      pip.textContent=card.rank===1?card.suit:card.suit;
+    }
+    const bottom=document.createElement("div");
+    bottom.className="corner bottom";
+    bottom.innerHTML=`${rankText(card.rank)}<span class="suit">${card.suit}</span>`;
+    el.append(corner,pip,bottom);
   }
-  persist();
- }
- function loadData(){
-  try{
-   const raw=localStorage.getItem(STORAGE_KEY);
-   if(!raw)return false;
-   const data=JSON.parse(raw);
-   if(!data||!Array.isArray(data.folders)||!Array.isArray(data.notes))return false;
-   folders=data.folders.filter(f=>f&&typeof f.id==="string"&&typeof f.name==="string");
-   notes=data.notes.filter(n=>n&&typeof n.id==="string"&&typeof n.folderId==="string"&&typeof n.title==="string"&&typeof n.content==="string");
-   activeFolder=data.activeFolder;
-   activeNote=data.activeNote;
-   return true;
-  }catch(error){return false}
- }
- function ensureFolder(){
-  if(!folders.length){
-   const id=uid();
-   folders.push({id,name:"My Notes",created:Date.now()});
-   activeFolder=id;
+  if(location.startsWith("tableau-")){
+    const col=Number(location.split("-")[1]);
+    const pile=tableau[col];
+    const previous=pile.slice(0,index).reduce((n,c)=>n+(c.faceUp?28:14),0);
+    el.style.top=previous+"px";
+    el.style.zIndex=String(index+1);
   }
-  if(!folders.some(f=>f.id===activeFolder))activeFolder=folders[0].id;
-  notes=notes.filter(n=>folders.some(f=>f.id===n.folderId));
- }
- function folderName(id){
-  const folder=folders.find(f=>f.id===id);
-  return folder?folder.name:"Unknown folder";
- }
- function currentNote(){
-  return notes.find(n=>n.id===activeNote&&n.folderId===activeFolder)||null;
- }
- function renderLists(){
-  folderList.innerHTML="";
-  folders.forEach(folder=>{
-   const count=notes.filter(n=>n.folderId===folder.id).length;
-   const button=document.createElement("button");
-   button.className="notes-folder-item"+(folder.id===activeFolder?" active":"");
-   button.innerHTML='<span>📁</span><span class="notes-folder-name">'+escapeHTML(folder.name)+'</span><span class="notes-folder-count">'+count+'</span>';
-   button.addEventListener("click",()=>{
-    flushSave();
-    activeFolder=folder.id;
-    activeNote=null;
-    persist();
-    renderLists();
-    renderEditor();
-   });
-   folderList.appendChild(button);
+  if(selected && selected.cardId===card.id)el.classList.add("selected");
+  if(currentHint && currentHint.cardId===card.id)el.classList.add("hint-source");
+  el.addEventListener("click",e=>{
+    e.stopPropagation();
+    handleCardClick(card.id,location,index);
   });
-
-  notesList.innerHTML="";
-  const folderNotes=notes.filter(n=>n.folderId===activeFolder).sort((a,b)=>(b.updated||0)-(a.updated||0));
-  if(!folderNotes.length){
-   const empty=document.createElement("div");
-   empty.className="notes-empty";
-   empty.style.fontSize="9px";
-   empty.textContent="No notes here yet.";
-   notesList.appendChild(empty);
-   return;
-  }
-  folderNotes.forEach(note=>{
-   const button=document.createElement("button");
-   button.className="notes-item"+(note.id===activeNote?" active":"");
-   const preview=note.content.replace(/\s+/g," ").trim();
-   button.innerHTML='<span>📄</span><span class="notes-item-info"><span class="notes-item-title">'+escapeHTML(note.title||"Untitled note")+'</span><span class="notes-item-preview">'+escapeHTML(preview||"Empty note")+'</span></span>';
-   button.addEventListener("click",()=>{
-    flushSave();
-    activeNote=note.id;
-    persist();
-    renderLists();
-    renderEditor();
-   });
-   notesList.appendChild(button);
+  el.addEventListener("dragstart",e=>{
+    if(!card.faceUp){e.preventDefault();return}
+    selectCard(card.id,location,index);
+    e.dataTransfer.setData("text/plain",String(card.id));
+    e.dataTransfer.effectAllowed="move";
   });
- }
- function renderEditor(){
-  const note=currentNote();
-  if(!note){
-   editor.innerHTML='<div class="notes-empty"><div class="notes-empty-icon">✦</div><strong>Nothing selected</strong>Create a note and write anything you want.<button class="notes-btn primary" id="notesEditorCreate">＋ New note</button></div>';
-   $("notesEditorCreate").addEventListener("click",createNote);
-   return;
-  }
-
-  editor.innerHTML=
-   '<div class="notes-editor-top"><div class="notes-breadcrumb">📁 '+escapeHTML(folderName(activeFolder))+' / EDITING NOTE</div>'+
-   '<div class="notes-editor-actions"><button class="notes-btn danger" id="notesDelete">Delete</button></div></div>'+
-   '<input class="notes-title-input" id="notesTitle" maxlength="120" placeholder="Name your note..." aria-label="Note title">'+
-   '<textarea class="notes-textarea" id="notesContent" placeholder="Start writing your note here..." aria-label="Note content" spellcheck="true"></textarea>'+
-   '<div class="notes-editor-footer"><span id="notesWordCount">0 characters</span><button class="notes-btn primary" id="notesSaveNow">✓ Save note</button></div>';
-
-  const titleInput=$("notesTitle");
-  const contentInput=$("notesContent");
-  titleInput.value=note.title;
-  contentInput.value=note.content;
-
-  function updateNote(){
-   const selected=currentNote();
-   if(!selected)return;
-   selected.title=titleInput.value;
-   selected.content=contentInput.value;
-   selected.updated=Date.now();
-   $("notesWordCount").textContent=selected.content.length.toLocaleString()+" characters";
-   scheduleSave();
-  }
-  $("notesWordCount").textContent=note.content.length.toLocaleString()+" characters";
-  titleInput.addEventListener("input",updateNote);
-  contentInput.addEventListener("input",updateNote);
-
-  $("notesSaveNow").addEventListener("click",()=>{
-   flushSave();
-   renderLists();
-   setSaveState("SAVED","#86efac");
+  el.draggable=card.faceUp;
+  el.addEventListener("dragover",e=>e.preventDefault());
+  el.addEventListener("drop",e=>{
+    e.preventDefault();e.stopPropagation();
+    const id=Number(e.dataTransfer.getData("text/plain"));
+    if(id)tryDropOnCard(id,location,index);
   });
-
-  $("notesDelete").addEventListener("click",()=>{
-   const confirmBox=document.createElement("div");
-   confirmBox.className="notes-confirm";
-   confirmBox.innerHTML='<strong>Delete this note?</strong><p>This note will be permanently removed from this browser.</p><div class="notes-confirm-actions"><button class="notes-btn" id="notesCancelConfirm">Cancel</button><button class="notes-btn danger" id="notesAcceptConfirm">Delete</button></div>';
-   editor.replaceChildren(confirmBox);
-   $("notesCancelConfirm").addEventListener("click",renderEditor);
-   $("notesAcceptConfirm").addEventListener("click",()=>{
-    flushSave();
-    notes=notes.filter(n=>n.id!==note.id);
-    activeNote=null;
-    persist();
-    renderLists();
-    renderEditor();
-   });
+  return el;
+}
+function render(){
+  stockEl.innerHTML="";
+  wasteEl.innerHTML="";
+  tableauEl.innerHTML="";
+  for(let i=0;i<4;i++){
+    const slot=$("foundation-"+i);
+    slot.querySelectorAll(".card").forEach(c=>c.remove());
+    slot.classList.toggle("hint-dest",!!(currentHint&&currentHint.targetId==="foundation-"+i));
+    slot.onclick=()=>handleDestination({type:"foundation",index:i});
+    slot.ondragover=e=>e.preventDefault();
+    slot.ondrop=e=>{
+      e.preventDefault();
+      const id=Number(e.dataTransfer.getData("text/plain"));
+      if(id){selectCardById(id);moveToFoundation(i)}
+    };
+    if(foundations[i].length){
+      const c=topOf(foundations[i]);
+      const el=createCard(c,"foundation-"+i,foundations[i].length-1);
+      el.style.top="0";
+      slot.appendChild(el);
+    }
+  }
+  if(stock.length){
+    const back=document.createElement("div");
+    back.className="card back";
+    back.style.top="0";
+    back.title="Draw a card";
+    stockEl.appendChild(back);
+  }else{
+    const empty=document.createElement("div");
+    empty.className="slot";
+    empty.style.width="var(--card-w)";
+    empty.style.height="var(--card-h)";
+    empty.style.display="grid";
+    empty.style.placeItems="center";
+    empty.style.color="#ffffff70";
+    empty.style.fontSize="24px";
+    empty.textContent="↻";
+    stockEl.appendChild(empty);
+  }
+  stockEl.onclick=drawCard;
+  if(waste.length){
+    const c=topOf(waste);
+    const el=createCard(c,"waste",waste.length-1);
+    el.style.top="0";
+    wasteEl.appendChild(el);
+  }
+  for(let col=0;col<7;col++){
+    const pileEl=document.createElement("div");
+    pileEl.className="pile";
+    pileEl.id="tableau-pile-"+col;
+    const hintTarget=currentHint&&currentHint.targetId==="tableau-slot-"+col;
+    const slot=document.createElement("div");
+    slot.className="slot"+(hintTarget?" hint-dest":"");
+    slot.id="tableau-slot-"+col;
+    if(!tableau[col].length){
+      const mark=document.createElement("span");
+      mark.className="suit-mark empty-king";
+      mark.textContent="K";
+      slot.appendChild(mark);
+    }
+    slot.onclick=()=>handleDestination({type:"tableau",index:col});
+    slot.ondragover=e=>e.preventDefault();
+    slot.ondrop=e=>{
+      e.preventDefault();
+      const id=Number(e.dataTransfer.getData("text/plain"));
+      if(id){selectCardById(id);moveToTableau(col)}
+    };
+    pileEl.appendChild(slot);
+    tableau[col].forEach((card,index)=>{
+      const el=createCard(card,"tableau-"+col,index);
+      pileEl.appendChild(el);
+    });
+    tableauEl.appendChild(pileEl);
+  }
+  if(currentHint){
+    const target=$(currentHint.targetId);
+    if(target)target.classList.add("hint-dest");
+  }
+  if(helpOn&&currentHint)requestAnimationFrame(drawHelpArrow);
+}
+function findCard(id){
+  for(let i=0;i<waste.length;i++)if(waste[i].id===id)return {card:waste[i],type:"waste",index:i};
+  for(let col=0;col<7;col++){
+    for(let i=0;i<tableau[col].length;i++){
+      if(tableau[col][i].id===id)return {card:tableau[col][i],type:"tableau",col,index:i};
+    }
+  }
+  for(let i=0;i<4;i++){
+    for(let j=0;j<foundations[i].length;j++){
+      if(foundations[i][j].id===id)return {card:foundations[i][j],type:"foundation",col:i,index:j};
+    }
+  }
+  return null;
+}
+function selectCardById(id){
+  const found=findCard(id);
+  if(!found)return;
+  selectCard(id,found.type==="tableau"?"tableau-"+found.col:found.type,found.index);
+}
+function selectCard(id,location,index){
+  const found=findCard(id);
+  if(!found||!found.card.faceUp)return;
+  if(found.type==="tableau"){
+    const pile=tableau[found.col];
+    if(pile.slice(found.index).some(c=>!c.faceUp))return;
+  }
+  if(found.type==="foundation" && found.index!==foundations[found.col].length-1)return;
+  selected={cardId:id,from:found.type,col:found.col,index:found.index};
+  clearHelp();
+  render();
+}
+function handleCardClick(id,location,index){
+  const found=findCard(id);
+  if(!found)return;
+  if(found.type==="tableau"&&!found.card.faceUp){
+    const pile=tableau[found.col];
+    if(index===pile.length-1){
+      saveHistory();pile[index].faceUp=true;moves++;score+=5;
+      selected=null;clearHelp();render();updateStats();
+      setStatus("Card flipped!");return;
+    }
+    return;
+  }
+  if(selected){
+    if(selected.cardId===id){selected=null;render();return}
+    const target=found;
+    if(target.type==="tableau"){moveToTableau(target.col);return}
+    if(target.type==="foundation"){moveToFoundation(target.col);return}
+    if(target.type==="waste"){
+      if(selected.from==="tableau"||selected.from==="waste")selectCard(id,location,index);
+      return;
+    }
+  }
+  if(found.type==="waste"){
+    selectCard(id,"waste",index);
+  }else if(found.type==="tableau"){
+    selectCard(id,location,index);
+  }else if(found.type==="foundation"){
+    if(found.index===foundations[found.col].length-1)selectCard(id,location,index);
+  }
+}
+function handleDestination(target){
+  if(!selected)return;
+  if(target.type==="tableau")moveToTableau(target.index);
+  else moveToFoundation(target.index);
+}
+function removeSelectedCards(){
+  if(!selected)return [];
+  if(selected.from==="waste"){
+    if(!waste.length||topOf(waste).id!==selected.cardId)return [];
+    return [waste.pop()];
+  }
+  if(selected.from==="tableau"){
+    const pile=tableau[selected.col];
+    if(!pile[selected.index]||pile[selected.index].id!==selected.cardId)return [];
+    return pile.splice(selected.index);
+  }
+  if(selected.from==="foundation"){
+    const pile=foundations[selected.col];
+    if(selected.index!==pile.length-1)return [];
+    return [pile.pop()];
+  }
+  return [];
+}
+function putBack(cards,from){
+  if(from==="waste")waste.push(...cards);
+  else if(from==="tableau")tableau[selected.col].push(...cards);
+  else if(from==="foundation")foundations[selected.col].push(...cards);
+}
+function getSelectedCards(){
+  if(!selected)return [];
+  if(selected.from==="waste")return waste.filter(c=>c.id===selected.cardId);
+  if(selected.from==="tableau")return tableau[selected.col].slice(selected.index);
+  if(selected.from==="foundation")return [topOf(foundations[selected.col])].filter(Boolean);
+  return [];
+}
+function validTableau(cards,targetCol){
+  if(!cards.length)return false;
+  const first=cards[0],pile=tableau[targetCol];
+  if(!first.faceUp)return false;
+  if(!pile.length)return first.rank===13;
+  const top=topOf(pile);
+  return top.faceUp&&top.rank===first.rank+1&&!sameColor(top,first);
+}
+function moveToTableau(col){
+  if(!selected)return false;
+  const cards=getSelectedCards();
+  if(!validTableau(cards,col))return false;
+  if(selected.from==="tableau"&&selected.col===col)return false;
+  saveHistory();
+  const oldFrom=selected.from,oldCol=selected.col;
+  const moving=removeSelectedCards();
+  if(!moving.length)return false;
+  tableau[col].push(...moving);
+  if(oldFrom==="tableau"&&tableau[oldCol].length&&!topOf(tableau[oldCol]).faceUp){
+    topOf(tableau[oldCol]).faceUp=true;score+=5;
+  }
+  moves++;selected=null;clearHelp();render();updateStats();
+  setStatus("Nice move! Build down in alternating colors.");
+  checkWin();
+  return true;
+}
+function foundationIndex(card){return suits.indexOf(card.suit)}
+function canFoundation(card,index){
+  const pile=foundations[index];
+  if(foundationIndex(card)!==index)return false;
+  if(!pile.length)return card.rank===1;
+  return topOf(pile).rank===card.rank-1;
+}
+function moveToFoundation(index){
+  if(!selected)return false;
+  const cards=getSelectedCards();
+  if(cards.length!==1||!canFoundation(cards[0],index))return false;
+  if(selected.from==="foundation"&&selected.col===index)return false;
+  saveHistory();
+  const oldFrom=selected.from,oldCol=selected.col;
+  const moving=removeSelectedCards();
+  if(!moving.length)return false;
+  foundations[index].push(moving[0]);
+  if(oldFrom==="tableau"&&tableau[oldCol].length&&!topOf(tableau[oldCol]).faceUp){
+    topOf(tableau[oldCol]).faceUp=true;score+=5;
+  }
+  score+=10;moves++;selected=null;clearHelp();render();updateStats();
+  setStatus("Card moved to the foundation.");
+  checkWin();
+  return true;
+}
+function tryDropOnCard(id,location,index){
+  if(!selected||selected.cardId!==id)selectCardById(id);
+  const target=findCard(Number(id));
+  if(!target)return;
+  if(location.startsWith("tableau-")){
+    const col=Number(location.split("-")[1]);
+    if(selected&&selected.col===col&&selected.from==="tableau")return;
+    moveToTableau(col);
+  }else if(location.startsWith("foundation-")){
+    moveToFoundation(Number(location.split("-")[1]));
+  }
+}
+function drawCard(){
+  if(stock.length){
+    saveHistory();
+    const c=stock.pop();c.faceUp=true;waste.push(c);
+    moves++;selected=null;clearHelp();render();updateStats();
+    setStatus("Drawn a card. Play it or draw another.");
+  }else if(waste.length){
+    saveHistory();
+    stock=waste.reverse().map(c=>({...c,faceUp:false}));
+    waste=[];moves++;score=Math.max(0,score-20);
+    selected=null;clearHelp();render();updateStats();
+    setStatus("Stock recycled. Draw again.");
+  }else{
+    setStatus("No cards left in the stock.");
+  }
+}
+function checkWin(){
+  if(foundations.every(p=>p.length===13)){
+    clearInterval(timerInterval);
+    $("win-overlay").classList.add("show");
+    setStatus("All cards completed!");
+  }
+}
+function clearHelp(){
+  helpOn=false;currentHint=null;
+  helpMessage.classList.remove("show");
+  helpMessage.textContent="";
+  arrow.style.display="none";arrow.setAttribute("d","");
+  arrowDot.style.display="none";
+  document.querySelectorAll(".hint-source,.hint-dest").forEach(el=>{
+    el.classList.remove("hint-source","hint-dest");
   });
- }
- function createNote(){
-  flushSave();
-  const note={id:uid(),folderId:activeFolder,title:"",content:"",created:Date.now(),updated:Date.now()};
-  notes.unshift(note);
-  activeNote=note.id;
-  persist();
-  renderLists();
-  renderEditor();
-  $("notesTitle").focus();
- }
- function createFolder(){
-  flushSave();
-  const name=prompt("Enter a name for your new folder:");
-  if(name===null)return;
-  const cleanName=name.trim();
-  if(!cleanName){alert("Please enter a folder name.");return}
-  if(cleanName.length>60){alert("Folder names must be 60 characters or less.");return}
-  const folder={id:uid(),name:cleanName,created:Date.now()};
-  folders.push(folder);
-  activeFolder=folder.id;
-  activeNote=null;
-  persist();
-  renderLists();
-  renderEditor();
- }
- function openNotes(){
-  overlay.hidden=false;
-  document.body.style.overflow="hidden";
-  renderLists();
-  renderEditor();
- }
- function closeNotes(){
-  flushSave();
-  overlay.hidden=true;
-  document.body.style.overflow="";
-  launcher.focus({preventScroll:true});
- }
+  $("help").textContent="💡 HELP";
+}
+function getCardLocation(card){
+  for(let col=0;col<7;col++){
+    const i=tableau[col].findIndex(c=>c.id===card.id);
+    if(i>=0)return {type:"tableau",col,index:i};
+  }
+  if(waste.some(c=>c.id===card.id))return {type:"waste",index:waste.findIndex(c=>c.id===card.id)};
+  return null;
+}
+function findHint(){
+  const sources=[];
+  if(waste.length)sources.push({card:topOf(waste),type:"waste",index:waste.length-1});
+  for(let col=0;col<7;col++){
+    const pile=tableau[col];
+    if(!pile.length)continue;
+    const top=topOf(pile);
+    if(top.faceUp)sources.push({card:top,type:"tableau",col,index:pile.length-1});
+    for(let i=0;i<pile.length;i++){
+      if(pile[i].faceUp&&i<pile.length-1){
+        if(pile.slice(i).every(c=>c.faceUp))sources.push({card:pile[i],type:"tableau",col,index:i});
+      }
+    }
+  }
+  // Priority 1: safe foundation moves.
+  for(const s of sources){
+    if(s.type==="tableau"&&s.index!==tableau[s.col].length-1)continue;
+    const fi=foundationIndex(s.card);
+    if(canFoundation(s.card,fi)){
+      return {cardId:s.card.id,targetId:"foundation-"+fi,text:`Move the ${rankText(s.card.rank)} of ${suitNames[fi]} to its foundation. Follow the arrow.`};
+    }
+  }
+  // Priority 2: move a card or a stack onto another tableau pile.
+  for(const s of sources){
+    for(let col=0;col<7;col++){
+      if(s.type==="tableau"&&s.col===col)continue;
+      if(validTableau(s.type==="tableau"?tableau[s.col].slice(s.index):[s.card],col)){
+        const pile=tableau[col];
+        const targetId=pile.length?"card-"+topOf(pile).id:"tableau-slot-"+col;
+        return {cardId:s.card.id,targetId,text:`Move ${rankText(s.card.rank)}${s.card.suit} onto the highlighted pile. Follow the arrow.`};
+      }
+    }
+  }
+  // Priority 3: reveal a hidden card by moving a visible king or stack.
+  for(let col=0;col<7;col++){
+    const pile=tableau[col];
+    if(!pile.length||topOf(pile).faceUp===false)continue;
+    const s={card:topOf(pile),type:"tableau",col,index:pile.length-1};
+    for(let target=0;target<7;target++){
+      if(target===col)continue;
+      if(validTableau([s.card],target)){
+        return {cardId:s.card.id,targetId:tableau[target].length?"card-"+topOf(tableau[target]).id:"tableau-slot-"+target,text:"Move this card to help uncover more cards. Follow the arrow."};
+      }
+    }
+  }
+  // If no move is available, recommend drawing from stock.
+  if(stock.length||waste.length){
+    return {cardId:null,targetId:"stock",text:"No obvious move is available. Tap the stock pile to draw a card."};
+  }
+  return {cardId:null,targetId:null,text:"No moves found. Try UNDO or start a new game."};
+}
+function drawHelpArrow(){
+  if(!helpOn||!currentHint)return;
+  let sourceEl=currentHint.cardId?$("card-"+currentHint.cardId):null;
+  let targetEl=$(currentHint.targetId);
+  if(currentHint.targetId==="stock")targetEl=stockEl;
+  if(!targetEl){
+    arrow.style.display="none";arrowDot.style.display="none";return;
+  }
+  const tr=targetEl.getBoundingClientRect();
+  const tx=tr.left+tr.width/2;
+  const ty=tr.top+tr.height/2;
+  let sx,sy;
+  if(sourceEl){
+    const sr=sourceEl.getBoundingClientRect();
+    sx=sr.left+sr.width/2;sy=sr.top+Math.min(sr.height*.45,40);
+  }else{
+    sx=tx;sy=Math.max(25,ty-90);
+  }
+  const dx=tx-sx,dy=ty-sy;
+  const dist=Math.hypot(dx,dy);
+  const shorten=Math.min(22,dist*.12);
+  const ex=tx-(dx/(dist||1))*shorten;
+  const ey=ty-(dy/(dist||1))*shorten;
+  const curve= Math.max(24,Math.min(90,Math.abs(dx)*.15));
+  const midX=(sx+ex)/2;
+  const midY=(sy+ey)/2-curve;
+  arrow.setAttribute("d",`M ${sx} ${sy} Q ${midX} ${midY} ${ex} ${ey}`);
+  arrow.style.display="block";
+  arrowDot.setAttribute("cx",sx);
+  arrowDot.setAttribute("cy",sy);
+  arrowDot.style.display=sourceEl?"block":"none";
+}
+function showHelp(){
+  if(helpOn){clearHelp();render();setStatus("Help turned off.");return}
+  clearHelp();
+  const hint=findHint();
+  helpOn=true;currentHint=hint;
+  $("help").textContent="✕ CLOSE HELP";
+  helpMessage.textContent=hint.text;
+  helpMessage.classList.add("show");
+  render();
+  requestAnimationFrame(drawHelpArrow);
+  setStatus("Follow the glowing arrow to see your next move.");
+}
+$("undo").addEventListener("click",undo);
+$("new-game").addEventListener("click",newGame);
+$("play-again").addEventListener("click",newGame);
+$("help").addEventListener("click",showHelp);
+window.addEventListener("resize",()=>{if(helpOn)requestAnimationFrame(drawHelpArrow)});
+window.addEventListener("scroll",()=>{if(helpOn)requestAnimationFrame(drawHelpArrow)},{passive:true});
 
- launcher.addEventListener("click",openNotes);
- closeBtn.addEventListener("click",closeNotes);
- $("notesNewFolder").addEventListener("click",createFolder);
- $("notesNewNote").addEventListener("click",createNote);
- $("notesEmptyCreate").addEventListener("click",createNote);
- overlay.addEventListener("click",event=>{
-  if(event.target===overlay)closeNotes();
- });
- document.addEventListener("keydown",event=>{
-  if(!overlay.hidden&&event.key==="Escape")closeNotes();
- });
- window.addEventListener("pagehide",flushSave);
-
- loadData();
- ensureFolder();
- if(!activeNote||!notes.some(n=>n.id===activeNote&&n.folderId===activeFolder))activeNote=null;
- persist();
- renderLists();
- renderEditor();
+newGame();
 })();
-
-/* Start */
-updateCounter();
-dice.forEach(d=>d.style.background=randomColor().hex);
-addLiveMessage("System","Welcome to the live! 🎲");
-addLiveMessage(randomName(),"What color are you picking? 👀");
-addLiveMessage(randomName(),"I'm going with PURPLE 💜");
-setInterval(()=>{if(Math.random()<.65&&!document.hidden)botMessage()},5000);
 </script>
 </body>
 </html>
