@@ -3,517 +3,372 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solitaire - Classic</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Windows 98 Desktop</title>
 <style>
-:root{--gray:#c0c0c0;--felt:#008000;--blue:#000080}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#008080;font:12px Tahoma,Arial,sans-serif;color:#000;user-select:none}
-button,select{font:inherit}
-button{background:var(--gray);border:2px solid;border-color:#fff #404040 #404040 #fff;border-radius:0;padding:5px 10px;min-height:26px;cursor:pointer}
-button:active{border-color:#404040 #fff #fff #404040;padding-top:6px;padding-bottom:4px}
-button:disabled{color:#777}
-.window{background:var(--gray);border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:1px 1px #404040}
-.titlebar{height:24px;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:3px 5px;display:flex;align-items:center;justify-content:space-between}
-.titlebar button{min-height:18px;width:20px;padding:0;font-weight:bold}
-.menu-bar{display:flex;border-bottom:1px solid #808080;padding:2px}
-.menu-button{border:0;background:transparent;min-height:23px;padding:3px 10px}
-.menu-button:hover{background:#000080;color:#fff}
-#menuScreen{width:min(420px,calc(100% - 24px));margin:8vh auto}
-.menu-content{padding:18px}
-.logo{text-align:center;margin:10px 0 22px}
-.logo .suits{font:46px Georgia;color:#000080}
-.logo h1{font-size:23px;margin:8px 0 4px}
-.logo p{margin:0;color:#444}
-.menu-actions{display:flex;flex-direction:column;gap:8px;max-width:220px;margin:auto}
-.menu-actions button{min-height:32px}
-.menu-foot{text-align:center;margin-top:20px;color:#444}
-#gameWindow{display:none;width:min(1100px,100%);margin:12px auto}
-.toolbar{display:flex;align-items:center;gap:5px;padding:5px;flex-wrap:wrap;border-bottom:1px solid #888}
-.status{margin-left:auto;padding:4px 7px;border:1px inset #fff;white-space:nowrap}
-#table{position:relative;background:var(--felt);padding:10px;min-height:510px;overflow:hidden}
-.top-row,.tableau-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(3px,1vw,12px)}
-.top-row{min-height:100px}
-.tableau-row{margin-top:12px;align-items:start}
-.pile,.tableau-pile{position:relative;min-width:0}
-.top-pile{width:100%;aspect-ratio:.70;max-height:100px;position:relative}
-.slot{border:1px solid rgba(255,255,255,.4)}
-.tableau-pile{min-height:120px}
-.card{position:absolute;left:0;top:0;width:100%;aspect-ratio:.70;max-height:100px;background:#fff;color:#000;border:1px solid #111;border-radius:3px;box-shadow:1px 1px rgba(0,0,0,.25);overflow:hidden;cursor:pointer;touch-action:pan-y}
-.card.red{color:#c00000}
-.card.black{color:#000}
-.card.face-down{border:3px solid #fff;outline:1px solid #111;background-color:#000080;background-image:repeating-linear-gradient(45deg,transparent 0 4px,#fff 4px 5px,transparent 5px 8px),repeating-linear-gradient(-45deg,transparent 0 4px,#a8c9ff 4px 5px,transparent 5px 8px);background-size:9px 9px}
-.card.face-down:after{content:"";position:absolute;inset:4px;border:1px solid #fff;pointer-events:none}
-.corner{position:absolute;top:2px;left:3px;font-weight:bold;font-size:clamp(10px,1.7vw,17px);line-height:1;text-align:center}
-.corner small{display:block;font-size:.72em}
-.corner.bottom{top:auto;left:auto;right:3px;bottom:2px;transform:rotate(180deg)}
-.center-suit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:clamp(22px,3vw,38px) Georgia}
-.face-decoration{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:45%;height:50%;display:flex;align-items:center;justify-content:center;border:1px solid currentColor;font:clamp(18px,2.5vw,28px) Georgia}
-.face-letter{position:absolute;bottom:6px;right:4px;font:bold clamp(18px,2.3vw,28px) Georgia}
-.card.selected{outline:3px solid #ffff00;outline-offset:1px;z-index:100!important}
-.card.hint-card{outline:3px dashed #ffff00;outline-offset:1px;z-index:101!important}
-#hintArrow{position:absolute;z-index:500;pointer-events:none;display:none;color:#ff0;font-size:35px;text-shadow:1px 1px #000;animation:bob .5s infinite alternate}
-@keyframes bob{to{transform:translateY(5px)}}
-#bottomStatus{background:var(--gray);padding:4px 6px;display:flex;gap:7px;flex-wrap:wrap;border-top:1px solid #fff}
-.status-part{padding:3px 6px;border:1px inset #fff}
-.overlay{position:fixed;inset:0;background:#0005;display:none;align-items:center;justify-content:center;padding:12px;z-index:1000}
-.dialog{width:min(420px,100%);background:var(--gray);border:2px solid;border-color:#fff #000 #000 #fff;box-shadow:2px 2px #444}
-.dialog-content{padding:14px}
-.groupbox{border:1px solid #808080;border-top-color:#fff;padding:12px 10px 8px;margin:10px 0;position:relative}
-.groupbox-title{position:absolute;top:-8px;left:8px;background:var(--gray);padding:0 4px}
-.setting-row{display:flex;align-items:center;gap:8px;margin:10px 0}
-.setting-row select{margin-left:auto;max-width:170px}
-.dialog-buttons{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-input[type=checkbox]{accent-color:#000080}
-#toast{display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#ffffe1;border:1px solid #000;padding:7px 12px;z-index:2000;box-shadow:2px 2px #444}
-@media(max-width:650px){
- #gameWindow{margin:0;width:100%}
- #table{padding:5px;min-height:450px}
- .top-row{min-height:75px}
- .top-pile{max-height:75px}
- .tableau-row{margin-top:8px}
- .toolbar{gap:4px;padding:4px}
- .toolbar button{padding:3px 6px}
- .status{margin-left:0}
- .card{border-radius:2px}
- .corner{left:2px}
- .corner.bottom{left:auto;right:2px}
+:root{--gray:#c0c0c0;--blue:#000080;--white:#fff;--dark:#404040}
+body{margin:0;background:#008080;font-family:Tahoma,Arial,sans-serif;font-size:12px;color:#000;overflow:hidden;user-select:none}
+button,input{font:inherit}
+button{cursor:pointer;color:#000;background:var(--gray);border:2px solid;border-color:#fff #555 #555 #fff;border-radius:0;padding:5px 10px}
+button:active{border-color:#555 #fff #fff #555;padding-top:6px;padding-bottom:4px}
+button:focus-visible{outline:1px dotted #000;outline-offset:-5px}
+.desktop{position:fixed;inset:0 0 30px 0;background:#008080;padding:10px;overflow:auto}
+.icons{display:grid;grid-template-columns:74px;grid-auto-rows:85px;gap:4px;width:80px}
+.deskicon{color:white;text-shadow:1px 1px #000;text-align:center;cursor:pointer;padding:5px 2px;border:1px solid transparent}
+.deskicon:active{background:#00008088;border:1px dotted white}
+.deskicon .emoji{font-size:31px;display:block;margin-bottom:5px}
+.deskicon span:last-child{line-height:16px}
+.window{position:absolute;background:var(--gray);border:2px solid;border-color:#fff #555 #555 #fff;box-shadow:2px 2px 0 #222;min-width:280px}
+.window.hidden{display:none}
+.titlebar{height:25px;background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:2px 3px 2px 7px;font-weight:bold;touch-action:none}
+.titlebar .x{font-weight:bold;width:22px;height:20px;padding:0;line-height:14px}
+.winbody{padding:9px}
+.menubar{display:flex;gap:18px;padding:5px 8px;border-bottom:1px solid #888}
+.inset{border:2px solid;border-color:#777 #fff #fff #777}
+.outset{border:2px solid;border-color:#fff #555 #555 #fff}
+.taskbar{position:fixed;bottom:0;left:0;right:0;height:30px;background:var(--gray);border-top:2px solid white;display:flex;align-items:center;gap:5px;padding:3px;z-index:9999}
+.start{font-weight:bold;height:24px;padding:2px 8px}
+.taskbtn{height:23px;min-width:95px;max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.task-spacer{flex:1}
+.clock{border:2px inset white;padding:4px 7px;min-width:75px;text-align:center}
+.desktop-note{position:absolute;bottom:13px;left:100px;color:white;text-shadow:1px 1px #000}
+.menu{position:fixed;bottom:29px;left:3px;width:210px;background:var(--gray);border:2px solid;border-color:white #555 #555 white;z-index:10000;box-shadow:2px 2px #222}
+.menu.hidden{display:none}
+.menu-head{background:var(--blue);color:white;padding:15px 8px;font-size:20px;font-weight:bold}
+.menu-item{padding:11px;cursor:pointer;display:flex;gap:10px;align-items:center}
+.menu-item:active,.menu-item:hover{background:var(--blue);color:white}
+.menu-item span{font-size:22px}
+#solitaire{width:min(850px,97vw);left:50%;top:50%;transform:translate(-50%,-50%);max-height:90vh;overflow:auto}
+#mines{width:min(540px,97vw);left:50%;top:50%;transform:translate(-50%,-50%);max-height:90vh;overflow:auto}
+#calendar{width:min(380px,97vw);left:50%;top:50%;transform:translate(-50%,-50%)}
+#calc{width:290px;left:50%;top:50%;transform:translate(-50%,-50%)}
+.sol-top{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:12px}
+.pile{height:100px;min-width:0;position:relative;border:1px solid #006b6b;background:#008080}
+.pile.empty:after{content:"";position:absolute;inset:3px;border:1px solid #55aaaa;pointer-events:none}
+.card{position:absolute;width:100%;height:98px;background:#fff;color:#000;border:1px solid #111;border-radius:4px;padding:3px;font-weight:bold;cursor:pointer;touch-action:manipulation}
+.card.red{color:#c00}
+.card.back{background:repeating-linear-gradient(45deg,#000080,#000080 4px,#fff 4px,#fff 5px);border:4px double white}
+.card .rank{font-size:15px;line-height:15px}
+.card .suit{font-size:23px;text-align:center;margin-top:7px}
+.card.selected{outline:3px solid yellow;z-index:100!important}
+.tableau{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.col{height:310px;min-height:180px;position:relative;background:#008080;border:1px solid #006b6b}
+.col .card{height:98px}
+.sol-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.sol-help{font-size:11px;margin-top:7px}
+#mineGrid{display:grid;gap:2px;margin:12px auto;justify-content:center;touch-action:manipulation}
+.minecell{width:clamp(23px,6.2vw,31px);height:clamp(23px,6.2vw,31px);padding:0;font-size:14px;font-weight:bold;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0}
+.minecell.revealed{border:1px solid #888;background:#c0c0c0;box-shadow:none}
+.minecell.flagged{color:red}
+.mine-status{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mine-display{background:#111;color:#f33;font:bold 22px monospace;padding:3px 6px;min-width:55px;text-align:center;border:2px inset white}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cal-head strong{font-size:16px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dayname{text-align:center;font-weight:bold;padding:5px 0}
+.calday{height:35px;padding:0;min-width:0}
+.calday.today{outline:2px solid navy}
+.calday.chosen{background:navy;color:white}
+.calc-display{width:100%;height:43px;background:white;text-align:right;font-size:24px;padding:5px;margin-bottom:8px;border:2px inset #777}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.calc-grid button{height:42px;font-size:16px}
+.calc-grid .wide{grid-column:span 2}
+.status{margin-top:7px;min-height:17px}
+@media(max-width:520px){
+ .desktop{padding:5px}
+ .icons{grid-template-columns:65px;grid-auto-rows:78px}
+ #solitaire .winbody{padding:5px}
+ .pile{height:76px}
+ .card,.col .card{height:78px;padding:2px}
+ .card .rank{font-size:12px}
+ .card .suit{font-size:19px;margin-top:5px}
+ .tableau{gap:3px}
+ .sol-top{gap:3px}
+ .col{height:290px}
+ .winbody{padding:7px}
 }
 </style>
 </head>
 <body>
+<div class="desktop" id="desktop">
+ <div class="icons">
+  <div class="deskicon" onclick="openApp('solitaire')"><span class="emoji">🃏</span><span>Solitaire</span></div>
+  <div class="deskicon" onclick="openApp('mines')"><span class="emoji">💣</span><span>Minesweeper</span></div>
+  <div class="deskicon" onclick="openApp('calendar')"><span class="emoji">📅</span><span>Calendar</span></div>
+  <div class="deskicon" onclick="openApp('calc')"><span class="emoji">🧮</span><span>Calculator</span></div>
+ </div>
+ <div class="desktop-note">Windows 98 Desktop</div>
+</div>
 
-<div id="menuScreen" class="window">
- <div class="titlebar"><span>♠ Solitaire</span><button title="Close">×</button></div>
- <div class="menu-content">
-  <div class="logo"><div class="suits">♠ ♥ ♦ ♣</div><h1>Solitaire</h1><p>Classic Klondike Card Game</p></div>
-  <div class="menu-actions">
-   <button id="playButton">New Game</button>
-   <button id="continueButton">Continue Game</button>
-   <button id="settingsButton">Settings...</button>
-   <button id="helpButton">How to Play</button>
+<div class="window hidden" id="solitaire">
+ <div class="titlebar" onpointerdown="startDrag(event,'solitaire')"><span>🃏 Solitaire</span><button class="x" onclick="closeApp('solitaire')">×</button></div>
+ <div class="menubar"><span onclick="newSolitaire()" style="cursor:pointer">Game</span><span onclick="toggleSound()" style="cursor:pointer">Sound</span><span onclick="solHelp()" style="cursor:pointer">Help</span></div>
+ <div class="winbody">
+  <div class="sol-actions"><button onclick="newSolitaire()">New Game</button><button onclick="undoSol()">Undo</button><button onclick="drawStock()">Draw Card</button><span id="solScore">Moves: 0</span></div>
+  <div class="sol-top">
+   <div class="pile empty" id="stock"><div id="stockCard" class="card back" style="display:none"></div></div>
+   <div class="pile empty" id="waste"></div>
+   <div></div>
+   <div class="pile empty" id="foundation0" data-pile="0"></div>
+   <div class="pile empty" id="foundation1" data-pile="1"></div>
+   <div class="pile empty" id="foundation2" data-pile="2"></div>
+   <div class="pile empty" id="foundation3" data-pile="3"></div>
   </div>
-  <div class="menu-foot">Classic Solitaire · Windows-style edition</div>
+  <div class="tableau" id="tableau"></div>
+  <div class="sol-help">Tap a card, then tap where you want to move it. Build alternating colors from King to Ace. Put Aces on the four top piles.</div>
+  <div class="status" id="solStatus">Welcome to Solitaire.</div>
  </div>
 </div>
 
-<div id="gameWindow" class="window">
- <div class="titlebar"><span>♠ Solitaire</span><button id="menuButton">×</button></div>
- <div class="menu-bar">
-  <button class="menu-button" id="fileMenu">File</button>
-  <button class="menu-button" id="gameMenu">Game</button>
-  <button class="menu-button" id="optionsMenu">Options</button>
-  <button class="menu-button" id="helpMenu">Help</button>
- </div>
- <div class="toolbar">
-  <button id="newButton">New Game</button>
-  <button id="undoButton">Undo</button>
-  <button id="hintButton">Hint (H)</button>
-  <button id="autoButton">Auto Move (J)</button>
-  <span class="status">Moves: <span id="moves">0</span></span>
-  <span class="status">Time: <span id="time">00:00</span></span>
- </div>
- <div id="table">
-  <div class="top-row">
-   <div class="pile"><div id="stock" class="top-pile slot"></div></div>
-   <div class="pile"><div id="waste" class="top-pile slot"></div></div>
-   <div></div><div></div>
-   <div class="pile"><div id="foundation0" class="top-pile slot foundation" data-pile="0"></div></div>
-   <div class="pile"><div id="foundation1" class="top-pile slot foundation" data-pile="1"></div></div>
-   <div class="pile"><div id="foundation2" class="top-pile slot foundation" data-pile="2"></div></div>
-  </div>
-  <div id="tableauRow" class="tableau-row">
-   <div class="tableau-pile" data-col="0"></div>
-   <div class="tableau-pile" data-col="1"></div>
-   <div class="tableau-pile" data-col="2"></div>
-   <div class="tableau-pile" data-col="3"></div>
-   <div class="tableau-pile" data-col="4"></div>
-   <div class="tableau-pile" data-col="5"></div>
-   <div class="tableau-pile" data-col="6"></div>
-  </div>
-  <div id="hintArrow">➜</div>
- </div>
- <div id="bottomStatus">
-  <span class="status-part" id="statusMessage">Ready</span>
-  <span class="status-part">Draw: <span id="drawLabel">1 card</span></span>
-  <span class="status-part">H = Hint</span>
-  <span class="status-part">J = Auto move</span>
+<div class="window hidden" id="mines">
+ <div class="titlebar" onpointerdown="startDrag(event,'mines')"><span>💣 Minesweeper</span><button class="x" onclick="closeApp('mines')">×</button></div>
+ <div class="menubar"><span onclick="newMines()" style="cursor:pointer">Game</span><span onclick="mineHelp()" style="cursor:pointer">Help</span></div>
+ <div class="winbody">
+  <div class="mine-status"><div class="mine-display" id="mineCount">010</div><button style="font-size:23px;padding:2px 10px" onclick="newMines()" id="mineFace">🙂</button><div class="mine-display" id="mineTimer">000</div></div>
+  <div style="display:flex;gap:6px;margin-top:8px;align-items:center"><label for="mineDifficulty">Difficulty:</label><select id="mineDifficulty" onchange="newMines()" style="padding:4px"><option value="easy">Beginner 9×9</option><option value="medium">Intermediate 12×12</option><option value="hard">Expert 16×16</option></select><button onclick="toggleFlagMode()" id="flagMode">🚩 Flag mode: Off</button></div>
+  <div id="mineGrid"></div>
+  <div id="mineStatus" class="status">Tap a square to start. Find every safe square!</div>
  </div>
 </div>
 
-<div class="overlay" id="settingsOverlay">
- <div class="dialog">
-  <div class="titlebar"><span>Options</span><button data-close="settingsOverlay">×</button></div>
-  <div class="dialog-content">
-   <div class="groupbox"><div class="groupbox-title">Game Options</div>
-    <label class="setting-row">Draw cards<select id="drawSetting"><option value="1">One card</option><option value="3">Three cards</option></select></label>
-    <label class="setting-row">Table color<select id="feltSetting"><option value="#008000">Classic green</option><option value="#006060">Dark teal</option><option value="#004000">Deep green</option><option value="#000080">Classic blue</option></select></label>
-   </div>
-   <div class="groupbox"><div class="groupbox-title">Display</div>
-    <label class="setting-row"><input type="checkbox" id="soundSetting"> Sound effects</label>
-    <label class="setting-row"><input type="checkbox" id="statsSetting" checked> Show moves and timer</label>
-    <label class="setting-row"><input type="checkbox" id="hintsSetting" checked> Allow hints</label>
-   </div>
-   <div class="dialog-buttons"><button id="settingsOK">OK</button><button data-close="settingsOverlay">Cancel</button></div>
-  </div>
+<div class="window hidden" id="calendar">
+ <div class="titlebar" onpointerdown="startDrag(event,'calendar')"><span>📅 Calendar</span><button class="x" onclick="closeApp('calendar')">×</button></div>
+ <div class="winbody">
+  <div class="cal-head"><button onclick="changeMonth(-1)">◀</button><strong id="monthTitle"></strong><button onclick="changeMonth(1)">▶</button></div>
+  <div class="calendar-grid" id="calendarGrid"></div>
+  <div class="status" id="calendarStatus"></div>
+  <button onclick="goToday()">Today</button>
  </div>
 </div>
 
-<div class="overlay" id="helpOverlay">
- <div class="dialog">
-  <div class="titlebar"><span>Solitaire Help</span><button data-close="helpOverlay">×</button></div>
-  <div class="dialog-content">
-   <b>How to play</b>
-   <p>Move all 52 cards to the four foundation piles, starting with Ace and ending with King.</p>
-   <ul>
-    <li>Build columns downward, alternating red and black.</li>
-    <li>Only Kings can go into empty columns.</li>
-    <li>Click the stock to draw cards. Click an empty stock to recycle.</li>
-    <li>Click a card, then its destination. Dragging is also supported.</li>
-   </ul>
-   <p><b>Keyboard:</b> H = Hint, J = Auto move, U = Undo, N = New Game, Escape = Close dialog.</p>
-   <div class="dialog-buttons"><button data-close="helpOverlay">OK</button></div>
+<div class="window hidden" id="calc">
+ <div class="titlebar" onpointerdown="startDrag(event,'calc')"><span>🧮 Calculator</span><button class="x" onclick="closeApp('calc')">×</button></div>
+ <div class="winbody">
+  <input id="calcDisplay" class="calc-display" value="0" readonly>
+  <div class="calc-grid">
+   <button onclick="calcClear()">C</button><button onclick="calcBack()">←</button><button onclick="calcOp('%')">%</button><button onclick="calcOp('/')">÷</button>
+   <button onclick="calcDigit('7')">7</button><button onclick="calcDigit('8')">8</button><button onclick="calcDigit('9')">9</button><button onclick="calcOp('*')">×</button>
+   <button onclick="calcDigit('4')">4</button><button onclick="calcDigit('5')">5</button><button onclick="calcDigit('6')">6</button><button onclick="calcOp('-')">−</button>
+   <button onclick="calcDigit('1')">1</button><button onclick="calcDigit('2')">2</button><button onclick="calcDigit('3')">3</button><button onclick="calcOp('+')">+</button>
+   <button onclick="calcDigit('0')" class="wide">0</button><button onclick="calcDigit('.')">.</button><button onclick="calcEquals()">=</button>
   </div>
+  <div class="status">A classic four-function calculator.</div>
  </div>
 </div>
 
-<div class="overlay" id="winDialog">
- <div class="dialog">
-  <div class="titlebar"><span>Solitaire</span><button data-close="winDialog">×</button></div>
-  <div class="dialog-content" style="text-align:center">
-   <h2>Congratulations!</h2><div style="font:36px Georgia;color:#000080">♠ ♥ ♦ ♣</div>
-   <p>You completed Solitaire!</p><p id="winStats"></p>
-   <div class="dialog-buttons"><button id="againButton">New Game</button><button data-close="winDialog">Close</button></div>
-  </div>
- </div>
+<div class="menu hidden" id="startMenu">
+ <div class="menu-head">Windows <span style="font-weight:normal">98</span></div>
+ <div class="menu-item" onclick="openApp('solitaire');toggleMenu()"><span>🃏</span>Solitaire</div>
+ <div class="menu-item" onclick="openApp('mines');toggleMenu()"><span>💣</span>Minesweeper</div>
+ <div class="menu-item" onclick="openApp('calendar');toggleMenu()"><span>📅</span>Calendar</div>
+ <div class="menu-item" onclick="openApp('calc');toggleMenu()"><span>🧮</span>Calculator</div>
+ <div class="menu-item" onclick="toggleSound();toggleMenu()"><span>🔊</span>Toggle sound</div>
 </div>
-<div id="toast"></div>
+<div class="taskbar">
+ <button class="start" onclick="toggleMenu()">🪟 Start</button>
+ <button class="taskbtn" onclick="openApp('solitaire')">🃏 Solitaire</button>
+ <button class="taskbtn" onclick="openApp('mines')">💣 Mines</button>
+ <button class="taskbtn" onclick="openApp('calendar')">📅 Calendar</button>
+ <button class="taskbtn" onclick="openApp('calc')">🧮 Calc</button>
+ <div class="task-spacer"></div><div class="clock" id="clock">12:00 PM</div>
+</div>
 
 <script>
-(() => {
- const $ = id => document.getElementById(id);
- const SUITS = [
-  {symbol:"♠",color:"black"},{symbol:"♥",color:"red"},
-  {symbol:"♦",color:"red"},{symbol:"♣",color:"black"}
- ];
- const RANKS = ["","A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const $=id=>document.getElementById(id);
+let zTop=20;
+function openApp(id){const w=$(id);w.classList.remove('hidden');w.style.zIndex=++zTop;if(id==='calendar')renderCalendar();if(id==='mines'&&!mineBoard.length)newMines();if(id==='solitaire'&&!deck.length)newSolitaire();}
+function closeApp(id){$(id).classList.add('hidden')}
+function toggleMenu(){$('startMenu').classList.toggle('hidden')}
+function toggleSound(){soundOn=!soundOn;playTone(650,.07);if($('solStatus'))$('solStatus').textContent='Sound '+(soundOn?'enabled':'muted')+'.'}
+let soundOn=true,audioCtx=null;
+function playTone(freq=500,duration=.07,type='square'){
+ if(!soundOn)return;
+ try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.055,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+}
+document.addEventListener('pointerdown',()=>{if(soundOn&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume()},{once:false});
+function startDrag(e,id){
+ if(e.target.closest('button'))return;
+ const w=$(id);w.style.zIndex=++zTop;
+ const r=w.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;
+ const left=r.left,top=r.top;
+ function move(ev){w.style.left=(left+ev.clientX-sx)+'px';w.style.top=(top+ev.clientY-sy)+'px';w.style.transform='none'}
+ function up(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up)}
+ document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);
+}
+function updateClock(){let d=new Date();$('clock').textContent=d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
+updateClock();setInterval(updateClock,10000);
 
- let stock=[],waste=[],foundations=[[],[],[],[]],tableau=[[],[],[],[],[],[],[]];
- let selected=null,history=[],moves=0,startTime=Date.now(),timer=null;
- let drawCount=1,showStats=true,allowHints=true,soundEnabled=false,hintMove=null,toastTimer=null;
+/* CALCULATOR */
+let calcValue='0',calcStored=null,calcOperator=null,calcFresh=false;
+function calcShow(){$('calcDisplay').value=calcValue}
+function calcDigit(d){playTone(520,.035);if(d==='.'&&calcValue.includes('.'))return;if(calcFresh){calcValue=d==='.'?'0.':d;calcFresh=false}else if(calcValue==='0'&&d!=='.')calcValue=d;else if(calcValue.length<16)calcValue+=d;calcShow()}
+function calcOp(op){playTone(420,.04);if(calcOperator&&!calcFresh)calcEquals(false);calcStored=Number(calcValue);calcOperator=op;calcFresh=true}
+function calcEquals(play=true){if(calcStored===null||!calcOperator)return;let a=calcStored,b=Number(calcValue),r=0;switch(calcOperator){case '+':r=a+b;break;case '-':r=a-b;break;case '*':r=a*b;break;case '/':r=b===0?'Error':a/b;break;case '%':r=a%b;break}calcValue=typeof r==='number'?(Number.isFinite(r)?String(Number(r.toPrecision(12))):'Error'):r;calcStored=null;calcOperator=null;calcFresh=true;calcShow();if(play)playTone(720,.1)}
+function calcClear(){calcValue='0';calcStored=null;calcOperator=null;calcFresh=false;calcShow();playTone(300,.06)}
+function calcBack(){calcValue=calcValue.length>1?calcValue.slice(0,-1):'0';calcShow();playTone(350,.03)}
 
- function status(s){$("statusMessage").textContent=s}
- function toast(s){
-  $("toast").textContent=s;$("toast").style.display="block";
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").style.display="none",1800);
+/* CALENDAR */
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calChosen=new Date();
+function renderCalendar(){
+ $('monthTitle').textContent=new Date(calYear,calMonth,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});
+ const grid=$('calendarGrid');grid.innerHTML='';
+ ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{let el=document.createElement('div');el.className='dayname';el.textContent=d;grid.appendChild(el)});
+ let first=new Date(calYear,calMonth,1).getDay(),days=new Date(calYear,calMonth+1,0).getDate(),today=new Date();
+ for(let i=0;i<first;i++){let e=document.createElement('div');grid.appendChild(e)}
+ for(let day=1;day<=days;day++){
+  let b=document.createElement('button');b.className='calday';b.textContent=day;
+  if(day===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear())b.classList.add('today');
+  if(day===calChosen.getDate()&&calMonth===calChosen.getMonth()&&calYear===calChosen.getFullYear())b.classList.add('chosen');
+  b.onclick=()=>{calChosen=new Date(calYear,calMonth,day);renderCalendar();$('calendarStatus').textContent='Selected: '+calChosen.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});playTone(600,.05)};
+  grid.appendChild(b)
  }
- function hideHint(){$("hintArrow").style.display="none"}
- function cardSuit(card){return SUITS[card.suit]}
- function isSelected(source,col,index,pile){
-  if(!selected||selected.source!==source)return false;
-  if(source==="tableau")return selected.col===col&&index>=selected.index;
-  if(source==="foundation")return selected.pile===pile;
-  return true;
- }
- function cardHTML(card,extra=""){
-  if(!card.faceUp)return `<div class="card face-down ${extra}" data-card="${card.id}"></div>`;
-  const suit=cardSuit(card),rank=RANKS[card.rank];
-  const center=card.rank>=11
-   ? `<div class="face-decoration">${suit.symbol}</div><div class="face-letter">${rank}</div>`
-   : `<div class="center-suit">${suit.symbol}</div>`;
-  return `<div class="card ${suit.color} ${extra}" data-card="${card.id}" draggable="true">
-   <div class="corner">${rank}<small>${suit.symbol}</small></div>${center}
-   <div class="corner bottom">${rank}<small>${suit.symbol}</small></div>
-  </div>`;
- }
- function saveHistory(){
-  history.push(JSON.stringify({stock,waste,foundations,tableau,moves}));
-  if(history.length>100)history.shift();
- }
- function undo(){
-  if(!history.length)return toast("Nothing to undo.");
-  const s=JSON.parse(history.pop());
-  stock=s.stock;waste=s.waste;foundations=s.foundations;tableau=s.tableau;moves=s.moves;
-  selected=null;hintMove=null;hideHint();render();status("Last move undone.");
- }
- function updateStats(){
-  $("moves").textContent=moves;
-  const sec=Math.floor((Date.now()-startTime)/1000);
-  $("time").textContent=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
-  $("drawLabel").textContent=drawCount+(drawCount===1?" card":" cards");
-  $("moves").parentElement.style.display=showStats?"":"none";
-  $("time").parentElement.style.display=showStats?"":"none";
-  $("undoButton").disabled=!history.length;
- }
- function newGame(){
-  let deck=[],id=0;
-  for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({id:id++,suit:s,rank:r,faceUp:false});
-  for(let i=deck.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
-  stock=[];waste=[];foundations=[[],[],[],[]];tableau=[[],[],[],[],[],[],[]];
-  selected=null;history=[];moves=0;hintMove=null;hideHint();
-  for(let c=0;c<7;c++)for(let r=0;r<=c;r++){let card=deck.pop();card.faceUp=r===c;tableau[c].push(card)}
-  stock=deck;startTime=Date.now();clearInterval(timer);timer=setInterval(updateStats,1000);
-  render();status("New game started.");
- }
- function render(){
-  $("stock").innerHTML=stock.length
-   ? `<div id="stockCard" class="card face-down" style="position:absolute;inset:0;width:100%;height:100%;max-height:none"></div>`
-   : `<div style="position:absolute;inset:0;display:grid;place-items:center;color:white;font-size:26px">↻</div>`;
-  $("waste").innerHTML="";
-  if(waste.length){
-   $("waste").innerHTML=cardHTML(waste[waste.length-1],isSelected("waste")?"selected":"");
-   const c=$("waste").firstElementChild;
-   c.style.cssText+=";position:absolute;inset:0;width:100%;height:100%;max-height:none";
-   c.dataset.source="waste";
-  }
-  for(let p=0;p<4;p++){
-   const el=$("foundation"+p);el.innerHTML="";
-   if(foundations[p].length){
-    el.innerHTML=cardHTML(foundations[p][foundations[p].length-1],isSelected("foundation",null,null,p)?"selected":"");
-    const c=el.firstElementChild;c.style.cssText+=";position:absolute;inset:0;width:100%;height:100%;max-height:none";
-    c.dataset.source="foundation";c.dataset.pile=p;
-   }else{
-    el.innerHTML=`<div style="position:absolute;inset:0;display:grid;place-items:center;color:#ffffffb0;font-size:28px">${SUITS[p].symbol}</div>`;
-   }
-  }
-  document.querySelectorAll(".tableau-pile").forEach((el,col)=>{
-   el.innerHTML="";
-   const step=innerWidth<=650?20:27;
-   tableau[col].forEach((card,index)=>{
-    const extra=isSelected("tableau",col,index)?"selected":"";
-    const hint=hintMove&&hintMove.source==="tableau"&&hintMove.col===col&&hintMove.index===index?"hint-card":"";
-    const wrap=document.createElement("div");wrap.innerHTML=cardHTML(card,[extra,hint].filter(Boolean).join(" "));
-    const c=wrap.firstElementChild;
-    c.style.top=(index*(card.faceUp?step:8))+"px";c.style.zIndex=index+1;
-    c.dataset.source="tableau";c.dataset.col=col;c.dataset.index=index;
-    el.appendChild(c);
-   });
-   el.style.height=Math.max(120,tableau[col].length?(tableau[col].length-1)*step+100:120)+"px";
+ $('calendarStatus').textContent='Selected: '+calChosen.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+}
+function changeMonth(n){calMonth+=n;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar();playTone(450,.04)}
+function goToday(){let d=new Date();calYear=d.getFullYear();calMonth=d.getMonth();calChosen=d;renderCalendar();playTone(650,.05)}
+
+/* MINESWEEPER */
+let mineBoard=[],mineRows=9,mineCols=9,mineTotal=10,mineFlags=0,mineRevealed=0,mineOver=false,mineStarted=false,mineFlagMode=false,mineSeconds=0,mineInterval=null;
+function newMines(){
+ clearInterval(mineInterval);mineInterval=null;mineSeconds=0;mineStarted=false;mineOver=false;mineFlags=0;mineRevealed=0;
+ const diff=$('mineDifficulty').value;
+ if(diff==='medium'){mineRows=12;mineCols=12;mineTotal=20}else if(diff==='hard'){mineRows=16;mineCols=16;mineTotal=40}else{mineRows=9;mineCols=9;mineTotal=10}
+ mineBoard=Array.from({length:mineRows*mineCols},()=>({bomb:false,n:0,open:false,flag:false}));
+ $('mineFace').textContent='🙂';$('mineCount').textContent=String(mineTotal).padStart(3,'0');$('mineTimer').textContent='000';
+ $('mineGrid').style.gridTemplateColumns=`repeat(${mineCols}, minmax(0,1fr))`;
+ $('mineGrid').innerHTML='';$('mineGrid').style.maxWidth='max-content';
+ mineBoard.forEach((c,i)=>{let b=document.createElement('button');b.className='minecell';b.dataset.i=i;b.textContent='';b.onclick=()=>mineClick(i);b.oncontextmenu=e=>{e.preventDefault();toggleMineFlag(i)};$('mineGrid').appendChild(b)});
+ $('mineStatus').textContent='Tap a square to start. Find every safe square!';$('flagMode').textContent='🚩 Flag mode: '+(mineFlagMode?'On':'Off');
+}
+function mineNeighbors(i){let r=Math.floor(i/mineCols),c=i%mineCols,out=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;let nr=r+dr,nc=c+dc;if(nr>=0&&nr<mineRows&&nc>=0&&nc<mineCols)out.push(nr*mineCols+nc)}return out}
+function setupBombs(first){
+ let safe=new Set([first,...mineNeighbors(first)]);
+ let pool=mineBoard.map((_,i)=>i).filter(i=>!safe.has(i));
+ for(let i=pool.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ pool.slice(0,mineTotal).forEach(i=>mineBoard[i].bomb=true);
+ mineBoard.forEach((c,i)=>{c.n=mineNeighbors(i).filter(j=>mineBoard[j].bomb).length});
+}
+function mineClick(i){
+ if(mineOver)return;
+ let c=mineBoard[i];if(c.open||c.flag)return;
+ if(mineFlagMode){toggleMineFlag(i);return}
+ if(!mineStarted){mineStarted=true;setupBombs(i);mineInterval=setInterval(()=>{if(!mineOver){mineSeconds++;$('mineTimer').textContent=String(Math.min(mineSeconds,999)).padStart(3,'0')}},1000)}
+ if(c.bomb){c.open=true;renderMineCell(i);mineLose();return}
+ revealMine(i);playTone(520,.035);checkMineWin()
+}
+function revealMine(i){
+ let c=mineBoard[i];if(c.open||c.flag||c.bomb)return;
+ c.open=true;mineRevealed++;renderMineCell(i);
+ if(c.n===0)mineNeighbors(i).forEach(j=>{if(!mineBoard[j].open)revealMine(j)});
+}
+function renderMineCell(i){
+ let c=mineBoard[i],b=$('mineGrid').children[i];b.className='minecell';b.textContent='';
+ if(c.flag){b.classList.add('flagged');b.textContent='🚩';return}
+ if(c.open){b.classList.add('revealed');if(c.bomb){b.textContent='💣';b.style.background='#ff5555'}else if(c.n){b.textContent=c.n;b.style.color=({1:'#0000ff',2:'#008000',3:'#ff0000',4:'#000080',5:'#800000',6:'#008080',7:'#000',8:'#777'})[c.n]}}
+}
+function toggleMineFlag(i){
+ if(mineOver||mineBoard[i].open)return;
+ let c=mineBoard[i];c.flag=!c.flag;mineFlags+=c.flag?1:-1;
+ $('mineCount').textContent=String(mineTotal-mineFlags).padStart(3,'0');renderMineCell(i);playTone(c.flag?700:350,.04)
+}
+function toggleFlagMode(){mineFlagMode=!mineFlagMode;$('flagMode').textContent='🚩 Flag mode: '+(mineFlagMode?'On':'Off');playTone(450,.04)}
+function mineLose(){
+ mineOver=true;clearInterval(mineInterval);$('mineFace').textContent='😵';mineBoard.forEach((c,i)=>{if(c.bomb){c.open=true;renderMineCell(i)}});$('mineStatus').textContent='Boom! You hit a bomb. Press the smiley to try again.';playTone(130,.3,'sawtooth')
+}
+function checkMineWin(){
+ if(mineRevealed===mineRows*mineCols-mineTotal){mineOver=true;clearInterval(mineInterval);$('mineFace').textContent='😎';$('mineStatus').textContent='You win! Every safe square is clear!';playTone(700,.12);setTimeout(()=>playTone(900,.15),130)}
+}
+function mineHelp(){alert('Minesweeper: tap squares to reveal them. Numbers show how many bombs touch that square. Turn Flag mode on, then tap a square to mark a suspected bomb. Reveal every safe square to win. Your first tap is always safe.')}
+
+/* SOLITAIRE: Klondike draw-one */
+const suits=['♠','♥','♦','♣'],ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+let deck=[],stock=[],waste=[],foundations=[[],[],[],[]],columns=Array.from({length:7},()=>[]),selected=null,moves=0,solUndo=[];
+function makeDeck(){let d=[];for(let s=0;s<4;s++)for(let r=1;r<=13;r++)d.push({s,r,faceUp:false,id:s*13+r});return d}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function newSolitaire(){
+ deck=shuffle(makeDeck());stock=[];waste=[];foundations=[[],[],[],[]];columns=Array.from({length:7},()=>[]);selected=null;moves=0;solUndo=[];
+ for(let c=0;c<7;c++)for(let j=0;j<=c;j++){let card=deck.pop();card.faceUp=j===c;columns[c].push(card)}
+ stock=deck;deck=[];$('solStatus').textContent='New game started.';renderSol();playTone(500,.05)
+}
+function rankName(r){return ranks[r-1]}
+function redCard(c){return c.s===1||c.s===2}
+function saveSol(){solUndo.push(JSON.stringify({stock,waste,foundations,columns,moves}));if(solUndo.length>40)solUndo.shift()}
+function undoSol(){if(!solUndo.length)return;let d=JSON.parse(solUndo.pop());stock=d.stock;waste=d.waste;foundations=d.foundations;columns=d.columns;moves=d.moves;selected=null;renderSol();playTone(350,.06)}
+function drawStock(){
+ if(!stock.length){if(!waste.length)return;saveSol();stock=waste.reverse().map(c=>({...c,faceUp:false}));waste=[];$('solStatus').textContent='Stock recycled.';moves++;renderSol();playTone(380,.06);return}
+ saveSol();let c=stock.pop();c.faceUp=true;waste.push(c);selected=null;moves++;renderSol();playTone(580,.045)
+}
+function cardHTML(c,extra=''){
+ let el=document.createElement('div');el.className='card'+(c.faceUp?'':' back')+(c.faceUp&&redCard(c)?' red':'')+extra;
+ el.dataset.card=c.id;
+ if(c.faceUp){el.innerHTML='<div class="rank">'+rankName(c.r)+'<br>'+suits[c.s]+'</div><div class="suit">'+suits[c.s]+'</div>'}
+ return el
+}
+function renderSol(){
+ $('solScore').textContent='Moves: '+moves;
+ const st=$('stock');st.innerHTML='';
+ if(stock.length){let back=document.createElement('div');back.className='card back';back.style.inset='0';back.style.width='100%';back.style.height='100%';st.appendChild(back)}else{st.classList.add('empty')}
+ const w=$('waste');w.innerHTML='';
+ if(waste.length){let c=waste[waste.length-1],el=cardHTML(c);el.style.inset='0';el.style.width='100%';el.style.height='100%';if(selected&&selected.type==='waste')el.classList.add('selected');w.appendChild(el)}
+ for(let i=0;i<4;i++){let f=$('foundation'+i);f.innerHTML='';let a=foundations[i];if(a.length){let el=cardHTML(a[a.length-1]);el.style.inset='0';el.style.width='100%';el.style.height='100%';f.appendChild(el)}f.classList.toggle('empty',!a.length)}
+ $('tableau').innerHTML='';
+ columns.forEach((col,ci)=>{
+  let pile=document.createElement('div');pile.className='col';pile.dataset.col=ci;
+  col.forEach((c,idx)=>{
+   let el=cardHTML(c);
+   el.style.top=(idx*(c.faceUp?22:13))+'px';
+   el.style.zIndex=idx+1;
+   if(selected&&selected.type==='col'&&selected.col===ci&&idx>=selected.index)el.classList.add('selected');
+   el.onclick=e=>{e.stopPropagation();selectTableau(ci,idx)};
+   pile.appendChild(el)
   });
-  updateStats();
-  if(hintMove)positionHint();
- }
- function getMoving(){
-  if(!selected)return [];
-  if(selected.source==="waste")return waste.length?[waste[waste.length-1]]:[];
-  if(selected.source==="foundation")return foundations[selected.pile].length?[foundations[selected.pile].at(-1)]:[];
-  if(selected.source==="tableau")return tableau[selected.col].slice(selected.index);
-  return [];
- }
- function removeSelected(){
-  if(selected.source==="waste")return [waste.pop()];
-  if(selected.source==="foundation")return [foundations[selected.pile].pop()];
-  if(selected.source==="tableau"){
-   const cards=tableau[selected.col].splice(selected.index),pile=tableau[selected.col];
-   if(pile.length&&!pile.at(-1).faceUp)pile.at(-1).faceUp=true;
-   return cards;
-  }
-  return [];
- }
- function canTableau(cards,col){
-  if(!cards.length||col<0||col>6)return false;
-  if(selected.source==="tableau"&&selected.col===col)return false;
-  const card=cards[0],pile=tableau[col];
-  if(!pile.length)return card.rank===13;
-  const top=pile.at(-1);
-  return top.faceUp&&top.rank===card.rank+1&&cardSuit(top).color!==cardSuit(card).color;
- }
- function canFoundation(card,p){
-  if(!card)return false;
-  const pile=foundations[p];
-  if(!pile.length)return card.rank===1&&card.suit===p;
-  const top=pile.at(-1);
-  return top.suit===card.suit&&card.rank===top.rank+1;
- }
- function moveTableau(col){
-  if(!selected)return false;
-  const cards=getMoving();
-  if(!canTableau(cards,col))return false;
-  saveHistory();const moving=removeSelected();tableau[col].push(...moving);
-  selected=null;hintMove=null;hideHint();moves++;render();status("Card placed.");checkWin();return true;
- }
- function moveFoundation(p){
-  if(!selected)return false;
-  const cards=getMoving();
-  if(cards.length!==1||!canFoundation(cards[0],p))return false;
-  saveHistory();const moving=removeSelected();foundations[p].push(moving[0]);
-  selected=null;hintMove=null;hideHint();moves++;render();status("Card placed on foundation.");checkWin();return true;
- }
- function drawStock(){
-  selected=null;hintMove=null;hideHint();
-  if(stock.length){
-   saveHistory();
-   for(let i=0;i<drawCount&&stock.length;i++){const c=stock.pop();c.faceUp=true;waste.push(c)}
-   moves++;render();status("Cards drawn.");
-  }else if(waste.length){
-   saveHistory();stock=waste.reverse().map(c=>({...c,faceUp:false}));waste=[];
-   moves++;render();status("Stock recycled.");
-  }else status("No cards left.");
- }
- function locateCard(id){
-  for(let col=0;col<7;col++){
-   const index=tableau[col].findIndex(c=>c.id===id);
-   if(index>=0)return {source:"tableau",col,index};
-  }
-  if(waste.length&&waste.at(-1).id===id)return {source:"waste"};
-  for(let p=0;p<4;p++)if(foundations[p].length&&foundations[p].at(-1).id===id)return {source:"foundation",pile:p};
-  return null;
- }
- function selectCard(el){
-  const source=el.dataset.source;
-  if(!source)return;
-  const col=Number(el.dataset.col),index=Number(el.dataset.index),p=Number(el.dataset.pile);
-  if(source==="tableau"){
-   const card=tableau[col][index];if(!card.faceUp)return;
-   if(selected){
-    if(selected.source==="tableau"&&selected.col===col&&selected.index===index){selected=null;render();return}
-    if(moveTableau(col))return;
-   }
-   selected={source:"tableau",col,index};render();return;
-  }
-  if(source==="waste"){
-   if(selected&&selected.source==="waste"){selected=null;render();return}
-   if(selected&&selected.source==="tableau"&&moveTableau(selected.col))return;
-   selected={source:"waste"};render();return;
-  }
-  if(source==="foundation"){
-   if(selected&&moveFoundation(p))return;
-   selected={source:"foundation",pile:p};render();
-  }
- }
- function tableClick(event){
-  const card=event.target.closest(".card");
-  if(card){
-   if(card.id==="stockCard")return drawStock();
-   selectCard(card);return;
-  }
-  const foundation=event.target.closest(".foundation");
-  if(foundation){if(selected)moveFoundation(Number(foundation.dataset.pile));return}
-  const colEl=event.target.closest(".tableau-pile");
-  if(colEl&&selected){
-   if(!moveTableau(Number(colEl.dataset.col)))status("That card cannot be placed there.");
-  }
- }
- function autoMove(){
-  if(!selected){
-   if(waste.length)selected={source:"waste"};
-   else{
-    for(let c=0;c<7;c++)if(tableau[c].length){selected={source:"tableau",col:c,index:tableau[c].length-1};break}
-   }
-  }
-  if(!selected)return false;
-  const cards=getMoving();if(cards.length!==1)return false;
-  for(let p=0;p<4;p++)if(canFoundation(cards[0],p))return moveFoundation(p);
-  return false;
- }
- function findHint(){
-  const candidates=[];
-  if(waste.length)candidates.push({source:"waste",card:waste.at(-1)});
-  for(let c=0;c<7;c++)if(tableau[c].length)candidates.push({source:"tableau",col:c,index:tableau[c].length-1,card:tableau[c].at(-1)});
-  for(const item of candidates)for(let p=0;p<4;p++)if(canFoundation(item.card,p))return {...item,target:"foundation",pile:p,cardId:item.card.id};
-  for(const item of candidates)for(let c=0;c<7;c++){
-   if(item.source==="tableau"&&item.col===c)continue;
-   const pile=tableau[c],card=item.card;
-   if((!pile.length&&card.rank===13)||(pile.length&&pile.at(-1).faceUp&&pile.at(-1).rank===card.rank+1&&cardSuit(pile.at(-1)).color!==cardSuit(card).color))
-    return {...item,target:"tableau",dest:c,cardId:card.id};
-  }
-  if(stock.length||waste.length)return {source:"stock",target:"stock"};
-  return null;
- }
- function hint(){
-  if(!allowHints)return toast("Hints are disabled.");
-  hintMove=findHint();if(!hintMove)return toast("No obvious move found.");
-  render();positionHint();status("Try the highlighted move.");
- }
- function positionHint(){
-  if(!hintMove)return hideHint();
-  let a,b;
-  if(hintMove.source==="stock"){a=$("stock");b=$("waste")}
-  else{
-   a=document.querySelector(`[data-card="${hintMove.cardId}"]`);
-   b=hintMove.target==="foundation"?$("foundation"+hintMove.pile):document.querySelector(`.tableau-pile[data-col="${hintMove.dest}"]`);
-  }
-  if(!a||!b)return hideHint();
-  const tr=$("table").getBoundingClientRect(),ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();
-  $("hintArrow").style.left=((ar.left+ar.width/2+br.left+br.width/2)/2-tr.left)+"px";
-  $("hintArrow").style.top=((ar.top+ar.height/2+br.top+br.height/2)/2-tr.top)+"px";
-  $("hintArrow").style.display="block";
- }
- function checkWin(){
-  if(foundations.reduce((n,p)=>n+p.length,0)===52){
-   clearInterval(timer);
-   $("winStats").textContent="Moves: "+moves+" · Time: "+$("time").textContent;
-   $("winDialog").style.display="flex";
-  }
- }
- function showDialog(id){$(id).style.display="flex"}
- function closeDialog(id){$(id).style.display="none"}
- function openGame(){
-  $("menuScreen").style.display="none";$("gameWindow").style.display="block";
-  if(!stock.length&&!waste.length&&tableau.every(p=>!p.length))newGame();
- }
- function openMenu(){$("gameWindow").style.display="none";$("menuScreen").style.display="block";hideHint()}
- function settings(){
-  drawCount=Number($("drawSetting").value);
-  document.documentElement.style.setProperty("--felt",$("feltSetting").value);
-  soundEnabled=$("soundSetting").checked;
-  showStats=$("statsSetting").checked;allowHints=$("hintsSetting").checked;
-  closeDialog("settingsOverlay");render();
- }
-
- $("stock").addEventListener("click",drawStock);
- $("table").addEventListener("click",tableClick);
-
- $("table").addEventListener("dragstart",event=>{
-  const el=event.target.closest(".card");
-  if(!el||el.id==="stockCard")return event.preventDefault();
-  const loc=locateCard(Number(el.dataset.card));
-  if(!loc)return event.preventDefault();
-  if(loc.source==="tableau"&&!tableau[loc.col][loc.index].faceUp)return event.preventDefault();
-  selected=loc;
-  event.dataTransfer.setData("text/plain",el.dataset.card);
-  event.dataTransfer.effectAllowed="move";
+  pile.onclick=()=>{if(!col.length&&selected)moveTableau(ci)};
+  $('tableau').appendChild(pile)
  });
- $("table").addEventListener("dragover",event=>{
-  if(event.target.closest(".tableau-pile")||event.target.closest(".foundation"))event.preventDefault();
- });
- $("table").addEventListener("drop",event=>{
-  const colEl=event.target.closest(".tableau-pile"),fEl=event.target.closest(".foundation");
-  if(!colEl&&!fEl)return;
-  event.preventDefault();
-  if(colEl)moveTableau(Number(colEl.dataset.col));
-  else moveFoundation(Number(fEl.dataset.pile));
- });
+ $('stock').onclick=drawStock;
+ $('waste').onclick=()=>{if(waste.length)selectWaste()};
+ $('solStatus').textContent=$('solStatus').textContent||'Tap cards to play.';
+ if(foundations.every(f=>f.length===13)){$('solStatus').textContent='You won! All cards are sorted!';playTone(750,.15);setTimeout(()=>playTone(950,.2),180)}
+}
+function selectWaste(){if(!waste.length)return;selected={type:'waste'};renderSol()}
+function selectTableau(ci,idx){
+ let c=columns[ci][idx];if(!c.faceUp){if(idx===columns[ci].length-1){saveSol();c.faceUp=true;moves++;selected=null;renderSol();playTone(500,.05)}return}
+ if(selected){if(selected.type==='col'&&selected.col===ci&&selected.index===idx){selected=null;renderSol();return}
+  if(selected.type==='col'&&selected.col===ci&&idx>selected.index){selected={type:'col',col:ci,index:idx};renderSol();return}
+  if(moveToColumn(ci))return;
+ }
+ selected={type:'col',col:ci,index:idx};renderSol()
+}
+function moveToColumn(target){
+ if(!selected)return false;
+ let srcCards=selected.type==='waste'?[waste[waste.length-1]]:columns[selected.col].slice(selected.index);
+ if(!srcCards.length)return false;
+ let moving=srcCards[0],dest=columns[target],top=dest[dest.length-1];
+ if(top){if(!top.faceUp||top.r!==moving.r+1||redCard(top)===redCard(moving))return false}
+ else if(moving.r!==13)return false;
+ saveSol();
+ if(selected.type==='waste')waste.pop();else{columns[selected.col].splice(selected.index);let old=columns[selected.col];if(old.length&&!old[old.length-1].faceUp)old[old.length-1].faceUp=true}
+ columns[target].push(...srcCards);moves++;selected=null;$('solStatus').textContent='Card moved.';renderSol();playTone(620,.05);return true
+}
+function moveTableau(target){if(moveToColumn(target))return}
+function tryFoundation(card,source,ci,idx){
+ let pile=foundations[card.s],top=pile[pile.length-1];
+ if(top?card.r!==top.r+1:card.r!==1)return false;
+ saveSol();
+ if(source==='waste')waste.pop();else{columns[ci].splice(idx);let col=columns[ci];if(col.length&&!col[col.length-1].faceUp)col[col.length-1].faceUp=true}
+ pile.push(card);selected=null;moves++;$('solStatus').textContent='Card sent to foundation.';renderSol();playTone(800,.07);return true
+}
+document.addEventListener('click',e=>{
+ let f=e.target.closest('[data-pile]');if(f){
+  if(!selected)return;
+  let card=selected.type==='waste'?waste[waste.length-1]:columns[selected.col][selected.index];
+  if(card&&tryFoundation(card,selected.type==='waste'?'waste':'col',selected.col,selected.index))return;
+ }
+});
+function solHelp(){alert('Tap a face-up card, then tap another column to move it. You can move a whole face-up sequence. Build descending alternating colors. Aces go to the top foundation piles, then build up by suit. Tap the stock to draw; tap an empty stock to recycle the waste. Tap Undo to reverse a move.')}
 
- $("playButton").onclick=()=>{openGame();newGame()};
- $("continueButton").onclick=openGame;
- $("settingsButton").onclick=()=>showDialog("settingsOverlay");
- $("helpButton").onclick=()=>showDialog("helpOverlay");
- $("newButton").onclick=newGame;
- $("undoButton").onclick=undo;
- $("hintButton").onclick=hint;
- $("autoButton").onclick=()=>{if(!autoMove())toast("No automatic foundation move available.")};
- $("menuButton").onclick=openMenu;
- $("fileMenu").onclick=()=>{if(confirm("Start a new game?"))newGame()};
- $("gameMenu").onclick=()=>toast("Use New Game or Undo.");
- $("optionsMenu").onclick=()=>showDialog("settingsOverlay");
- $("helpMenu").onclick=()=>showDialog("helpOverlay");
- $("settingsOK").onclick=settings;
- $("againButton").onclick=()=>{closeDialog("winDialog");openGame();newGame()};
- document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeDialog(b.dataset.close));
- document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)closeDialog(o.id)}));
-
- document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){document.querySelectorAll(".overlay").forEach(o=>o.style.display="none");return}
-  if($("gameWindow").style.display==="none"||document.querySelector(".overlay[style*='flex']"))return;
-  if(e.key.toLowerCase()==="h")hint();
-  if(e.key.toLowerCase()==="j"&&!autoMove())toast("No automatic move available.");
-  if(e.key.toLowerCase()==="u")undo();
-  if(e.key.toLowerCase()==="n"&&confirm("Start a new game?"))newGame();
- });
- window.addEventListener("resize",()=>{if(hintMove)positionHint()});
- render();
-})();
+newSolitaire();newMines();renderCalendar();calcShow();
 </script>
 </body>
 </html>
