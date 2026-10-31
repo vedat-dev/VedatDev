@@ -250,7 +250,7 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
  </div>
  <div class="window-menu"><span onclick="calcClear()">EDIT</span><span onclick="alert('RETRO PIXEL CALCULATOR')">HELP</span></div>
  <div class="content">
-  <input class="calc-display" id="calcDisplay" value="0" readonly>
+  <input class="calc-display" id="calcDisplay" value="0" readonly inputmode="none">
   <div class="calc-grid">
    <button onclick="calcClear()">C</button><button onclick="calcBack()">DEL</button><button onclick="calcOp('%')">%</button><button onclick="calcOp('/')">÷</button>
    <button onclick="calcDigit('7')">7</button><button onclick="calcDigit('8')">8</button><button onclick="calcDigit('9')">9</button><button onclick="calcOp('*')">×</button>
@@ -278,7 +278,7 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
    <button onclick="noteSelectAll()">SELECT ALL</button>
    <button onclick="noteClear()">CLEAR</button>
   </div>
-  <textarea id="noteText" placeholder="Start typing here..." spellcheck="true"></textarea>
+  <textarea id="noteText" placeholder="Start typing here..." spellcheck="true" inputmode="none" virtualkeyboardpolicy="manual"></textarea>
   <div class="note-status">
    <span id="noteCount">0 CHARACTERS</span>
    <span>NOTEPAD READY</span>
