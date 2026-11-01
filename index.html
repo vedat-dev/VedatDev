@@ -121,6 +121,10 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
 .paint-bottom{display:flex;gap:5px;flex-wrap:wrap}
 .paint-bottom button{font-size:6px;padding:6px}
 .paint-color-name{font-size:6px;line-height:1.8;overflow-wrap:anywhere}
+.resolution-buttons{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.resolution-buttons button{font-size:6px;padding:6px 2px}
+.resolution-current{background:#fff;border:2px inset #aaa;padding:6px;text-align:center;font-size:7px;line-height:1.8}
+.resolution-warning{font-size:5px;line-height:1.8;color:#555}
 
 /* SAVED PAINTS WINDOW */
 #savedPaints{width:min(340px,94vw);left:calc(50% + 405px);top:50%;transform:translateY(-50%);max-height:calc(100vh - 55px);overflow:auto}
@@ -239,12 +243,11 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
 </div>
 
 <div class="window" id="notepad">
- <div class="titlebar" onpointerdown="startDrag(event,'notepad')"><div class="title-name"><span class="title-icon" data-icon="iconNote"></span>NOTEPAD.EXE</div><div class="title-actions"><button onclick="minimizeApp('notepad')">_</button><button onclick="closeApp('notepad')">×</button></div></div>
+ <div class="titlebar" onpointerdown="startDrag(event,'notepad')"><div class="title-name"><span class="title-icon" data-icon="iconNote"></span>NOTEPAD.EXE</div><div class="title-actions"><button onclick="minimizeApp('notepad')">_</button><button onclick="closeCalculator()">×</button></div></div>
  <div class="window-menu"><span onclick="noteNew()">FILE</span><span onclick="noteSelectAll()">EDIT</span><span onclick="noteSave()">SAVE</span></div>
  <div class="content"><div class="note-toolbar"><button onclick="noteNew()">NEW</button><button onclick="noteSelectAll()">SELECT ALL</button><button onclick="noteClear()">CLEAR</button></div><textarea id="noteText" placeholder="Start typing here..." spellcheck="true" inputmode="none" virtualkeyboardpolicy="manual"></textarea><div class="note-status"><span id="noteCount">0 CHARACTERS</span><span>NOTEPAD READY</span></div></div>
 </div>
 
-<!-- PAINT STUDIO -->
 <div class="window" id="paint">
  <div class="titlebar" onpointerdown="startDrag(event,'paint')">
   <div class="title-name"><span class="title-icon" data-icon="iconPaint"></span>PAINT STUDIO.EXE</div>
@@ -291,8 +294,13 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
      <input type="range" id="paintSize" min="1" max="12" value="1" oninput="paintSetSize(this.value)">
      <span class="small" id="paintSizeLabel">1 STUD</span>
      <hr>
-     <span class="paint-label">CANVAS</span>
-     <span class="small">40 × 30 STUDS</span>
+     <span class="paint-label">PAPER STUD RESOLUTION</span>
+     <div class="resolution-buttons">
+      <button onclick="paintChangeResolution(-1)">− LESS</button>
+      <button onclick="paintChangeResolution(1)">+ MORE</button>
+     </div>
+     <div class="resolution-current" id="paintResolutionLabel">40 × 30 STUDS</div>
+     <div class="resolution-warning">MAXIMUM: 1,000 × 750 STUDS</div>
     </div>
     <div class="paint-help">BUCKET: TAP ANYWHERE TO FILL THE WHOLE CANVAS WITH YOUR SELECTED COLOR.</div>
    </aside>
@@ -309,7 +317,6 @@ hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0
  </div>
 </div>
 
-<!-- SAVED PAINTS -->
 <div class="window" id="savedPaints">
  <div class="titlebar" onpointerdown="startDrag(event,'savedPaints')">
   <div class="title-name"><span class="title-icon" data-icon="iconPaint"></span>SAVED PAINTS</div>
@@ -518,14 +525,27 @@ function revealMine(i){
 }
 function openMineHelp(){openApp('helpDialog')}
 
-/* PAINT STUDIO */
-const PAINT_COLS=40,PAINT_ROWS=30,STUD=16;
+/* PAINT STUDIO WITH UP TO 1,000 x 750 STUDS */
+let PAINT_COLS=40,PAINT_ROWS=30;
+const STUD=16;
 const paintCanvas=document.getElementById('paintCanvas');
 const paintCtx=paintCanvas.getContext('2d',{alpha:false});
 let paintPixels=Array(PAINT_COLS*PAINT_ROWS).fill('#ffffff');
 let paintColor='#000080',paintTool='pencil',paintBrush=1,paintGrid=true,paintZoomLevel=100;
 let paintDrawing=false,paintStart=null,paintLast=null,paintPreview=null;
 let paintUndoStack=[],paintRedoStack=[],paintHistoryLimit=35;
+
+const paintResolutions=[
+ {cols:40,rows:30},
+ {cols:100,rows:75},
+ {cols:200,rows:150},
+ {cols:400,rows:300},
+ {cols:600,rows:450},
+ {cols:800,rows:600},
+ {cols:1000,rows:750}
+];
+let paintResolutionIndex=0;
+
 const paintPaletteColors=[
  '#000000','#444444','#888888','#cccccc','#ffffff',
  '#7f0000','#ff0000','#ff7777','#ff8800','#ffcc00',
@@ -544,6 +564,7 @@ function paintInit(){
  });
  paintSetTool('pencil');paintChooseColor(paintColor);
  paintUndoStack=[paintPixels.slice()];paintDraw();
+ paintUpdateResolutionLabel();
  refreshSavedPaints();
 }
 function paintChooseColor(color){
@@ -580,29 +601,103 @@ function paintRedo(){
  paintPixels=next.slice();paintDraw();paintStatus('REDO');
 }
 function paintStatus(message){document.getElementById('paintStatus').textContent=message}
-function paintDraw(){
- const w=paintCanvas.width,h=paintCanvas.height;
- paintCtx.fillStyle='#ffffff';paintCtx.fillRect(0,0,w,h);
- for(let y=0;y<PAINT_ROWS;y++){
-  for(let x=0;x<PAINT_COLS;x++){
-   paintCtx.fillStyle=paintPixels[y*PAINT_COLS+x];
-   paintCtx.fillRect(x*STUD,y*STUD,STUD,STUD);
+
+/* Resize the canvas resolution while preserving the drawing */
+function paintResample(oldPixels,oldCols,oldRows,newCols,newRows){
+ const next=new Array(newCols*newRows);
+ for(let y=0;y<newRows;y++){
+  const sourceY=Math.min(oldRows-1,Math.floor(y*oldRows/newRows));
+  for(let x=0;x<newCols;x++){
+   const sourceX=Math.min(oldCols-1,Math.floor(x*oldCols/newCols));
+   next[y*newCols+x]=oldPixels[sourceY*oldCols+sourceX]||'#ffffff';
   }
  }
- if(paintGrid){
-  paintCtx.beginPath();paintCtx.strokeStyle='rgba(0,0,0,.22)';paintCtx.lineWidth=1;
-  for(let x=0;x<=PAINT_COLS;x++){paintCtx.moveTo(x*STUD+.5,0);paintCtx.lineTo(x*STUD+.5,h)}
-  for(let y=0;y<=PAINT_ROWS;y++){paintCtx.moveTo(0,y*STUD+.5);paintCtx.lineTo(w,y*STUD+.5)}
-  paintCtx.stroke();
-  paintCtx.fillStyle='rgba(255,255,255,.20)';
-  for(let y=0;y<PAINT_ROWS;y++)for(let x=0;x<PAINT_COLS;x++)paintCtx.fillRect(x*STUD+1,y*STUD+1,2,2);
+ return next;
+}
+function paintUpdateResolutionLabel(){
+ document.getElementById('paintResolutionLabel').textContent=
+  PAINT_COLS.toLocaleString()+' × '+PAINT_ROWS.toLocaleString()+' STUDS';
+}
+function paintChangeResolution(direction){
+ const nextIndex=Math.max(0,Math.min(paintResolutions.length-1,paintResolutionIndex+direction));
+ if(nextIndex===paintResolutionIndex){
+  paintStatus(direction>0?'MAXIMUM RESOLUTION':'MINIMUM RESOLUTION');
+  return;
  }
+ const next=paintResolutions[nextIndex];
+ const newCount=next.cols*next.rows;
+ if(newCount>400000&& !confirm('This resolution uses a lot of memory. Continue?'))return;
+
+ paintPixels=paintResample(paintPixels,PAINT_COLS,PAINT_ROWS,next.cols,next.rows);
+ PAINT_COLS=next.cols;
+ PAINT_ROWS=next.rows;
+ paintResolutionIndex=nextIndex;
+
+ paintUndoStack=[paintPixels.slice()];
+ paintRedoStack=[];
+ paintPreview=null;
+ paintStart=null;
+ paintLast=null;
+ paintDrawing=false;
+
+ paintUpdateResolutionLabel();
+ paintDraw();
+ paintStatus('RESOLUTION: '+PAINT_COLS+' × '+PAINT_ROWS);
+}
+
+/* Render logical studs into the fixed-size display canvas */
+function paintDraw(){
+ const w=paintCanvas.width,h=paintCanvas.height;
+ const cw=w/PAINT_COLS,ch=h/PAINT_ROWS;
+
+ paintCtx.fillStyle='#ffffff';
+ paintCtx.fillRect(0,0,w,h);
+
+ for(let y=0;y<PAINT_ROWS;y++){
+  for(let x=0;x<PAINT_COLS;x++){
+   paintCtx.fillStyle=paintPixels[y*PAINT_COLS+x]||'#ffffff';
+   paintCtx.fillRect(x*cw,y*ch,Math.ceil(cw)+.2,Math.ceil(ch)+.2);
+  }
+ }
+
+ if(paintGrid&&PAINT_COLS<=400){
+  paintCtx.beginPath();
+  paintCtx.strokeStyle='rgba(0,0,0,.22)';
+  paintCtx.lineWidth=1;
+  for(let x=0;x<=PAINT_COLS;x++){
+   const px=x*cw;
+   paintCtx.moveTo(px+.5,0);
+   paintCtx.lineTo(px+.5,h);
+  }
+  for(let y=0;y<=PAINT_ROWS;y++){
+   const py=y*ch;
+   paintCtx.moveTo(0,py+.5);
+   paintCtx.lineTo(w,py+.5);
+  }
+  paintCtx.stroke();
+ }
+
  if(paintPreview&&paintStart){
-  paintCtx.save();paintCtx.globalAlpha=.8;paintCtx.fillStyle=paintColor;paintCtx.strokeStyle=paintColor;paintCtx.lineWidth=STUD*paintBrush;paintCtx.lineCap='square';
+  paintCtx.save();
+  paintCtx.globalAlpha=.8;
+  paintCtx.fillStyle=paintColor;
+  paintCtx.strokeStyle=paintColor;
+  paintCtx.lineWidth=Math.max(cw,ch)*paintBrush;
+  paintCtx.lineCap='square';
   const a=paintStart,b=paintPreview;
-  if(paintTool==='line'){paintCtx.beginPath();paintCtx.moveTo((a.x+.5)*STUD,(a.y+.5)*STUD);paintCtx.lineTo((b.x+.5)*STUD,(b.y+.5)*STUD);paintCtx.stroke()}
-  else if(paintTool==='rect'){paintCtx.fillRect(Math.min(a.x,b.x)*STUD,Math.min(a.y,b.y)*STUD,(Math.abs(a.x-b.x)+1)*STUD,(Math.abs(a.y-b.y)+1)*STUD)}
-  else if(paintTool==='circle'){const cx=(a.x+b.x+1)/2*STUD,cy=(a.y+b.y+1)/2*STUD,rx=(Math.abs(a.x-b.x)+1)*STUD/2,ry=(Math.abs(a.y-b.y)+1)*STUD/2;paintCtx.beginPath();paintCtx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);paintCtx.stroke()}
+  if(paintTool==='line'){
+   paintCtx.beginPath();
+   paintCtx.moveTo((a.x+.5)*cw,(a.y+.5)*ch);
+   paintCtx.lineTo((b.x+.5)*cw,(b.y+.5)*ch);
+   paintCtx.stroke();
+  }else if(paintTool==='rect'){
+   paintCtx.fillRect(Math.min(a.x,b.x)*cw,Math.min(a.y,b.y)*ch,
+    (Math.abs(a.x-b.x)+1)*cw,(Math.abs(a.y-b.y)+1)*ch);
+  }else if(paintTool==='circle'){
+   const cx=(a.x+b.x+1)/2*cw,cy=(a.y+b.y+1)/2*ch;
+   const rx=(Math.abs(a.x-b.x)+1)*cw/2,ry=(Math.abs(a.y-b.y)+1)*ch/2;
+   paintCtx.beginPath();paintCtx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);paintCtx.stroke();
+  }
   paintCtx.restore();
  }
 }
@@ -625,23 +720,35 @@ function paintLineCells(a,b,color,size=1){
  const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;
  let err=dx+dy;
  while(true){
-  paintCell(x0,y0,color,size);if(x0===x1&&y0===y1)break;
-  const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}
+  paintCell(x0,y0,color,size);
+  if(x0===x1&&y0===y1)break;
+  const e2=2*err;
+  if(e2>=dy){err+=dy;x0+=sx}
+  if(e2<=dx){err+=dx;y0+=sy}
  }
 }
 function paintShape(a,b,tool){
  if(tool==='line'){paintLineCells(a,b,paintColor,paintBrush);return}
  if(tool==='rect'){
-  for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){paintCell(x,a.y,paintColor,paintBrush);paintCell(x,b.y,paintColor,paintBrush)}
-  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++){paintCell(a.x,y,paintColor,paintBrush);paintCell(b.x,y,paintColor,paintBrush)}
+  for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){
+   paintCell(x,a.y,paintColor,paintBrush);
+   paintCell(x,b.y,paintColor,paintBrush);
+  }
+  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++){
+   paintCell(a.x,y,paintColor,paintBrush);
+   paintCell(b.x,y,paintColor,paintBrush);
+  }
   return;
  }
  if(tool==='circle'){
-  const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,rx=Math.max(.5,Math.abs(a.x-b.x)/2),ry=Math.max(.5,Math.abs(a.y-b.y)/2);
-  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++)for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){
-   const d=Math.pow((x-cx)/rx,2)+Math.pow((y-cy)/ry,2);
-   if(Math.abs(d-1)<Math.max(.2,.8/Math.max(rx,ry)))paintCell(x,y,paintColor,paintBrush);
-  }
+  const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;
+  const rx=Math.max(.5,Math.abs(a.x-b.x)/2),ry=Math.max(.5,Math.abs(a.y-b.y)/2);
+  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++)
+   for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){
+    const d=Math.pow((x-cx)/rx,2)+Math.pow((y-cy)/ry,2);
+    if(Math.abs(d-1)<Math.max(.2,.8/Math.max(rx,ry)))
+     paintCell(x,y,paintColor,paintBrush);
+   }
  }
 }
 function paintStartDraw(e){
@@ -654,12 +761,18 @@ function paintStartDraw(e){
   paintDraw();paintStatus('WHOLE CANVAS FILLED');
   return;
  }
- if(paintTool==='eyedrop'){paintChooseColor(paintPixels[cell.y*PAINT_COLS+cell.x]);paintStatus('COLOR PICKED');return}
+ if(paintTool==='eyedrop'){
+  paintChooseColor(paintPixels[cell.y*PAINT_COLS+cell.x]);
+  paintStatus('COLOR PICKED');return;
+ }
  paintDrawing=true;paintStart=cell;paintLast=cell;paintPreview=cell;
  if(paintTool==='pencil'||paintTool==='eraser'){
-  paintSaveHistory();paintCell(cell.x,cell.y,paintTool==='eraser'?'#ffffff':paintColor,paintBrush);paintDraw();
+  paintSaveHistory();
+  paintCell(cell.x,cell.y,paintTool==='eraser'?'#ffffff':paintColor,paintBrush);
+  paintDraw();
  }
- paintCanvas.setPointerCapture?.(e.pointerId);e.preventDefault();
+ paintCanvas.setPointerCapture?.(e.pointerId);
+ e.preventDefault();
 }
 function paintMoveDraw(e){
  const cell=paintGetCell(e);
@@ -668,13 +781,17 @@ function paintMoveDraw(e){
  if(paintTool==='pencil'||paintTool==='eraser'){
   paintLineCells(paintLast,cell,paintTool==='eraser'?'#ffffff':paintColor,paintBrush);
   paintLast=cell;paintDraw();
- }else{paintPreview=cell;paintDraw()}
+ }else{
+  paintPreview=cell;paintDraw();
+ }
 }
 function paintEndDraw(e){
  if(!paintDrawing)return;
  const cell=paintGetCell(e)||paintPreview||paintStart;
  if(['line','rect','circle'].includes(paintTool)){
-  paintSaveHistory();paintShape(paintStart,cell,paintTool);paintDraw();
+  paintSaveHistory();
+  paintShape(paintStart,cell,paintTool);
+  paintDraw();
  }
  paintDrawing=false;paintStart=null;paintLast=null;paintPreview=null;
  paintStatus('READY');
@@ -705,27 +822,38 @@ function paintZoom(direction){
  paintDraw();
 }
 
-/* EXPORT A PNG */
-function paintMakePNG(){
+/* EXPORT PNG AT ONE PIXEL PER STUD */
+function paintPixelsToPNG(pixels,cols,rows,showGrid){
  const out=document.createElement('canvas');
- out.width=PAINT_COLS*STUD;out.height=PAINT_ROWS*STUD;
- const c=out.getContext('2d');
- c.fillStyle='#fff';c.fillRect(0,0,out.width,out.height);
- for(let y=0;y<PAINT_ROWS;y++)for(let x=0;x<PAINT_COLS;x++){
-  c.fillStyle=paintPixels[y*PAINT_COLS+x];
-  c.fillRect(x*STUD,y*STUD,STUD,STUD);
+ out.width=cols;
+ out.height=rows;
+ const c=out.getContext('2d',{alpha:false});
+ const image=c.createImageData(cols,rows);
+ for(let i=0;i<cols*rows;i++){
+  const hex=(pixels[i]||'#ffffff').replace('#','');
+  const value=parseInt(hex,16);
+  const p=i*4;
+  image.data[p]=(value>>16)&255;
+  image.data[p+1]=(value>>8)&255;
+  image.data[p+2]=value&255;
+  image.data[p+3]=255;
  }
- if(paintGrid){
-  c.strokeStyle='rgba(0,0,0,.22)';c.lineWidth=1;
-  for(let x=0;x<=PAINT_COLS;x++){c.beginPath();c.moveTo(x*STUD+.5,0);c.lineTo(x*STUD+.5,out.height);c.stroke()}
-  for(let y=0;y<=PAINT_ROWS;y++){c.beginPath();c.moveTo(0,y*STUD+.5);c.lineTo(out.width,y*STUD+.5);c.stroke()}
+ c.putImageData(image,0,0);
+ if(showGrid&&cols<=400){
+  c.strokeStyle='rgba(0,0,0,.22)';
+  c.lineWidth=1;
+  for(let x=0;x<=cols;x++){c.beginPath();c.moveTo(x+.5,0);c.lineTo(x+.5,rows);c.stroke()}
+  for(let y=0;y<=rows;y++){c.beginPath();c.moveTo(0,y+.5);c.lineTo(cols,y+.5);c.stroke()}
  }
  return out;
+}
+function paintMakePNG(){
+ return paintPixelsToPNG(paintPixels,PAINT_COLS,PAINT_ROWS,paintGrid);
 }
 function paintSave(){
  const out=paintMakePNG();
  const link=document.createElement('a');
- link.download='paint-studio.png';
+ link.download='paint-studio-'+PAINT_COLS+'x'+PAINT_ROWS+'.png';
  link.href=out.toDataURL('image/png');
  document.body.appendChild(link);link.click();link.remove();
  paintStatus('PNG DOWNLOADED');
@@ -755,6 +883,8 @@ function paintSaveToGallery(){
   id:Date.now().toString()+'-'+Math.random().toString(36).slice(2,8),
   name:cleanName,
   pixels:paintPixels.slice(),
+  cols:PAINT_COLS,
+  rows:PAINT_ROWS,
   stud:STUD,
   grid:paintGrid,
   date:new Date().toLocaleString()
@@ -782,6 +912,14 @@ function openSavedPaints(){
   w.style.left='50%';w.style.top='50%';w.style.transform='translate(-50%,-50%)';
  }
 }
+function paintEntryToDataURL(item){
+ const cols=Number(item.cols)||40;
+ const rows=Number(item.rows)||30;
+ const pixels=Array.isArray(item.pixels)?item.pixels:[];
+ const safePixels=pixels.length===cols*rows?pixels:Array(cols*rows).fill('#ffffff');
+ const canvas=paintPixelsToPNG(safePixels,cols,rows,item.grid!==false);
+ return canvas.toDataURL('image/png');
+}
 function refreshSavedPaints(){
  const list=document.getElementById('savedPaintList');
  if(!list)return;
@@ -797,7 +935,8 @@ function refreshSavedPaints(){
   img.src=paintEntryToDataURL(item);
   const info=document.createElement('div');
   const name=document.createElement('div');name.className='saved-name';name.textContent=item.name;
-  const date=document.createElement('div');date.className='saved-date';date.textContent=item.date||'SAVED PAINT';
+  const date=document.createElement('div');date.className='saved-date';
+  date.textContent=(item.cols||40)+' × '+(item.rows||30)+' STUDS · '+(item.date||'SAVED PAINT');
   const actions=document.createElement('div');actions.className='saved-actions';
   const open=document.createElement('button');open.textContent='OPEN';open.onclick=()=>paintLoadSaved(item.id);
   const download=document.createElement('button');download.textContent='PNG';download.onclick=()=>paintDownloadSaved(item.id);
@@ -805,33 +944,29 @@ function refreshSavedPaints(){
   actions.append(open,download,del);info.append(name,date,actions);row.append(img,info);list.appendChild(row);
  });
 }
-function paintEntryToDataURL(item){
- const canvas=document.createElement('canvas');
- const stud=STUD;
- canvas.width=PAINT_COLS*stud;canvas.height=PAINT_ROWS*stud;
- const ctx=canvas.getContext('2d');
- const pixels=Array.isArray(item.pixels)?item.pixels:[];
- for(let y=0;y<PAINT_ROWS;y++)for(let x=0;x<PAINT_COLS;x++){
-  ctx.fillStyle=pixels[y*PAINT_COLS+x]||'#ffffff';
-  ctx.fillRect(x*stud,y*stud,stud,stud);
- }
- if(item.grid!==false){
-  ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=1;
-  for(let x=0;x<=PAINT_COLS;x++){ctx.beginPath();ctx.moveTo(x*stud+.5,0);ctx.lineTo(x*stud+.5,canvas.height);ctx.stroke()}
-  for(let y=0;y<=PAINT_ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*stud+.5);ctx.lineTo(canvas.width,y*stud+.5);ctx.stroke()}
- }
- return canvas.toDataURL('image/png');
-}
 function paintLoadSaved(id){
  const item=paintGetSaved().find(p=>p.id===id);
  if(!item)return;
  if(!confirm('OPEN THIS PAINTING? Your current canvas will be replaced.'))return;
+ const cols=Number(item.cols)||40;
+ const rows=Number(item.rows)||30;
+ if(cols>1000||rows>750||cols<1||rows<1){
+  alert('This saved painting has an invalid resolution.');
+  return;
+ }
+ const targetIndex=paintResolutions.findIndex(r=>r.cols===cols&&r.rows===rows);
  paintSaveHistory();
- paintPixels=Array.isArray(item.pixels)&&item.pixels.length===PAINT_COLS*PAINT_ROWS?item.pixels.slice():(Array(PAINT_COLS*PAINT_ROWS).fill('#ffffff'));
+ PAINT_COLS=cols;
+ PAINT_ROWS=rows;
+ paintResolutionIndex=targetIndex>=0?targetIndex:0;
+ const oldPixels=Array.isArray(item.pixels)?item.pixels:[];
+ paintPixels=oldPixels.length===cols*rows?oldPixels.slice():Array(cols*rows).fill('#ffffff');
  paintGrid=item.grid!==false;
  document.getElementById('paintGridBtn').textContent='GRID: '+(paintGrid?'ON':'OFF');
+ paintUpdateResolutionLabel();
  paintDraw();
- paintUndoStack=[paintPixels.slice()];paintRedoStack=[];
+ paintUndoStack=[paintPixels.slice()];
+ paintRedoStack=[];
  closeApp('savedPaints');
  openApp('paint');
  paintStatus('PAINTING OPENED');
