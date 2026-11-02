@@ -1,200 +1,992 @@
-<style>
-/* ONLINE DICE */
-#onlineDice{width:min(390px,96vw);left:50%;top:50%;transform:translate(-50%,-50%)}
-#onlineDice .content{padding:12px}
-.dice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:8px 0 14px}
-.dice{
- height:100px;border:4px solid;border-color:#fff #555 #555 #fff;
- display:flex;align-items:center;justify-content:center;
- border-radius:5px;position:relative;
-}
-.dice-face{display:grid;grid-template-columns:repeat(3,10px);grid-template-rows:repeat(3,10px);gap:5px}
-.dice-dot{width:10px;height:10px;background:#fff;border-radius:50%;box-shadow:1px 1px #333}
-.dice.green{background:#159447}
-.dice.blue{background:#1765bb}
-.dice.yellow{background:#e5c52a}
-.dice.orange{background:#e87924}
-.dice-label{position:absolute;bottom:5px;right:6px;color:#fff;font-size:6px}
-.dice-reroll{width:100%;font-size:10px;padding:12px;margin-bottom:12px}
-.dice-panel{background:#b5b5b5;border:3px inset #ddd;padding:10px;margin-top:10px}
-.dice-panel-title{text-align:center;margin-bottom:10px;line-height:1.8}
-.counter-number{font-family:monospace;font-size:27px;font-weight:bold;text-align:center;background:#111;color:#42ff42;padding:8px;margin-bottom:9px}
-.counter-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.counter-controls button{padding:8px 2px;font-size:7px}
-.counter-reset{width:100%;margin-top:6px}
-.coin-area{display:flex;align-items:center;justify-content:center;gap:16px}
-.coin{
- width:76px;height:76px;border-radius:50%;
- border:5px solid #76520c;background:linear-gradient(135deg,#ffe875,#c58b14);
- display:flex;align-items:center;justify-content:center;
- color:#493000;font-size:8px;font-weight:bold;
- box-shadow:3px 3px #555;
-}
-.coin-result{min-width:75px;text-align:center;line-height:2}
-.coin-flip{margin-top:10px;width:100%}
-</style>
 
-<template id="iconDice">
-<svg viewBox="0 0 40 36">
- <rect x="2" y="3" width="16" height="16" fill="#159447" stroke="#fff" stroke-width="2"/>
- <rect x="22" y="3" width="16" height="16" fill="#1765bb" stroke="#fff" stroke-width="2"/>
- <rect x="2" y="21" width="16" height="13" fill="#e5c52a" stroke="#fff" stroke-width="2"/>
- <rect x="22" y="21" width="16" height="13" fill="#e87924" stroke="#fff" stroke-width="2"/>
- <g fill="#fff"><circle cx="7" cy="8" r="2"/><circle cx="13" cy="14" r="2"/><circle cx="27" cy="8" r="2"/><circle cx="33" cy="14" r="2"/><circle cx="7" cy="26" r="2"/><circle cx="27" cy="26" r="2"/></g>
-</svg>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Retro Pixel Desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--gray:#c0c0c0;--blue:#000080;--teal:#008080}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--teal);color:#000;overflow:hidden;font-family:"Press Start 2P",monospace;font-size:8px;user-select:none;image-rendering:pixelated}
+button,select,input,textarea{font:inherit;color:#000}
+button{background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;padding:9px 7px;cursor:pointer;line-height:1.6}
+button:active{border-color:#555 #fff #fff #555}
+select{background:#fff;border:2px inset #aaa;padding:5px;max-width:100%}
+.desktop{position:fixed;inset:0 0 37px;overflow:auto;padding:5px}
+.deskicon{width:100px;min-height:85px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:white;text-shadow:2px 2px #000;cursor:pointer;text-align:center;padding:7px;line-height:1.8}
+.deskicon:active{background:#00008088;outline:1px dotted white}
+.pixel-icon{width:40px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pixel-icon svg{width:100%;height:100%;shape-rendering:crispEdges}
+.title-icon{width:19px;height:19px;display:inline-flex;flex-shrink:0}
+.title-icon svg{width:100%;height:100%;shape-rendering:crispEdges}
+.window{position:absolute;background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;box-shadow:3px 3px #222;display:none;min-width:265px;max-width:98vw}
+.titlebar{height:29px;background:var(--blue);color:white;display:flex;align-items:center;justify-content:space-between;padding:3px 4px;font-weight:bold;touch-action:none;cursor:move;gap:4px}
+.title-name{display:flex;align-items:center;gap:7px;overflow:hidden;line-height:1.7}
+.title-actions{display:flex;gap:3px;flex-shrink:0}
+.title-actions button{padding:0;width:24px;height:22px;font-family:Arial;font-size:15px;font-weight:bold}
+.content{padding:9px}
+.window-menu{padding:7px;border-bottom:2px solid #888;display:flex;gap:13px;flex-wrap:wrap;line-height:1.8}
+.window-menu span{cursor:pointer}
+.window-menu span:active{text-decoration:underline}
+.taskbar{position:fixed;bottom:0;left:0;right:0;height:37px;background:var(--gray);border-top:3px solid #fff;display:flex;align-items:center;gap:5px;padding:3px;z-index:9999}
+.start-btn{height:29px;display:flex;align-items:center;gap:5px;font-weight:bold;white-space:nowrap}
+.start-logo{width:20px;height:20px;display:inline-block}
+.start-logo svg{width:100%;height:100%;shape-rendering:crispEdges}
+.task-buttons{display:flex;gap:4px;flex:1;overflow-x:auto}
+.taskbtn{height:27px;white-space:nowrap;padding:4px;font-size:7px}
+.clock{border:3px inset #ddd;padding:7px 5px;white-space:nowrap;margin-left:auto;font-size:7px}
+.start-menu{display:none;position:fixed;bottom:37px;left:3px;width:235px;background:var(--gray);border:3px solid;border-color:#fff #555 #555 #fff;z-index:10000;padding:4px;box-shadow:3px 3px #333}
+.start-menu.show{display:block}
+.menu-banner{background:var(--blue);color:white;font-weight:bold;writing-mode:vertical-rl;transform:rotate(180deg);position:absolute;left:4px;top:4px;bottom:4px;width:27px;display:flex;align-items:center;justify-content:flex-end;padding:8px 4px;letter-spacing:1px;font-size:8px}
+.menu-list{margin-left:31px}
+.menu-item{min-height:39px;display:flex;align-items:center;gap:10px;padding:6px;cursor:pointer;line-height:1.8}
+.menu-item .pixel-icon{width:25px;height:25px}
+.menu-item:active{background:var(--blue);color:white}
+.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.center{text-align:center}
+.small{font-size:7px;line-height:1.9}
+hr{border:0;border-top:2px solid #888;border-bottom:1px solid white;margin:9px 0}
+#mines,#calendar,#calc,#notepad,#helpDialog{left:50%;top:48%;transform:translate(-50%,-50%)}
+#mines{width:min(420px,98vw)}
+#calendar{width:min(355px,97vw)}
+#calc,#notepad{width:min(290px,46vw);min-width:0}
+#helpDialog{width:min(350px,96vw);z-index:500}
+.mine-head{display:flex;justify-content:space-between;align-items:center;padding:5px;border:3px inset #ddd;margin-bottom:8px}
+.mine-counter{background:#000;color:red;font-family:monospace;font-size:19px;font-weight:bold;padding:5px;min-width:43px;text-align:center}
+.mine-face{padding:0;width:35px;height:32px;display:flex;align-items:center;justify-content:center}
+.mine-face svg{width:23px;height:23px;shape-rendering:crispEdges}
+#mineBoard{display:grid;gap:2px;background:#808080;padding:4px;border:3px inset #ddd;width:max-content;max-width:100%;margin:auto}
+.mine-cell{width:27px;height:27px;min-width:0;padding:0;font-family:"Press Start 2P",monospace;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;border:3px solid;border-color:#fff #555 #555 #fff;line-height:1}
+.mine-cell.revealed{border:1px solid #888;background:#c0c0c0;padding:0;box-shadow:none}
+.mine-cell.flagged{color:red}
+.mine-cell.n1{color:blue}.mine-cell.n2{color:green}.mine-cell.n3{color:red}.mine-cell.n4{color:navy}.mine-cell.n5{color:maroon}.mine-cell.n6{color:teal}.mine-cell.n7{color:black}.mine-cell.n8{color:#666}
+.bomb-pixel{width:17px;height:17px;display:block;position:relative;background:#222;border:2px solid #000}
+.bomb-pixel:before{content:"";position:absolute;left:4px;top:-5px;width:5px;height:5px;background:#222;border:1px solid #000}
+.bomb-pixel:after{content:"";position:absolute;left:4px;top:4px;width:4px;height:4px;background:#ddd}
+.flag-pixel{width:19px;height:20px;position:relative;display:inline-block}
+.flag-pixel:before{content:"";position:absolute;left:3px;top:1px;width:3px;height:17px;background:#222}
+.flag-pixel:after{content:"";position:absolute;left:6px;top:2px;width:10px;height:8px;background:#f00;clip-path:polygon(0 0,100% 25%,0 100%)}
+.flag-base{position:absolute;left:0;bottom:0;width:13px;height:3px;background:#222}
+#mineStatus{margin-top:8px;min-height:25px;text-align:center;line-height:1.8}
+.help-panel{line-height:2}
+.help-panel h3{font-size:10px;line-height:2}
+.help-row{display:flex;align-items:flex-start;gap:9px;margin:10px 0;line-height:2}
+.help-icon{width:29px;min-width:29px;height:27px;display:flex;align-items:center;justify-content:center}
+.help-icon svg{width:25px;height:25px;shape-rendering:crispEdges}
+.help-footer{border-top:2px solid #888;padding-top:9px;margin-top:10px;text-align:right}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:9px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.calendar-grid div{text-align:center;padding:9px 0;font-size:7px}
+.calendar-grid .dayname{font-weight:bold;background:#ddd}
+.calendar-grid .today{background:var(--blue);color:white;font-weight:bold}
+.calendar-grid .other{color:#888}
+.calc-display{width:100%;height:42px;text-align:right;font-size:12px;background:white;border:3px inset #aaa;padding:5px;margin-bottom:8px;user-select:text}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.calc-grid button{height:42px;font-size:10px}
+.calc-grid .equals{background:#b8caff}
+.calc-hint{text-align:center;margin-top:8px;color:#444;font-size:6px;line-height:1.8}
+#notepad .content{padding:8px}
+.note-toolbar{display:flex;gap:5px;margin-bottom:7px}
+.note-toolbar button{flex:1;padding:7px 3px;font-size:7px}
+#noteText{display:block;width:100%;height:267px;resize:none;background:#fff;color:#111;border:3px inset #aaa;padding:9px;font-family:Arial,sans-serif;font-size:15px;line-height:1.5;outline:none;user-select:text;-webkit-user-select:text}
+.note-status{display:flex;justify-content:space-between;margin-top:7px;font-size:6px;color:#444;line-height:1.8}
+
+/* PAINT STUDIO */
+#paint{left:50%;top:50%;transform:translate(-50%,-50%);width:min(790px,98vw);max-height:calc(100vh - 48px);overflow:auto}
+#paint .content{padding:7px}
+.paint-toolbar{display:flex;gap:5px;flex-wrap:wrap;padding:5px;background:#b5b5b5;border:2px inset #ddd;margin-bottom:7px}
+.paint-toolbar button{font-size:7px;padding:6px}
+.paint-toolbar button.active{background:#d5e3ff;border-color:#555 #fff #fff #555}
+.paint-main{display:grid;grid-template-columns:125px minmax(0,1fr);gap:7px;min-height:300px}
+.paint-side{border:2px inset #ddd;padding:6px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.paint-section{border-bottom:1px solid #888;padding-bottom:7px}
+.paint-label{font-size:7px;display:block;margin-bottom:7px;line-height:1.8}
+.paint-tools{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.paint-tools button{padding:7px 2px;font-size:6px;min-height:35px}
+.paint-tools button.active{background:#d5e3ff;border-color:#555 #fff #fff #555}
+.paint-palette{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.paint-swatch{height:25px;min-width:0;padding:0;border:3px solid;border-color:#fff #555 #555 #fff}
+.paint-swatch.active{outline:2px dotted #000;outline-offset:1px}
+.paint-color-row{display:flex;gap:5px;align-items:center}
+#paintColor{width:100%;height:35px;padding:2px;background:#fff;border:2px inset #aaa}
+.paint-settings{display:flex;flex-direction:column;gap:7px}
+.paint-settings input[type=range]{width:100%}
+.paint-workspace{min-width:0;display:flex;flex-direction:column;gap:5px}
+.paint-info{background:#fff;border:2px inset #aaa;padding:6px;font-size:6px;line-height:1.8;display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap}
+.paint-canvas-wrap{background:#777;border:3px inset #ddd;overflow:auto;flex:1;min-height:260px;max-height:55vh;display:flex;align-items:flex-start;justify-content:flex-start;padding:12px}
+#paintCanvas{display:block;width:640px;height:480px;max-width:none;background:white;touch-action:none;image-rendering:pixelated;box-shadow:2px 2px #222}
+.paint-help{font-size:6px;line-height:1.9;color:#333}
+.paint-bottom{display:flex;gap:5px;flex-wrap:wrap}
+.paint-bottom button{font-size:6px;padding:6px}
+.paint-color-name{font-size:6px;line-height:1.8;overflow-wrap:anywhere}
+.resolution-buttons{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.resolution-buttons button{font-size:6px;padding:6px 2px}
+.resolution-current{background:#fff;border:2px inset #aaa;padding:6px;text-align:center;font-size:7px;line-height:1.8}
+.resolution-warning{font-size:5px;line-height:1.8;color:#555}
+
+/* SAVED PAINTS WINDOW */
+#savedPaints{width:min(340px,94vw);left:calc(50% + 405px);top:50%;transform:translateY(-50%);max-height:calc(100vh - 55px);overflow:auto}
+.saved-content{padding:8px}
+.saved-heading{background:#fff;border:2px inset #aaa;padding:8px;margin-bottom:8px;line-height:1.8}
+.saved-list{display:flex;flex-direction:column;gap:7px;max-height:55vh;overflow:auto}
+.saved-item{display:grid;grid-template-columns:76px minmax(0,1fr);gap:7px;padding:6px;border:2px inset #ddd;background:#b5b5b5;align-items:center}
+.saved-thumb{width:76px;height:62px;background:#fff;border:2px inset #aaa;object-fit:contain;image-rendering:pixelated}
+.saved-name{font-size:7px;line-height:1.8;overflow-wrap:anywhere}
+.saved-date{font-size:5px;color:#444;line-height:1.8;margin-top:3px}
+.saved-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.saved-actions button{font-size:6px;padding:5px}
+.saved-empty{text-align:center;padding:25px 8px;line-height:2;color:#555}
+.saved-footer{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.saved-footer button{font-size:6px;padding:6px}
+@media(max-width:850px){
+ #savedPaints{left:50%;top:50%;transform:translate(-50%,-50%);z-index:100}
+}
+@media(max-width:560px){
+ #paint{width:98vw}
+ .paint-main{grid-template-columns:95px minmax(0,1fr);gap:5px}
+ .paint-side{padding:4px}
+ .paint-tools button{font-size:5px;padding:5px 1px}
+ .paint-canvas-wrap{min-height:240px;padding:7px;max-height:48vh}
+ .paint-palette{grid-template-columns:repeat(3,1fr)}
+ .paint-toolbar button{font-size:6px;padding:5px}
+ #savedPaints{width:94vw}
+}
+@media(max-width:450px){
+ body{font-size:7px}
+ .mine-cell{width:24px;height:25px;font-size:9px}
+ #mines .content{padding:5px}
+ .window-menu{gap:8px}
+ .deskicon{width:86px}
+ .taskbtn{font-size:6px}
+ #calc,#notepad{width:48vw;min-width:0}
+ #calc .content,#notepad .content{padding:5px}
+ #calc .window-menu,#notepad .window-menu{padding:5px;gap:7px}
+ .calc-grid{gap:3px}
+ .calc-grid button{height:38px;font-size:8px;padding:3px}
+ .calc-display{font-size:10px;height:37px}
+ #noteText{height:250px;font-size:14px;padding:6px}
+ .note-toolbar button{font-size:6px}
+}
+</style>
+</head>
+<body>
+
+<template id="iconBomb">
+<svg viewBox="0 0 40 36"><rect x="17" y="2" width="6" height="5" fill="#222"/><rect x="22" y="3" width="6" height="3" fill="#f00"/><rect x="11" y="7" width="18" height="18" fill="#111"/><rect x="14" y="4" width="12" height="5" fill="#222"/><rect x="8" y="11" width="6" height="12" fill="#111"/><rect x="26" y="11" width="6" height="12" fill="#111"/><rect x="11" y="23" width="18" height="5" fill="#111"/><rect x="14" y="10" width="5" height="5" fill="#fff"/><rect x="21" y="18" width="5" height="5" fill="#888"/></svg>
+</template>
+<template id="iconCalendar">
+<svg viewBox="0 0 40 36"><rect x="4" y="5" width="32" height="28" fill="#fff"/><rect x="4" y="5" width="32" height="8" fill="#d22"/><rect x="10" y="2" width="4" height="9" fill="#333"/><rect x="26" y="2" width="4" height="9" fill="#333"/><g fill="#000080"><rect x="9" y="17" width="4" height="3"/><rect x="17" y="17" width="4" height="3"/><rect x="25" y="17" width="4" height="3"/><rect x="9" y="23" width="4" height="3"/><rect x="17" y="23" width="4" height="3"/><rect x="25" y="23" width="4" height="3"/></g></svg>
+</template>
+<template id="iconCalc">
+<svg viewBox="0 0 40 36"><rect x="6" y="1" width="28" height="34" fill="#333"/><rect x="10" y="5" width="20" height="7" fill="#a6c9a0"/><g fill="#ddd"><rect x="10" y="16" width="5" height="5"/><rect x="18" y="16" width="5" height="5"/><rect x="26" y="16" width="5" height="5"/><rect x="10" y="24" width="5" height="5"/><rect x="18" y="24" width="5" height="5"/><rect x="26" y="24" width="5" height="5"/></g></svg>
+</template>
+<template id="iconNote">
+<svg viewBox="0 0 40 36"><rect x="7" y="2" width="26" height="32" fill="#333"/><rect x="10" y="5" width="20" height="26" fill="#fff"/><rect x="13" y="9" width="14" height="2" fill="#000080"/><rect x="13" y="14" width="14" height="2" fill="#777"/><rect x="13" y="19" width="14" height="2" fill="#777"/><rect x="13" y="24" width="10" height="2" fill="#777"/></svg>
+</template>
+<template id="iconSound">
+<svg viewBox="0 0 32 32"><rect x="3" y="12" width="7" height="9" fill="#000080"/><path d="M10 12 L20 4 L20 28 L10 21 Z" fill="#000080"/><path d="M23 10 Q30 16 23 22" fill="none" stroke="#000080" stroke-width="3"/></svg>
+</template>
+<template id="iconWindows">
+<svg viewBox="0 0 24 24"><path d="M1 3 L10 2 L10 11 L1 11 Z" fill="#f33"/><path d="M12 2 L22 1 L22 11 L12 11 Z" fill="#36d"/><path d="M1 13 L10 13 L10 22 L1 21 Z" fill="#3b5"/><path d="M12 13 L22 13 L22 23 L12 22 Z" fill="#fd3"/></svg>
+</template>
+<template id="iconPaint">
+<svg viewBox="0 0 40 36"><path d="M4 5 H31 L37 11 V30 H4 Z" fill="#eee" stroke="#222" stroke-width="2"/><path d="M8 9 H28 V25 H8 Z" fill="#fff"/><rect x="10" y="11" width="5" height="5" fill="#f00"/><rect x="17" y="11" width="5" height="5" fill="#00f"/><rect x="24" y="11" width="3" height="5" fill="#0a0"/><path d="M7 30 L28 8" stroke="#8b4513" stroke-width="4"/><path d="M25 10 L30 5 L33 8 L28 13 Z" fill="#d6a15b"/></svg>
 </template>
 
-<script>
-/* Add the Online Dice desktop icon */
-const desktop=document.querySelector('.desktop');
-const diceIcon=document.createElement('div');
-diceIcon.className='deskicon';
-diceIcon.innerHTML='<span class="pixel-icon" data-icon="iconDice"></span><span>ONLINE DICE</span>';
-diceIcon.onclick=()=>openApp('onlineDice');
-desktop.appendChild(diceIcon);
+<div class="desktop">
+ <div class="deskicon" onclick="openApp('mines')"><span class="pixel-icon" data-icon="iconBomb"></span><span>MINESWEEPER</span></div>
+ <div class="deskicon" onclick="openApp('calendar')"><span class="pixel-icon" data-icon="iconCalendar"></span><span>CALENDAR</span></div>
+ <div class="deskicon" onclick="openApp('calc')"><span class="pixel-icon" data-icon="iconCalc"></span><span>CALCULATOR</span></div>
+ <div class="deskicon" onclick="openApp('paint')"><span class="pixel-icon" data-icon="iconPaint"></span><span>PAINT STUDIO</span></div>
+</div>
 
-const diceTemplate=document.getElementById('iconDice');
-diceIcon.querySelector('[data-icon]').appendChild(diceTemplate.content.cloneNode(true));
-
-/* Add Start menu entry */
-const menuList=document.querySelector('.menu-list');
-const diceMenu=document.createElement('div');
-diceMenu.className='menu-item';
-diceMenu.innerHTML='<span class="pixel-icon"></span>ONLINE DICE';
-diceMenu.querySelector('.pixel-icon').appendChild(diceTemplate.content.cloneNode(true));
-diceMenu.onclick=()=>{openApp('onlineDice');toggleMenu()};
-menuList.insertBefore(diceMenu,menuList.querySelector('hr'));
-
-/* Add taskbar button */
-const taskButtons=document.querySelector('.task-buttons');
-const diceTask=document.createElement('button');
-diceTask.className='taskbtn';
-diceTask.textContent='DICE';
-diceTask.onclick=()=>openApp('onlineDice');
-taskButtons.appendChild(diceTask);
-
-/* Create Online Dice window */
-const diceWindow=document.createElement('div');
-diceWindow.className='window';
-diceWindow.id='onlineDice';
-diceWindow.innerHTML=`
- <div class="titlebar" onpointerdown="startDrag(event,'onlineDice')">
-  <div class="title-name">
-   <span class="title-icon" id="diceTitleIcon"></span>ONLINE DICE.EXE
-  </div>
-  <div class="title-actions">
-   <button onclick="minimizeApp('onlineDice')">_</button>
-   <button onclick="closeApp('onlineDice')">×</button>
-  </div>
- </div>
+<div class="window" id="mines">
+ <div class="titlebar" onpointerdown="startDrag(event,'mines')"><div class="title-name"><span class="title-icon" data-icon="iconBomb"></span>MINESWEEPER.EXE</div><div class="title-actions"><button onclick="minimizeApp('mines')">_</button><button onclick="closeApp('mines')">×</button></div></div>
+ <div class="window-menu"><span onclick="newMines()">GAME</span><span onclick="toggleFlagMode()">FLAG MODE</span><span onclick="openMineHelp()">HELP</span></div>
  <div class="content">
-  <div class="dice-grid">
-   <div class="dice green" id="dice0"></div>
-   <div class="dice blue" id="dice1"></div>
-   <div class="dice yellow" id="dice2"></div>
-   <div class="dice orange" id="dice3"></div>
-  </div>
-  <button class="dice-reroll" onclick="rollOnlineDice()">REROLL</button>
+  <div class="row" style="justify-content:space-between;margin-bottom:8px"><label>LEVEL: <select id="mineDifficulty" onchange="newMines()"><option value="easy">BEGINNER</option><option value="medium">MEDIUM</option><option value="hard">EXPERT</option></select></label><button onclick="openMineHelp()">? HELP</button></div>
+  <div class="mine-head"><div class="mine-counter" id="mineCount">010</div><button class="mine-face" id="mineFace" onclick="newMines()"></button><div class="mine-counter" id="mineTime">000</div></div>
+  <div id="mineBoard"></div>
+  <div class="row" style="justify-content:center;margin-top:9px"><button id="flagButton" onclick="toggleFlagMode()"><span class="flag-pixel"><i class="flag-base"></i></span> FLAG: OFF</button><button onclick="newMines()">RESTART</button></div>
+  <div id="mineStatus">REVEAL ALL SAFE SQUARES!</div>
+ </div>
+</div>
 
-  <div class="dice-panel">
-   <div class="dice-panel-title">WIN / LOSS COUNTER</div>
-   <div class="row" style="gap:8px">
-    <div style="flex:1">
-     <div class="small center">WINS</div>
-     <div class="counter-number" id="diceWins">0</div>
-    </div>
-    <div style="flex:1">
-     <div class="small center">LOSSES</div>
-     <div class="counter-number" id="diceLosses">0</div>
-    </div>
-   </div>
-   <div class="small center" style="margin:8px 0">SELECT COUNTER</div>
-   <select id="diceCounterSelect" style="width:100%;margin-bottom:8px">
-    <option value="wins">WINS</option>
-    <option value="losses">LOSSES</option>
-   </select>
-   <div class="counter-controls">
-    <button onclick="changeDiceCounter(1)">+1</button>
-    <button onclick="changeDiceCounter(10)">+10</button>
-    <button onclick="changeDiceCounter(-1)">−1</button>
-    <button onclick="changeDiceCounter(-10)">−10</button>
-   </div>
-   <button class="counter-reset" onclick="resetDiceCounters()">RESET</button>
-  </div>
+<div class="window" id="helpDialog">
+ <div class="titlebar" onpointerdown="startDrag(event,'helpDialog')"><div class="title-name"><span class="title-icon" data-icon="iconBomb"></span>MINESWEEPER HELP</div><div class="title-actions"><button onclick="closeApp('helpDialog')">×</button></div></div>
+ <div class="content help-panel"><h3>HOW TO PLAY</h3><hr>
+  <div class="help-row"><div class="help-icon" data-icon="iconBomb"></div><div><b>AVOID BOMBS</b><br>Some squares hide bombs. Reveal one and you lose.</div></div>
+  <div class="help-row"><div class="help-icon"><svg viewBox="0 0 24 24"><g fill="#000080"><rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5"/><rect x="17" y="3" width="5" height="5"/><rect x="3" y="10" width="5" height="5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="5" height="5"/><rect x="3" y="17" width="5" height="5"/><rect x="10" y="17" width="5" height="5"/><rect x="17" y="17" width="5" height="5"/></g></svg></div><div><b>READ NUMBERS</b><br>A number tells you how many bombs touch that square.</div></div>
+  <div class="help-row"><div class="help-icon"><span class="flag-pixel"><i class="flag-base"></i></span></div><div><b>PLACE FLAGS</b><br>Turn FLAG MODE on, then tap a square you think contains a bomb.</div></div>
+  <div class="help-row"><div class="help-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="#228b22"/><rect x="5" y="5" width="14" height="14" fill="#75d34c"/></svg></div><div><b>WIN</b><br>Reveal every square without a bomb to win.</div></div>
+  <hr><div class="small">TIP: START WITH A CORNER OR AN OPEN AREA.</div><div class="help-footer"><button onclick="closeApp('helpDialog')">OK!</button></div>
+ </div>
+</div>
 
-  <div class="dice-panel">
-   <div class="dice-panel-title">COIN FLIP</div>
-   <div class="coin-area">
-    <div class="coin" id="diceCoin">COIN</div>
-    <div class="coin-result" id="diceCoinResult">READY</div>
+<div class="window" id="calendar">
+ <div class="titlebar" onpointerdown="startDrag(event,'calendar')"><div class="title-name"><span class="title-icon" data-icon="iconCalendar"></span>CALENDAR.EXE</div><div class="title-actions"><button onclick="minimizeApp('calendar')">_</button><button onclick="closeApp('calendar')">×</button></div></div>
+ <div class="content"><div class="calendar-head"><button onclick="changeMonth(-1)">◀</button><strong id="calTitle"></strong><button onclick="changeMonth(1)">▶</button></div><div id="calGrid" class="calendar-grid"></div><hr><div class="row" style="justify-content:space-between"><span id="calToday"></span><button onclick="goToday()">TODAY</button></div></div>
+</div>
+
+<div class="window" id="calc">
+ <div class="titlebar" onpointerdown="startDrag(event,'calc')"><div class="title-name"><span class="title-icon" data-icon="iconCalc"></span>CALCULATOR.EXE</div><div class="title-actions"><button onclick="minimizeApp('calc')">_</button><button onclick="closeCalculator()">×</button></div></div>
+ <div class="window-menu"><span onclick="calcClear()">EDIT</span><span onclick="alert('RETRO PIXEL CALCULATOR')">HELP</span></div>
+ <div class="content"><input class="calc-display" id="calcDisplay" value="0" readonly inputmode="none"><div class="calc-grid">
+  <button onclick="calcClear()">C</button><button onclick="calcBack()">DEL</button><button onclick="calcOp('%')">%</button><button onclick="calcOp('/')">÷</button>
+  <button onclick="calcDigit('7')">7</button><button onclick="calcDigit('8')">8</button><button onclick="calcDigit('9')">9</button><button onclick="calcOp('*')">×</button>
+  <button onclick="calcDigit('4')">4</button><button onclick="calcDigit('5')">5</button><button onclick="calcDigit('6')">6</button><button onclick="calcOp('-')">−</button>
+  <button onclick="calcDigit('1')">1</button><button onclick="calcDigit('2')">2</button><button onclick="calcDigit('3')">3</button><button onclick="calcOp('+')">+</button>
+  <button onclick="calcDigit('0')">0</button><button onclick="calcDigit('.')">.</button><button onclick="calcSign()">±</button><button class="equals" onclick="calcEquals()">=</button>
+ </div><div class="calc-hint">KEYBOARD: 0–9 · + − × ÷ · ENTER</div></div>
+</div>
+
+<div class="window" id="notepad">
+ <div class="titlebar" onpointerdown="startDrag(event,'notepad')"><div class="title-name"><span class="title-icon" data-icon="iconNote"></span>NOTEPAD.EXE</div><div class="title-actions"><button onclick="minimizeApp('notepad')">_</button><button onclick="closeCalculator()">×</button></div></div>
+ <div class="window-menu"><span onclick="noteNew()">FILE</span><span onclick="noteSelectAll()">EDIT</span><span onclick="noteSave()">SAVE</span></div>
+ <div class="content"><div class="note-toolbar"><button onclick="noteNew()">NEW</button><button onclick="noteSelectAll()">SELECT ALL</button><button onclick="noteClear()">CLEAR</button></div><textarea id="noteText" placeholder="Start typing here..." spellcheck="true" inputmode="none" virtualkeyboardpolicy="manual"></textarea><div class="note-status"><span id="noteCount">0 CHARACTERS</span><span>NOTEPAD READY</span></div></div>
+</div>
+
+<div class="window" id="paint">
+ <div class="titlebar" onpointerdown="startDrag(event,'paint')">
+  <div class="title-name"><span class="title-icon" data-icon="iconPaint"></span>PAINT STUDIO.EXE</div>
+  <div class="title-actions"><button onclick="minimizeApp('paint')">_</button><button onclick="closeApp('paint')">×</button></div>
+ </div>
+ <div class="window-menu"><span onclick="paintNew()">FILE</span><span onclick="paintUndo()">UNDO</span><span onclick="paintRedo()">REDO</span><span onclick="paintSave()">SAVE AS</span><span onclick="openSavedPaints()">SAVED</span></div>
+ <div class="content">
+  <div class="paint-toolbar">
+   <button onclick="paintUndo()">↶ UNDO</button><button onclick="paintRedo()">↷ REDO</button>
+   <button onclick="paintClear()">CLEAR</button><button onclick="paintGridToggle()" id="paintGridBtn">GRID: ON</button>
+   <button onclick="paintZoom(-1)">− ZOOM</button><button onclick="paintZoom(1)">+ ZOOM</button>
+   <button onclick="paintSaveToGallery()">SAVE PAINT</button>
+   <button onclick="paintSave()">DOWNLOAD PNG</button>
+   <button onclick="openSavedPaints()">SAVED PAINTS</button>
+  </div>
+  <div class="paint-main">
+   <aside class="paint-side">
+    <div class="paint-section">
+     <span class="paint-label">TOOLS</span>
+     <div class="paint-tools">
+      <button class="active" data-tool="pencil" onclick="paintSetTool('pencil')">PENCIL</button>
+      <button data-tool="eraser" onclick="paintSetTool('eraser')">ERASER</button>
+      <button data-tool="bucket" onclick="paintSetTool('bucket')">BUCKET</button>
+      <button data-tool="eyedrop" onclick="paintSetTool('eyedrop')">PICKER</button>
+      <button data-tool="line" onclick="paintSetTool('line')">LINE</button>
+      <button data-tool="rect" onclick="paintSetTool('rect')">SQUARE</button>
+      <button data-tool="circle" onclick="paintSetTool('circle')">CIRCLE</button>
+     </div>
+    </div>
+    <div class="paint-section">
+     <span class="paint-label">COLORS</span>
+     <div class="paint-palette" id="paintPalette"></div>
+     <hr>
+     <span class="paint-label">CUSTOM COLOR</span>
+     <input id="paintColor" type="color" value="#000080" oninput="paintChooseColor(this.value)">
+     <div class="paint-color-name" id="paintColorName">#000080</div>
+    </div>
+    <div class="paint-section paint-settings">
+     <span class="paint-label">BRUSH SIZE</span>
+     <div class="row">
+      <button onclick="paintSetSize(paintBrush-1)">− SMALLER</button>
+      <button onclick="paintSetSize(paintBrush+1)">+ BIGGER</button>
+     </div>
+     <input type="range" id="paintSize" min="1" max="12" value="1" oninput="paintSetSize(this.value)">
+     <span class="small" id="paintSizeLabel">1 STUD</span>
+     <hr>
+     <span class="paint-label">PAPER STUD RESOLUTION</span>
+     <div class="resolution-buttons">
+      <button onclick="paintChangeResolution(-1)">− LESS</button>
+      <button onclick="paintChangeResolution(1)">+ MORE</button>
+     </div>
+     <div class="resolution-current" id="paintResolutionLabel">40 × 30 STUDS</div>
+     <div class="resolution-warning">MAXIMUM: 1,000 × 750 STUDS</div>
+    </div>
+    <div class="paint-help">BUCKET: TAP ANYWHERE TO FILL THE WHOLE CANVAS WITH YOUR SELECTED COLOR.</div>
+   </aside>
+   <div class="paint-workspace">
+    <div class="paint-info"><span id="paintToolInfo">TOOL: PENCIL</span><span id="paintZoomLabel">ZOOM: 100%</span></div>
+    <div class="paint-canvas-wrap" id="paintCanvasWrap">
+     <canvas id="paintCanvas" width="640" height="480"></canvas>
+    </div>
+    <div class="paint-info"><span id="paintPosition">X: -- Y: --</span><span id="paintStatus">READY</span></div>
+    <div class="paint-bottom"><button onclick="paintNew()">NEW CANVAS</button><button onclick="paintClear()">ERASE ALL</button><button onclick="paintSaveToGallery()">SAVE PAINT</button><button onclick="paintSave()">DOWNLOAD PNG</button><button onclick="openSavedPaints()">SAVED</button></div>
+    <div class="paint-help">PENCIL: DRAW · BUCKET: FILL ALL · PICKER: SAMPLE COLOR · SHAPES: DRAG TO DRAW</div>
    </div>
-   <button class="coin-flip" onclick="flipOnlineCoin()">FLIP COIN</button>
   </div>
  </div>
-`;
-document.body.insertBefore(diceWindow,document.querySelector('.taskbar'));
+</div>
 
-document.getElementById('diceTitleIcon').appendChild(diceTemplate.content.cloneNode(true));
+<div class="window" id="savedPaints">
+ <div class="titlebar" onpointerdown="startDrag(event,'savedPaints')">
+  <div class="title-name"><span class="title-icon" data-icon="iconPaint"></span>SAVED PAINTS</div>
+  <div class="title-actions"><button onclick="minimizeApp('savedPaints')">_</button><button onclick="closeApp('savedPaints')">×</button></div>
+ </div>
+ <div class="content saved-content">
+  <div class="saved-heading">MY PAINT FILES<br><span class="small">YOUR SAVED DRAWINGS ARE STORED ON THIS DEVICE.</span></div>
+  <div id="savedPaintList" class="saved-list"></div>
+  <div class="saved-footer">
+   <button onclick="paintSaveToGallery()">SAVE CURRENT</button>
+   <button onclick="refreshSavedPaints()">REFRESH</button>
+  </div>
+  <div class="small" style="margin-top:8px">TIP: DOWNLOAD PNG TO KEEP A SEPARATE COPY IN YOUR FILES.</div>
+ </div>
+</div>
 
-/* Dice logic */
-const onlineDiceValues=[1,2,3,4];
+<div class="start-menu" id="startMenu">
+ <div class="menu-banner">WINDOWS 98</div>
+ <div class="menu-list">
+  <div class="menu-item" onclick="openApp('mines');toggleMenu()"><span class="pixel-icon" data-icon="iconBomb"></span>MINESWEEPER</div>
+  <div class="menu-item" onclick="openApp('calendar');toggleMenu()"><span class="pixel-icon" data-icon="iconCalendar"></span>CALENDAR</div>
+  <div class="menu-item" onclick="openApp('calc');toggleMenu()"><span class="pixel-icon" data-icon="iconCalc"></span>CALCULATOR</div>
+  <div class="menu-item" onclick="openApp('notepad');toggleMenu()"><span class="pixel-icon" data-icon="iconNote"></span>NOTEPAD</div>
+  <div class="menu-item" onclick="openApp('paint');toggleMenu()"><span class="pixel-icon" data-icon="iconPaint"></span>PAINT STUDIO</div>
+  <hr><div class="menu-item" onclick="toggleSound();toggleMenu()"><span class="pixel-icon" data-icon="iconSound"></span>SOUND ON/OFF</div>
+ </div>
+</div>
 
-function drawOnlineDie(index,value){
- const die=document.getElementById('dice'+index);
- const positions={
-  1:[4],
-  2:[0,8],
-  3:[0,4,8],
-  4:[0,2,6,8],
-  5:[0,2,4,6,8],
-  6:[0,2,3,5,6,8]
+<div class="taskbar">
+ <button class="start-btn" onclick="toggleMenu()"><span class="start-logo" data-icon="iconWindows"></span>START</button>
+ <div class="task-buttons">
+  <button class="taskbtn" onclick="openApp('mines')">MINES</button>
+  <button class="taskbtn" onclick="openApp('calendar')">CALENDAR</button>
+  <button class="taskbtn" onclick="openApp('calc')">CALC</button>
+  <button class="taskbtn" onclick="openApp('notepad')">NOTEPAD</button>
+  <button class="taskbtn" onclick="openApp('paint')">PAINT</button>
+  <button class="taskbtn" onclick="openSavedPaints()">SAVED</button>
+ </div>
+ <div class="clock" id="clock">00:00</div>
+</div>
+
+<script>
+document.querySelectorAll('[data-icon]').forEach(el=>{
+ const t=document.getElementById(el.dataset.icon);
+ if(t)el.appendChild(t.content.cloneNode(true));
+});
+
+function faceSVG(kind='normal'){
+ const mouths={normal:'<rect x="8" y="17" width="8" height="2" fill="#000"/>',sad:'<path d="M7 19 L9 17 L15 17 L17 19" fill="#000"/>',cool:'<rect x="3" y="8" width="7" height="5" fill="#000"/><rect x="14" y="8" width="7" height="5" fill="#000"/><rect x="10" y="9" width="4" height="2" fill="#000"/><rect x="8" y="17" width="8" height="2" fill="#000"/>'};
+ return '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="#ffdf35" stroke="#000" stroke-width="2"/><rect x="6" y="7" width="3" height="4" fill="#000"/><rect x="15" y="7" width="3" height="4" fill="#000"/>'+(mouths[kind]||mouths.normal)+'</svg>';
+}
+
+let zIndex=20,soundOn=true,audioCtx=null;
+function playTone(freq=440,duration=.08,type='square'){
+ if(!soundOn)return;
+ try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.04,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+}
+function toggleSound(){soundOn=!soundOn;playTone(soundOn?660:220,.08)}
+
+function openApp(id){
+ const w=document.getElementById(id);if(!w)return;
+ w.style.display='block';w.style.zIndex=++zIndex;
+ document.getElementById('startMenu').classList.remove('show');
+ if(id==='calendar')renderCalendar();
+ if(id==='mines'&&!mineBoard.length)newMines();
+ if(id==='paint')paintDraw();
+ if(id==='savedPaints')refreshSavedPaints();
+ if(id==='calc'||id==='notepad')positionCalculatorPair();
+}
+function positionCalculatorPair(){
+ const calc=document.getElementById('calc'),note=document.getElementById('notepad');
+ const cw=calc.offsetWidth,nw=note.offsetWidth,gap=8,total=cw+nw+gap;
+ const left=Math.max(2,(innerWidth-total)/2);
+ calc.style.transform='none';note.style.transform='none';
+ calc.style.left=left+'px';note.style.left=(left+cw+gap)+'px';
+ calc.style.top='50%';note.style.top='50%';
+ calc.style.marginTop=innerWidth>=600?'-170px':'-155px';
+ note.style.marginTop=innerWidth>=600?'-170px':'-155px';
+}
+function closeApp(id){const w=document.getElementById(id);if(w)w.style.display='none'}
+function closeCalculator(){closeApp('calc');closeApp('notepad')}
+function minimizeApp(id){closeApp(id)}
+function toggleMenu(){document.getElementById('startMenu').classList.toggle('show')}
+function startDrag(e,id){
+ if(e.target.closest('button'))return;
+ const w=document.getElementById(id);if(!w)return;
+ w.style.zIndex=++zIndex;
+ const r=w.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,ox=r.left,oy=r.top;
+ w.style.transform='none';w.style.marginTop='0';w.style.left=ox+'px';w.style.top=oy+'px';
+ function move(ev){w.style.left=Math.max(0,Math.min(innerWidth-w.offsetWidth,ox+ev.clientX-sx))+'px';w.style.top=Math.max(0,Math.min(innerHeight-45,oy+ev.clientY-sy))+'px'}
+ function end(){document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',end)}
+ document.addEventListener('pointermove',move);document.addEventListener('pointerup',end);e.preventDefault();
+}
+document.addEventListener('pointerdown',e=>{const w=e.target.closest('.window');if(w)w.style.zIndex=++zIndex});
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+updateClock();setInterval(updateClock,1000);
+
+/* CALCULATOR */
+let calcValue='0',calcFirst=null,calcOperator=null,calcReset=false;
+function calcShow(){document.getElementById('calcDisplay').value=calcValue}
+function calcDigit(d){if(calcReset){calcValue='0';calcReset=false}if(d==='.'&&calcValue.includes('.'))return;if(calcValue==='0'&&d!=='.')calcValue=d;else calcValue+=d;calcShow();playTone(500,.025)}
+function calcOp(op){if(calcValue==='ERROR')calcClear();if(calcOperator&&!calcReset)calcEquals();calcFirst=parseFloat(calcValue);calcOperator=op;calcReset=true;playTone(400,.04)}
+function calcEquals(){
+ if(calcOperator===null||calcFirst===null)return;
+ const b=parseFloat(calcValue);let r;
+ switch(calcOperator){case '+':r=calcFirst+b;break;case '-':r=calcFirst-b;break;case '*':r=calcFirst*b;break;case '/':r=b===0?'ERROR':calcFirst/b;break;case '%':r=calcFirst%b;break}
+ calcValue=typeof r==='number'&&Number.isFinite(r)?String(Number(r.toPrecision(10))):String(r);
+ calcOperator=null;calcFirst=null;calcReset=true;calcShow();playTone(700,.1);
+}
+function calcClear(){calcValue='0';calcFirst=null;calcOperator=null;calcReset=false;calcShow()}
+function calcBack(){if(calcValue==='ERROR'){calcClear();return}if(calcReset){calcValue='0';calcReset=false}else calcValue=calcValue.length>1?calcValue.slice(0,-1):'0';calcShow()}
+function calcSign(){if(calcValue!=='0'&&calcValue!=='ERROR')calcValue=String(-parseFloat(calcValue));calcShow()}
+document.addEventListener('keydown',e=>{
+ if(e.target===document.getElementById('noteText'))return;
+ if(document.getElementById('calc').style.display!=='block')return;
+ const k=e.key;
+ if(/^[0-9]$/.test(k)){e.preventDefault();calcDigit(k);return}
+ if(k==='.'){e.preventDefault();calcDigit('.');return}
+ if(['+','-','*','/','%'].includes(k)){e.preventDefault();calcOp(k);return}
+ if(k==='Enter'||k==='='){e.preventDefault();calcEquals();return}
+ if(k==='Backspace'){e.preventDefault();calcBack();return}
+ if(k==='Escape'||k==='Delete'){e.preventDefault();calcClear()}
+});
+
+/* NOTEPAD */
+const noteText=document.getElementById('noteText');
+function updateNoteCount(){document.getElementById('noteCount').textContent=noteText.value.length+' CHARACTERS'}
+noteText.addEventListener('input',updateNoteCount);
+function noteNew(){if(noteText.value.trim()&&!confirm('Create a new note? Current text will be cleared.'))return;noteText.value='';updateNoteCount();noteText.focus()}
+function noteClear(){if(!noteText.value)return;if(confirm('Clear all text?')){noteText.value='';updateNoteCount();noteText.focus()}}
+function noteSelectAll(){noteText.focus();noteText.select()}
+function noteSave(){try{localStorage.setItem('retroNotepadText',noteText.value);alert('NOTE SAVED!')}catch(e){alert('Unable to save note on this browser.')}}
+function loadNote(){try{noteText.value=localStorage.getItem('retroNotepadText')||''}catch(e){}updateNoteCount()}
+loadNote();
+
+/* CALENDAR */
+let calDate=new Date();
+function renderCalendar(){
+ const y=calDate.getFullYear(),m=calDate.getMonth();
+ document.getElementById('calTitle').textContent=calDate.toLocaleDateString(undefined,{month:'short',year:'numeric'}).toUpperCase();
+ document.getElementById('calToday').textContent='TODAY: '+new Date().toLocaleDateString();
+ const grid=document.getElementById('calGrid');grid.innerHTML='';
+ ['SU','MO','TU','WE','TH','FR','SA'].forEach(d=>{const el=document.createElement('div');el.className='dayname';el.textContent=d;grid.appendChild(el)});
+ const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate();
+ for(let i=0;i<42;i++){
+  const el=document.createElement('div');let n,dt;
+  if(i<first){n=prev-first+i+1;el.className='other';dt=new Date(y,m-1,n)}
+  else if(i>=first+days){n=i-first-days+1;el.className='other';dt=new Date(y,m+1,n)}
+  else{n=i-first+1;dt=new Date(y,m,n)}
+  if(dt.toDateString()===new Date().toDateString())el.className='today';
+  el.textContent=n;grid.appendChild(el);
+ }
+}
+function changeMonth(n){calDate.setMonth(calDate.getMonth()+n);renderCalendar()}
+function goToday(){calDate=new Date();renderCalendar()}
+
+/* MINESWEEPER */
+let mineBoard=[],mineRows=9,mineCols=9,mineTotal=10,mineFlags=0,mineSeconds=0;
+let mineStarted=false,mineOver=false,flagMode=false,mineTimer=null;
+function newMines(){
+ clearInterval(mineTimer);mineTimer=null;
+ const d=document.getElementById('mineDifficulty').value;
+ if(d==='easy'){mineRows=9;mineCols=9;mineTotal=10}
+ else if(d==='medium'){mineRows=12;mineCols=12;mineTotal=22}
+ else{mineRows=16;mineCols=16;mineTotal=40}
+ mineBoard=Array.from({length:mineRows*mineCols},()=>({bomb:false,open:false,flag:false,n:0}));
+ mineFlags=0;mineSeconds=0;mineStarted=false;mineOver=false;flagMode=false;
+ document.getElementById('mineFace').innerHTML=faceSVG('normal');
+ document.getElementById('mineStatus').textContent='REVEAL ALL SAFE SQUARES!';
+ document.getElementById('mineTime').textContent='000';
+ document.getElementById('flagButton').innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span> FLAG: OFF';
+ for(let i=0;i<mineTotal;i++){let n;do{n=Math.floor(Math.random()*mineBoard.length)}while(mineBoard[n].bomb);mineBoard[n].bomb=true}
+ for(let i=0;i<mineBoard.length;i++){
+  if(mineBoard[i].bomb)continue;
+  const x=i%mineCols,y=Math.floor(i/mineCols);
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<mineCols&&ny<mineRows&&mineBoard[ny*mineCols+nx].bomb)mineBoard[i].n++}
+ }
+ renderMines();
+}
+function renderMines(){
+ const board=document.getElementById('mineBoard');board.innerHTML='';board.style.gridTemplateColumns=`repeat(${mineCols}, minmax(0,1fr))`;
+ mineBoard.forEach((c,i)=>{
+  const b=document.createElement('button');b.className='mine-cell';
+  if(c.open){b.classList.add('revealed');if(c.bomb)b.innerHTML='<span class="bomb-pixel"></span>';else if(c.n){b.textContent=c.n;b.classList.add('n'+c.n)}}
+  else if(c.flag){b.innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span>';b.classList.add('flagged')}
+  b.setAttribute('aria-label',c.open?(c.bomb?'Bomb':c.n?'Number '+c.n:'Empty'):c.flag?'Flagged square':'Hidden square');
+  b.addEventListener('click',()=>mineClick(i));b.addEventListener('contextmenu',e=>{e.preventDefault();toggleMineFlag(i)});board.appendChild(b);
+ });
+ document.getElementById('mineCount').textContent=String(Math.max(0,mineTotal-mineFlags)).padStart(3,'0');
+}
+function toggleFlagMode(){flagMode=!flagMode;document.getElementById('flagButton').innerHTML='<span class="flag-pixel"><i class="flag-base"></i></span> FLAG: '+(flagMode?'ON':'OFF')}
+function toggleMineFlag(i){if(mineOver||mineBoard[i].open)return;mineBoard[i].flag=!mineBoard[i].flag;mineFlags+=mineBoard[i].flag?1:-1;renderMines();playTone(350,.04)}
+function mineClick(i){
+ if(mineOver)return;const c=mineBoard[i];if(c.open)return;
+ if(flagMode){toggleMineFlag(i);return}if(c.flag)return;
+ if(!mineStarted){mineStarted=true;mineTimer=setInterval(()=>{if(!mineOver){mineSeconds++;document.getElementById('mineTime').textContent=String(Math.min(999,mineSeconds)).padStart(3,'0')}},1000)}
+ if(c.bomb){c.open=true;mineOver=true;clearInterval(mineTimer);mineBoard.forEach(q=>{if(q.bomb)q.open=true});document.getElementById('mineFace').innerHTML=faceSVG('sad');document.getElementById('mineStatus').textContent='BOOM! GAME OVER!';renderMines();playTone(120,.3);return}
+ revealMine(i);
+ if(mineBoard.every(q=>q.bomb||q.open)){mineOver=true;clearInterval(mineTimer);document.getElementById('mineFace').innerHTML=faceSVG('cool');document.getElementById('mineStatus').textContent='YOU WIN! NICE WORK!';playTone(850,.15)}
+ else playTone(500,.025);
+ renderMines();
+}
+function revealMine(i){
+ const c=mineBoard[i];if(!c||c.open||c.flag||c.bomb)return;c.open=true;
+ if(c.n===0){const x=i%mineCols,y=Math.floor(i/mineCols);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<mineCols&&ny<mineRows)revealMine(ny*mineCols+nx)}}
+}
+function openMineHelp(){openApp('helpDialog')}
+
+/* PAINT STUDIO WITH UP TO 1,000 x 750 STUDS */
+let PAINT_COLS=40,PAINT_ROWS=30;
+const STUD=16;
+const paintCanvas=document.getElementById('paintCanvas');
+const paintCtx=paintCanvas.getContext('2d',{alpha:false});
+let paintPixels=Array(PAINT_COLS*PAINT_ROWS).fill('#ffffff');
+let paintColor='#000080',paintTool='pencil',paintBrush=1,paintGrid=true,paintZoomLevel=100;
+let paintDrawing=false,paintStart=null,paintLast=null,paintPreview=null;
+let paintUndoStack=[],paintRedoStack=[],paintHistoryLimit=35;
+
+const paintResolutions=[
+ {cols:40,rows:30},
+ {cols:100,rows:75},
+ {cols:200,rows:150},
+ {cols:400,rows:300},
+ {cols:600,rows:450},
+ {cols:800,rows:600},
+ {cols:1000,rows:750}
+];
+let paintResolutionIndex=0;
+
+const paintPaletteColors=[
+ '#000000','#444444','#888888','#cccccc','#ffffff',
+ '#7f0000','#ff0000','#ff7777','#ff8800','#ffcc00',
+ '#777700','#00aa00','#00ff00','#008080','#00cccc',
+ '#000080','#0000ff','#6699ff','#800080','#ff00ff',
+ '#663300','#aa6633','#ddaa77','#ffcccc'
+];
+
+function paintInit(){
+ const palette=document.getElementById('paintPalette');palette.innerHTML='';
+ paintPaletteColors.forEach(color=>{
+  const b=document.createElement('button');b.className='paint-swatch';b.style.background=color;
+  b.title=color;b.setAttribute('aria-label','Select '+color);
+  b.addEventListener('click',()=>paintChooseColor(color));
+  palette.appendChild(b);
+ });
+ paintSetTool('pencil');paintChooseColor(paintColor);
+ paintUndoStack=[paintPixels.slice()];paintDraw();
+ paintUpdateResolutionLabel();
+ refreshSavedPaints();
+}
+function paintChooseColor(color){
+ paintColor=color.toLowerCase();
+ document.getElementById('paintColor').value=paintColor;
+ document.getElementById('paintColorName').textContent=paintColor.toUpperCase();
+ document.querySelectorAll('.paint-swatch').forEach(b=>b.classList.toggle('active',b.title.toLowerCase()===paintColor));
+}
+function paintSetTool(tool){
+ paintTool=tool;
+ document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));
+ document.getElementById('paintToolInfo').textContent='TOOL: '+tool.toUpperCase();
+}
+function paintSetSize(value){
+ paintBrush=Math.max(1,Math.min(12,Number(value)||1));
+ document.getElementById('paintSize').value=paintBrush;
+ document.getElementById('paintSizeLabel').textContent=paintBrush+' STUD'+(paintBrush>1?'S':'');
+ paintStatus('BRUSH SIZE: '+paintBrush);
+}
+function paintSaveHistory(){
+ paintUndoStack.push(paintPixels.slice());
+ if(paintUndoStack.length>paintHistoryLimit)paintUndoStack.shift();
+ paintRedoStack=[];
+}
+function paintUndo(){
+ if(paintUndoStack.length<=1)return;
+ paintRedoStack.push(paintUndoStack.pop());
+ paintPixels=paintUndoStack[paintUndoStack.length-1].slice();
+ paintDraw();paintStatus('UNDO');
+}
+function paintRedo(){
+ if(!paintRedoStack.length)return;
+ const next=paintRedoStack.pop();paintUndoStack.push(next.slice());
+ paintPixels=next.slice();paintDraw();paintStatus('REDO');
+}
+function paintStatus(message){document.getElementById('paintStatus').textContent=message}
+
+/* Resize the canvas resolution while preserving the drawing */
+function paintResample(oldPixels,oldCols,oldRows,newCols,newRows){
+ const next=new Array(newCols*newRows);
+ for(let y=0;y<newRows;y++){
+  const sourceY=Math.min(oldRows-1,Math.floor(y*oldRows/newRows));
+  for(let x=0;x<newCols;x++){
+   const sourceX=Math.min(oldCols-1,Math.floor(x*oldCols/newCols));
+   next[y*newCols+x]=oldPixels[sourceY*oldCols+sourceX]||'#ffffff';
+  }
+ }
+ return next;
+}
+function paintUpdateResolutionLabel(){
+ document.getElementById('paintResolutionLabel').textContent=
+  PAINT_COLS.toLocaleString()+' × '+PAINT_ROWS.toLocaleString()+' STUDS';
+}
+function paintChangeResolution(direction){
+ const nextIndex=Math.max(0,Math.min(paintResolutions.length-1,paintResolutionIndex+direction));
+ if(nextIndex===paintResolutionIndex){
+  paintStatus(direction>0?'MAXIMUM RESOLUTION':'MINIMUM RESOLUTION');
+  return;
+ }
+ const next=paintResolutions[nextIndex];
+ const newCount=next.cols*next.rows;
+ if(newCount>400000&& !confirm('This resolution uses a lot of memory. Continue?'))return;
+
+ paintPixels=paintResample(paintPixels,PAINT_COLS,PAINT_ROWS,next.cols,next.rows);
+ PAINT_COLS=next.cols;
+ PAINT_ROWS=next.rows;
+ paintResolutionIndex=nextIndex;
+
+ paintUndoStack=[paintPixels.slice()];
+ paintRedoStack=[];
+ paintPreview=null;
+ paintStart=null;
+ paintLast=null;
+ paintDrawing=false;
+
+ paintUpdateResolutionLabel();
+ paintDraw();
+ paintStatus('RESOLUTION: '+PAINT_COLS+' × '+PAINT_ROWS);
+}
+
+/* Render logical studs into the fixed-size display canvas */
+function paintDraw(){
+ const w=paintCanvas.width,h=paintCanvas.height;
+ const cw=w/PAINT_COLS,ch=h/PAINT_ROWS;
+
+ paintCtx.fillStyle='#ffffff';
+ paintCtx.fillRect(0,0,w,h);
+
+ for(let y=0;y<PAINT_ROWS;y++){
+  for(let x=0;x<PAINT_COLS;x++){
+   paintCtx.fillStyle=paintPixels[y*PAINT_COLS+x]||'#ffffff';
+   paintCtx.fillRect(x*cw,y*ch,Math.ceil(cw)+.2,Math.ceil(ch)+.2);
+  }
+ }
+
+ if(paintGrid&&PAINT_COLS<=400){
+  paintCtx.beginPath();
+  paintCtx.strokeStyle='rgba(0,0,0,.22)';
+  paintCtx.lineWidth=1;
+  for(let x=0;x<=PAINT_COLS;x++){
+   const px=x*cw;
+   paintCtx.moveTo(px+.5,0);
+   paintCtx.lineTo(px+.5,h);
+  }
+  for(let y=0;y<=PAINT_ROWS;y++){
+   const py=y*ch;
+   paintCtx.moveTo(0,py+.5);
+   paintCtx.lineTo(w,py+.5);
+  }
+  paintCtx.stroke();
+ }
+
+ if(paintPreview&&paintStart){
+  paintCtx.save();
+  paintCtx.globalAlpha=.8;
+  paintCtx.fillStyle=paintColor;
+  paintCtx.strokeStyle=paintColor;
+  paintCtx.lineWidth=Math.max(cw,ch)*paintBrush;
+  paintCtx.lineCap='square';
+  const a=paintStart,b=paintPreview;
+  if(paintTool==='line'){
+   paintCtx.beginPath();
+   paintCtx.moveTo((a.x+.5)*cw,(a.y+.5)*ch);
+   paintCtx.lineTo((b.x+.5)*cw,(b.y+.5)*ch);
+   paintCtx.stroke();
+  }else if(paintTool==='rect'){
+   paintCtx.fillRect(Math.min(a.x,b.x)*cw,Math.min(a.y,b.y)*ch,
+    (Math.abs(a.x-b.x)+1)*cw,(Math.abs(a.y-b.y)+1)*ch);
+  }else if(paintTool==='circle'){
+   const cx=(a.x+b.x+1)/2*cw,cy=(a.y+b.y+1)/2*ch;
+   const rx=(Math.abs(a.x-b.x)+1)*cw/2,ry=(Math.abs(a.y-b.y)+1)*ch/2;
+   paintCtx.beginPath();paintCtx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);paintCtx.stroke();
+  }
+  paintCtx.restore();
+ }
+}
+function paintGetCell(e){
+ const r=paintCanvas.getBoundingClientRect();
+ const x=Math.floor((e.clientX-r.left)/r.width*PAINT_COLS);
+ const y=Math.floor((e.clientY-r.top)/r.height*PAINT_ROWS);
+ if(x<0||y<0||x>=PAINT_COLS||y>=PAINT_ROWS)return null;
+ return{x,y};
+}
+function paintInside(x,y){return x>=0&&y>=0&&x<PAINT_COLS&&y<PAINT_ROWS}
+function paintCell(x,y,color,size=1){
+ const offset=Math.floor((size-1)/2);
+ for(let yy=y-offset;yy<y-offset+size;yy++)
+  for(let xx=x-offset;xx<x-offset+size;xx++)
+   if(paintInside(xx,yy))paintPixels[yy*PAINT_COLS+xx]=color;
+}
+function paintLineCells(a,b,color,size=1){
+ let x0=a.x,y0=a.y,x1=b.x,y1=b.y;
+ const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;
+ let err=dx+dy;
+ while(true){
+  paintCell(x0,y0,color,size);
+  if(x0===x1&&y0===y1)break;
+  const e2=2*err;
+  if(e2>=dy){err+=dy;x0+=sx}
+  if(e2<=dx){err+=dx;y0+=sy}
+ }
+}
+function paintShape(a,b,tool){
+ if(tool==='line'){paintLineCells(a,b,paintColor,paintBrush);return}
+ if(tool==='rect'){
+  for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){
+   paintCell(x,a.y,paintColor,paintBrush);
+   paintCell(x,b.y,paintColor,paintBrush);
+  }
+  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++){
+   paintCell(a.x,y,paintColor,paintBrush);
+   paintCell(b.x,y,paintColor,paintBrush);
+  }
+  return;
+ }
+ if(tool==='circle'){
+  const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;
+  const rx=Math.max(.5,Math.abs(a.x-b.x)/2),ry=Math.max(.5,Math.abs(a.y-b.y)/2);
+  for(let y=Math.min(a.y,b.y);y<=Math.max(a.y,b.y);y++)
+   for(let x=Math.min(a.x,b.x);x<=Math.max(a.x,b.x);x++){
+    const d=Math.pow((x-cx)/rx,2)+Math.pow((y-cy)/ry,2);
+    if(Math.abs(d-1)<Math.max(.2,.8/Math.max(rx,ry)))
+     paintCell(x,y,paintColor,paintBrush);
+   }
+ }
+}
+function paintStartDraw(e){
+ if(e.button!==undefined&&e.button!==0)return;
+ const cell=paintGetCell(e);if(!cell)return;
+ if(paintTool==='bucket'){
+  if(paintPixels.every(color=>color===paintColor)){paintStatus('ALREADY THIS COLOR');return}
+  paintSaveHistory();
+  paintPixels.fill(paintColor);
+  paintDraw();paintStatus('WHOLE CANVAS FILLED');
+  return;
+ }
+ if(paintTool==='eyedrop'){
+  paintChooseColor(paintPixels[cell.y*PAINT_COLS+cell.x]);
+  paintStatus('COLOR PICKED');return;
+ }
+ paintDrawing=true;paintStart=cell;paintLast=cell;paintPreview=cell;
+ if(paintTool==='pencil'||paintTool==='eraser'){
+  paintSaveHistory();
+  paintCell(cell.x,cell.y,paintTool==='eraser'?'#ffffff':paintColor,paintBrush);
+  paintDraw();
+ }
+ paintCanvas.setPointerCapture?.(e.pointerId);
+ e.preventDefault();
+}
+function paintMoveDraw(e){
+ const cell=paintGetCell(e);
+ if(cell)document.getElementById('paintPosition').textContent='X: '+(cell.x+1)+' Y: '+(cell.y+1);
+ if(!paintDrawing||!cell)return;
+ if(paintTool==='pencil'||paintTool==='eraser'){
+  paintLineCells(paintLast,cell,paintTool==='eraser'?'#ffffff':paintColor,paintBrush);
+  paintLast=cell;paintDraw();
+ }else{
+  paintPreview=cell;paintDraw();
+ }
+}
+function paintEndDraw(e){
+ if(!paintDrawing)return;
+ const cell=paintGetCell(e)||paintPreview||paintStart;
+ if(['line','rect','circle'].includes(paintTool)){
+  paintSaveHistory();
+  paintShape(paintStart,cell,paintTool);
+  paintDraw();
+ }
+ paintDrawing=false;paintStart=null;paintLast=null;paintPreview=null;
+ paintStatus('READY');
+}
+paintCanvas.addEventListener('pointerdown',paintStartDraw);
+paintCanvas.addEventListener('pointermove',paintMoveDraw);
+paintCanvas.addEventListener('pointerup',paintEndDraw);
+paintCanvas.addEventListener('pointercancel',paintEndDraw);
+
+function paintClear(){
+ if(!confirm('Clear the entire canvas?'))return;
+ paintSaveHistory();paintPixels.fill('#ffffff');paintDraw();paintStatus('CANVAS CLEARED');
+}
+function paintNew(){
+ if(!confirm('Start a new blank canvas?'))return;
+ paintSaveHistory();paintPixels.fill('#ffffff');paintDraw();paintStatus('NEW CANVAS');
+}
+function paintGridToggle(){
+ paintGrid=!paintGrid;
+ document.getElementById('paintGridBtn').textContent='GRID: '+(paintGrid?'ON':'OFF');
+ paintDraw();
+}
+function paintZoom(direction){
+ paintZoomLevel=Math.max(50,Math.min(200,paintZoomLevel+direction*25));
+ paintCanvas.style.width=(640*paintZoomLevel/100)+'px';
+ paintCanvas.style.height=(480*paintZoomLevel/100)+'px';
+ document.getElementById('paintZoomLabel').textContent='ZOOM: '+paintZoomLevel+'%';
+ paintDraw();
+}
+
+/* EXPORT PNG AT ONE PIXEL PER STUD */
+function paintPixelsToPNG(pixels,cols,rows,showGrid){
+ const out=document.createElement('canvas');
+ out.width=cols;
+ out.height=rows;
+ const c=out.getContext('2d',{alpha:false});
+ const image=c.createImageData(cols,rows);
+ for(let i=0;i<cols*rows;i++){
+  const hex=(pixels[i]||'#ffffff').replace('#','');
+  const value=parseInt(hex,16);
+  const p=i*4;
+  image.data[p]=(value>>16)&255;
+  image.data[p+1]=(value>>8)&255;
+  image.data[p+2]=value&255;
+  image.data[p+3]=255;
+ }
+ c.putImageData(image,0,0);
+ if(showGrid&&cols<=400){
+  c.strokeStyle='rgba(0,0,0,.22)';
+  c.lineWidth=1;
+  for(let x=0;x<=cols;x++){c.beginPath();c.moveTo(x+.5,0);c.lineTo(x+.5,rows);c.stroke()}
+  for(let y=0;y<=rows;y++){c.beginPath();c.moveTo(0,y+.5);c.lineTo(cols,y+.5);c.stroke()}
+ }
+ return out;
+}
+function paintMakePNG(){
+ return paintPixelsToPNG(paintPixels,PAINT_COLS,PAINT_ROWS,paintGrid);
+}
+function paintSave(){
+ const out=paintMakePNG();
+ const link=document.createElement('a');
+ link.download='paint-studio-'+PAINT_COLS+'x'+PAINT_ROWS+'.png';
+ link.href=out.toDataURL('image/png');
+ document.body.appendChild(link);link.click();link.remove();
+ paintStatus('PNG DOWNLOADED');
+}
+
+/* SAVE PAINTINGS IN THE PHONE BROWSER */
+const PAINT_STORAGE_KEY='retroPixelSavedPaintsV1';
+function paintGetSaved(){
+ try{return JSON.parse(localStorage.getItem(PAINT_STORAGE_KEY)||'[]')}
+ catch(e){return []}
+}
+function paintWriteSaved(items){
+ try{
+  localStorage.setItem(PAINT_STORAGE_KEY,JSON.stringify(items));
+  return true;
+ }catch(e){
+  alert('Storage is full or unavailable. Download the PNG to keep your painting.');
+  return false;
+ }
+}
+function paintSaveToGallery(){
+ const name=prompt('NAME YOUR PAINTING:','MY PIXEL ART');
+ if(name===null)return;
+ const cleanName=name.trim()||'UNTITLED PAINT';
+ const items=paintGetSaved();
+ const entry={
+  id:Date.now().toString()+'-'+Math.random().toString(36).slice(2,8),
+  name:cleanName,
+  pixels:paintPixels.slice(),
+  cols:PAINT_COLS,
+  rows:PAINT_ROWS,
+  stud:STUD,
+  grid:paintGrid,
+  date:new Date().toLocaleString()
  };
- die.innerHTML='';
- const face=document.createElement('div');
- face.className='dice-face';
- for(let i=0;i<9;i++){
-  const dot=document.createElement('span');
-  if(positions[value].includes(i))dot.className='dice-dot';
-  face.appendChild(dot);
+ items.unshift(entry);
+ if(!paintWriteSaved(items))return;
+ paintStatus('SAVED TO GALLERY');
+ refreshSavedPaints();
+ openSavedPaints();
+}
+function openSavedPaints(){
+ const w=document.getElementById('savedPaints');
+ w.style.display='block';w.style.zIndex=++zIndex;
+ refreshSavedPaints();
+ const p=document.getElementById('paint');
+ if(p.style.display==='block'&&innerWidth>850){
+  const pr=p.getBoundingClientRect();
+  const sw=w.offsetWidth;
+  let left=pr.right+8;
+  if(left+sw>innerWidth)left=Math.max(4,innerWidth-sw-5);
+  w.style.left=left+'px';
+  w.style.top=Math.max(40,Math.min(innerHeight-w.offsetHeight-45,pr.top))+'px';
+  w.style.transform='none';
+ }else{
+  w.style.left='50%';w.style.top='50%';w.style.transform='translate(-50%,-50%)';
  }
- const label=document.createElement('span');
- label.className='dice-label';
- label.textContent=value;
- die.append(face,label);
 }
-function rollOnlineDice(){
- for(let i=0;i<4;i++){
-  onlineDiceValues[i]=Math.floor(Math.random()*6)+1;
-  drawOnlineDie(i,onlineDiceValues[i]);
+function paintEntryToDataURL(item){
+ const cols=Number(item.cols)||40;
+ const rows=Number(item.rows)||30;
+ const pixels=Array.isArray(item.pixels)?item.pixels:[];
+ const safePixels=pixels.length===cols*rows?pixels:Array(cols*rows).fill('#ffffff');
+ const canvas=paintPixelsToPNG(safePixels,cols,rows,item.grid!==false);
+ return canvas.toDataURL('image/png');
+}
+function refreshSavedPaints(){
+ const list=document.getElementById('savedPaintList');
+ if(!list)return;
+ const items=paintGetSaved();
+ list.innerHTML='';
+ if(!items.length){
+  list.innerHTML='<div class="saved-empty">NO SAVED PAINTINGS YET.<br><br>DRAW SOMETHING AND PRESS SAVE PAINT.</div>';
+  return;
  }
- playTone(650,.08);
+ items.forEach(item=>{
+  const row=document.createElement('div');row.className='saved-item';
+  const img=document.createElement('img');img.className='saved-thumb';img.alt='Painting preview';
+  img.src=paintEntryToDataURL(item);
+  const info=document.createElement('div');
+  const name=document.createElement('div');name.className='saved-name';name.textContent=item.name;
+  const date=document.createElement('div');date.className='saved-date';
+  date.textContent=(item.cols||40)+' × '+(item.rows||30)+' STUDS · '+(item.date||'SAVED PAINT');
+  const actions=document.createElement('div');actions.className='saved-actions';
+  const open=document.createElement('button');open.textContent='OPEN';open.onclick=()=>paintLoadSaved(item.id);
+  const download=document.createElement('button');download.textContent='PNG';download.onclick=()=>paintDownloadSaved(item.id);
+  const del=document.createElement('button');del.textContent='DELETE';del.onclick=()=>paintDeleteSaved(item.id);
+  actions.append(open,download,del);info.append(name,date,actions);row.append(img,info);list.appendChild(row);
+ });
 }
-function changeDiceCounter(amount){
- const type=document.getElementById('diceCounterSelect').value;
- const el=document.getElementById(type==='wins'?'diceWins':'diceLosses');
- const next=Math.max(0,Number(el.textContent)+amount);
- el.textContent=next;
- playTone(500,.04);
+function paintLoadSaved(id){
+ const item=paintGetSaved().find(p=>p.id===id);
+ if(!item)return;
+ if(!confirm('OPEN THIS PAINTING? Your current canvas will be replaced.'))return;
+ const cols=Number(item.cols)||40;
+ const rows=Number(item.rows)||30;
+ if(cols>1000||rows>750||cols<1||rows<1){
+  alert('This saved painting has an invalid resolution.');
+  return;
+ }
+ const targetIndex=paintResolutions.findIndex(r=>r.cols===cols&&r.rows===rows);
+ paintSaveHistory();
+ PAINT_COLS=cols;
+ PAINT_ROWS=rows;
+ paintResolutionIndex=targetIndex>=0?targetIndex:0;
+ const oldPixels=Array.isArray(item.pixels)?item.pixels:[];
+ paintPixels=oldPixels.length===cols*rows?oldPixels.slice():Array(cols*rows).fill('#ffffff');
+ paintGrid=item.grid!==false;
+ document.getElementById('paintGridBtn').textContent='GRID: '+(paintGrid?'ON':'OFF');
+ paintUpdateResolutionLabel();
+ paintDraw();
+ paintUndoStack=[paintPixels.slice()];
+ paintRedoStack=[];
+ closeApp('savedPaints');
+ openApp('paint');
+ paintStatus('PAINTING OPENED');
 }
-function resetDiceCounters(){
- document.getElementById('diceWins').textContent='0';
- document.getElementById('diceLosses').textContent='0';
- playTone(300,.08);
+function paintDownloadSaved(id){
+ const item=paintGetSaved().find(p=>p.id===id);
+ if(!item)return;
+ const link=document.createElement('a');
+ link.href=paintEntryToDataURL(item);
+ link.download=(item.name||'saved-paint').replace(/[^\w\-]+/g,'-')+'.png';
+ document.body.appendChild(link);link.click();link.remove();
+}
+function paintDeleteSaved(id){
+ if(!confirm('DELETE THIS SAVED PAINTING?'))return;
+ const items=paintGetSaved().filter(p=>p.id!==id);
+ if(paintWriteSaved(items))refreshSavedPaints();
 }
 
-/* Coin flip */
-function flipOnlineCoin(){
- const heads=Math.random()<.5;
- const coin=document.getElementById('diceCoin');
- const result=document.getElementById('diceCoinResult');
- coin.textContent=heads?'HEADS':'TAILS';
- result.textContent=heads?'HEADS':'TAILS';
- coin.style.background=heads
-  ?'linear-gradient(135deg,#ffe875,#c58b14)'
-  :'linear-gradient(135deg,#d8d8d8,#777)';
- playTone(heads?700:400,.12);
-}
-
-/* Initial display */
-rollOnlineDice();
+/* INITIALIZE */
+newMines();renderCalendar();calcShow();paintInit();
 </script>
+</body>
+</html>
